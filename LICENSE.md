@@ -1,1 +1,1 @@
-LICENSE.md
+lgpl-3.0.md
