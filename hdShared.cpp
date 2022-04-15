@@ -15,26 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "hdShared.hpp"
 #include "hdApp.hpp"
-#include "hdSplashScene.hpp"
-
-
-
-
-void printVersions(){
-    SDL_version sdlver;
-    SDL_GetVersion(&sdlver);
-    printf("SDL v%d.%d.%d\n",sdlver.major,sdlver.minor,sdlver.patch);
+hd::Shared::Surface
+hd::Shared::makeSurface (const char *path)
+{
+  SDL_Surface *surface = IMG_Load (path);
+  if (surface == NULL)
+    {
+      return nullptr;
+    }
+  return Surface (surface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
 }
 
-int main(int argc, char **argv)
+hd::Shared::Texture
+hd::Shared::makeTexture (const char *path, SDL_Renderer *r)
 {
-    hd::App app;
-    hd::SplashScene splash;
-    if(app.startup()){
-        app.setScene(&splash);
-        app.frameLoop();
-        app.shutdown();
-    };
-    return 0;
+  SDL_Surface *surface = IMG_Load (path);
+  if (surface == NULL)
+    {
+      App::printSdlError ();
+      return nullptr;
+    }
+  SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
+  SDL_FreeSurface (surface);
+  if (texture == NULL)
+    {
+      App::printSdlError ();
+
+      return nullptr;
+    }
+  return Texture (texture, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
 }

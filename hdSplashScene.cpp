@@ -15,26 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdApp.hpp"
+
 #include "hdSplashScene.hpp"
-
-
-
-
-void printVersions(){
-    SDL_version sdlver;
-    SDL_GetVersion(&sdlver);
-    printf("SDL v%d.%d.%d\n",sdlver.major,sdlver.minor,sdlver.patch);
+bool
+hd::SplashScene::load (SDL_Renderer *r)
+{
+  splash = Shared::makeTexture ("splash.bmp", r);
+  if (splash != NULL)
+    {
+      return true;
+    }
+  else
+    {
+      return false;
+    }
+}
+void
+hd::SplashScene::unload ()
+{
+  if (splash != NULL)
+    {
+      splash = nullptr;
+      splash = NULL;
+    }
 }
 
-int main(int argc, char **argv)
+void
+hd::SplashScene::render (SDL_Renderer *r)
 {
-    hd::App app;
-    hd::SplashScene splash;
-    if(app.startup()){
-        app.setScene(&splash);
-        app.frameLoop();
-        app.shutdown();
-    };
-    return 0;
+  SDL_Rect dstBox = { 0, 0};
+  SDL_GetRendererOutputSize (r, &dstBox.w, &dstBox.h);
+  printf("dstBox@(%d,%d)of(%d,%d)\n",dstBox.x,dstBox.y,dstBox.w,dstBox.h);
+  SDL_RenderCopy (r, splash.get(), NULL, &dstBox);
 }

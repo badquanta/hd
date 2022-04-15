@@ -1,3 +1,4 @@
+#pragma once
 /**
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
@@ -15,26 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdApp.hpp"
-#include "hdSplashScene.hpp"
+#include "hdScene.hpp"
+#include <memory>
+#include <stdio.h>
 
-
-
-
-void printVersions(){
-    SDL_version sdlver;
-    SDL_GetVersion(&sdlver);
-    printf("SDL v%d.%d.%d\n",sdlver.major,sdlver.minor,sdlver.patch);
-}
-
-int main(int argc, char **argv)
+namespace hd
 {
-    hd::App app;
-    hd::SplashScene splash;
-    if(app.startup()){
-        app.setScene(&splash);
-        app.frameLoop();
-        app.shutdown();
-    };
-    return 0;
-}
+  /**
+   *
+   */
+  class App
+  {
+public:
+    App ();
+    ~App ();
+    bool startup ();
+    void shutdown ();
+    void frameLoop ();
+    void setScene (Scene *);
+    static void printSdlError (const char *msg = NULL);
+
+private:
+    int handleEvents ();
+
+    Scene *currentScene;
+    FPSmanager fpsMan;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    bool quit = false;
+  };
+} // namespace hd
