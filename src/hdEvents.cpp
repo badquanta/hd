@@ -35,7 +35,7 @@ namespace hd
         **/
       namespace key
       {
-        SDL_Keycode
+        int
         CodePolicy::getEvent (const SDL_Event &e)
         {
           return e.key.keysym.sym;

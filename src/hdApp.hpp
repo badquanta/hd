@@ -46,8 +46,12 @@ public:
     /** Print out what went wrong with SDL2.
      * \deprecated someone else should just do this. **/
     static void printSdlError (const char *msg = NULL);
+    /** Callback list for any/all events. **/
+    sdl::event::List on;
     /** Event Type Dispatcher **/
-    sdl::event::TypeDispatcher on;
+    sdl::event::TypeDispatcher onType;
+    /** Event Dispatcher for KEY{UP,DOWN} events by Key Code. **/
+    sdl::event::key::CodeDispatcher onKey;
 
 private:
     /** Ensure we are responsive to changes to our environment. */

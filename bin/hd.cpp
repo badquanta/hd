@@ -37,6 +37,7 @@ int main(int argc, char **argv)
   hd::SplashScene splash;
   if (app.startup ())
     {
+      app.onKey.appendListener(SDLK_UP, [](const SDL_Event&e){printf("Got Up key.\n");});
       app.setScene (&splash);
       app.frameLoop ();
       app.shutdown ();

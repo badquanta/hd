@@ -25,6 +25,10 @@ namespace hd
   {
     namespace event
     {
+
+      class List : public eventpp::CallbackList<void (const SDL_Event &)>
+      {
+      };
       template <typename BASE> class CallableDispatcher : public BASE
       {
     public:
@@ -59,14 +63,14 @@ namespace hd
         /** Policy for SDL_KEY{DOWN,UP} **/
         struct CodePolicy
         {
-          static SDL_Keycode getEvent (const SDL_Event &e);
+          static int getEvent (const SDL_Event &e);
           using Mixins
               = eventpp::MixinList<eventpp::MixinFilter, CallableDispatcher>;
         };
         /** dispatcher for SDL_KEY{DOWN,UP} KeySyms **/
         class CodeDispatcher
             : public eventpp::EventDispatcher<
-                  SDL_Keycode, void (const SDL_Event &e), CodePolicy>
+                  int, void (const SDL_Event &e), CodePolicy>
         {
       public:
           CodeDispatcher ();

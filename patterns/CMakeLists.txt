@@ -1,1 +1,1 @@
-configure_file(splash.bmp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/splash.bmp COPYONLY)
+configure_file(splash.bmp splash.bmp COPYONLY)

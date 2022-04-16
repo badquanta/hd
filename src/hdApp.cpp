@@ -22,7 +22,11 @@ namespace hd
 {
   /** Some boring details about how to construct an application. **/
   App::App () {
-    on.appendListener (SDL_QUIT, [this] (const SDL_Event &e) { quit = true; });
+    on.append (onType);
+    onType.appendListener (SDL_QUIT,
+                           [this] (const SDL_Event &e) { quit = true; });
+    onType.appendListener (SDL_KEYUP, onKey);
+    onType.appendListener (SDL_KEYDOWN, onKey);
   }
   /** **/
   App::~App () {}
@@ -63,7 +67,7 @@ namespace hd
     while (SDL_PollEvent (&e) != 0)
       {
         //on.dispatch (e);
-        on (e);
+        onType (e);
         // switch (e.type)
         //   {
         //   case SDL_QUIT:
