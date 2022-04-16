@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hdScene.hpp"
-#include <memory>
 #include <stdio.h>
 
 namespace hd
