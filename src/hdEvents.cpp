@@ -18,26 +18,36 @@
  */
 namespace hd
 {
-
-  int
-  SDL_EventPolicies::getEvent (const SDL_Event &e)
+  namespace sdl
   {
-    return e.type;
-  }
-/*
-  void SDL_EventTypeDispatcher::operator() (const SDL_Event &e){
-    dispatch (e);
-  }
-  **/
+    namespace event
+    {
+      int
+      TypeDispatchPolicy::getEvent (const SDL_Event &e)
+      {
+        return e.type;
+      }
 
-  SDL_Keycode
-  SDL_EventKeySymPolicies::getEvent (const SDL_Event &e)
-  {
-    return e.key.keysym.sym;
-  }
-  SDL_EventKeyDispatcher::SDL_EventKeyDispatcher(){
-    this->appendFilter ([] (const SDL_Event &e) -> bool {
-      return ((e.type == SDL_KEYDOWN)) || ((e.type == SDL_KEYUP));
-    });
-  }
+      /*
+        void TypeDispatcher::operator() (const SDL_Event &e){
+          dispatch (e);
+        }
+        **/
+      namespace key
+      {
+        SDL_Keycode
+        CodePolicy::getEvent (const SDL_Event &e)
+        {
+          return e.key.keysym.sym;
+        }
+        CodeDispatcher::CodeDispatcher ()
+        {
+          this->appendFilter ([] (const SDL_Event &e) -> bool {
+            return ((e.type == SDL_KEYDOWN)) || ((e.type == SDL_KEYUP));
+          });
+        }
+      } // namespace key
+    }   // namespace event
+  }     // namespace sdl
+
 } // namespace hd

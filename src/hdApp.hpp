@@ -47,7 +47,7 @@ public:
      * \deprecated someone else should just do this. **/
     static void printSdlError (const char *msg = NULL);
     /** Event Type Dispatcher **/
-    SDL_EventTypeDispatcher on;
+    sdl::event::TypeDispatcher on;
 
 private:
     /** Ensure we are responsive to changes to our environment. */
