@@ -16,9 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hdScene.hpp"
-
-void
-hd::Scene::handleEvent (SDL_Event &e)
+namespace hd
 {
-  return;
-}
+  void
+  Scene::handleEvent (SDL_Event &e)
+  {
+    return;
+  }
+} // namespace hd

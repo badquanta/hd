@@ -27,11 +27,13 @@ namespace hd
   {
 
 protected:
-
 public:
+    /** \pure **/
     virtual bool load (SDL_Renderer *renderer) = 0;
+    /** \pure **/
     virtual void unload () = 0;
+    /** \pure **/
     virtual void render (SDL_Renderer *r) = 0;
     virtual void handleEvent (SDL_Event &e);
   };
-}
+} // namespace hd

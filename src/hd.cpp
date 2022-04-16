@@ -20,21 +20,26 @@
 
 
 
-
+void printVersion( const SDL_version*v ,const char* of = "SDL"){
+  printf ("%s version %d.%d.%d\n", of, v->major, v->minor, v->patch);
+}
 void printVersions(){
     SDL_version sdlver;
-    SDL_GetVersion(&sdlver);
-    printf("SDL v%d.%d.%d\n",sdlver.major,sdlver.minor,sdlver.patch);
+    SDL_GetVersion(&sdlver);    
+    printVersion (&sdlver);
+    printVersion (IMG_Linked_Version(), "SDL_image");
 }
 
 int main(int argc, char **argv)
 {
-    hd::App app;
-    hd::SplashScene splash;
-    if(app.startup()){
-        app.setScene(&splash);
-        app.frameLoop();
-        app.shutdown();
+  printVersions ();
+  hd::App app;
+  hd::SplashScene splash;
+  if (app.startup ())
+    {
+      app.setScene (&splash);
+      app.frameLoop ();
+      app.shutdown ();
     };
     return 0;
 }

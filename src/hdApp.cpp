@@ -17,119 +17,129 @@
  */
 #include "hdApp.hpp"
 
-//hd::Scene::Scene (SDL_Renderer *r) : renderer (r) {}
-
-
-hd::App::App () {}
-
-hd::App::~App () {}
-
-void
-hd::App::setScene (Scene *s)
+// Scene::Scene (SDL_Renderer *r) : renderer (r) {}
+namespace hd
 {
-  currentScene = s;
-  s->load(renderer);
-}
-void
-hd::App::frameLoop ()
-{
-  quit = false;
-  while (!quit)
-    {
-      handleEvents ();
-      SDL_Renderer *renderer = SDL_GetRenderer (window);
-      if (renderer != NULL)
-        {
-          currentScene->render (renderer);
-          SDL_RenderPresent (renderer);
-          SDL_Delay (SDL_framerateDelay (&fpsMan));
-        }
-      else
-        {
-          printSdlError ();
-        }
-    }
-}
+  /** Some boring details about how to construct an application. **/
+  App::App () {
+    on.appendListener (SDL_QUIT, [this] (const SDL_Event &e) { quit = true; });
+  }
+  /** **/
+  App::~App () {}
+  /** **/
+  void
+  App::setScene (Scene *s)
+  {
+    currentScene = s;
+    s->load (renderer);
+  }
+  /** **/
+  void
+  App::frameLoop ()
+  {
+    quit = false;
+    while (!quit)
+      {
+        handleEvents ();
+        SDL_Renderer *renderer = SDL_GetRenderer (window);
+        if (renderer != NULL)
+          {
+            currentScene->render (renderer);
+            SDL_RenderPresent (renderer);
+            SDL_Delay (SDL_framerateDelay (&fpsMan));
+          }
+        else
+          {
+            printSdlError ();
+          }
+      }
+  }
+  /** **/
+  int
+  App::handleEvents ()
+  {
+    int evtCnt = 0;
+    SDL_Event e;
+    while (SDL_PollEvent (&e) != 0)
+      {
+        //on.dispatch (e);
+        on (e);
+        // switch (e.type)
+        //   {
+        //   case SDL_QUIT:
+        //     quit = true;
+        //     break;
+        //  default:
+        //   if (currentScene != NULL)
+        //    {
+        //     currentScene->handleEvent (e);
+        //  }
+        // }
+      }
+    return evtCnt;
+  }
+  /** **/
+  bool
+  App::startup ()
+  {
+    if (SDL_Init (SDL_INIT_EVERYTHING) != 0)
+      {
+        printSdlError ();
+        return false;
+      }
+    SDL_initFramerate (&fpsMan);
+    SDL_setFramerate (&fpsMan, FPS_UPPER_LIMIT);
+    SDL_CreateWindowAndRenderer (
+        320, 200, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer);
+    if ((window == NULL) || (renderer == NULL))
+      {
+        printSdlError ();
+        return false;
+      }
+    int imgInitFlags
+        = (IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
+    if (IMG_Init (imgInitFlags) != imgInitFlags)
+      {
+        printf ("Failed to initialize SDL_Image because: %s\n",
+                IMG_GetError ());
+        return false;
+      }
+    return true;
+  }
+  /** **/
+  void
+  App::shutdown ()
+  {
+    if (currentScene != NULL)
+      {
+        currentScene->unload ();
+        currentScene = NULL;
+      }
+    if (window != NULL)
+      {
+        SDL_DestroyWindow (window);
+        window = NULL;
+      }
+    if (SDL_WasInit (SDL_INIT_EVERYTHING) != 0)
+      {
+        SDL_Quit ();
+      }
+  }
+  /** **/
+  void
+  App::printSdlError (const char *msg)
+  {
+    const char *DEFAULT = "SDL Error";
+    const char *MSG;
+    if (msg != NULL)
+      {
+        MSG = msg;
+      }
+    else
+      {
+        MSG = DEFAULT;
+      }
 
-int
-hd::App::handleEvents ()
-{
-  int evtCnt = 0;
-  SDL_Event e;
-  while (SDL_PollEvent (&e) != 0)
-    {
-      switch (e.type)
-        {
-        case SDL_QUIT:
-          quit = true;
-          break;
-        default:
-          if (currentScene != NULL)
-            {
-              currentScene->handleEvent (e);
-            }
-        }
-    }
-  return evtCnt;
-}
-
-bool
-hd::App::startup ()
-{
-  if (SDL_Init (SDL_INIT_EVERYTHING) != 0)
-    {
-      printSdlError ();
-      return false;
-    }
-  SDL_initFramerate (&fpsMan);
-  SDL_setFramerate (&fpsMan, FPS_UPPER_LIMIT);
-  SDL_CreateWindowAndRenderer (320, 200, SDL_WINDOW_SHOWN| SDL_WINDOW_RESIZABLE, &window, &renderer);
-  if ((window == NULL) || (renderer == NULL))
-    {
-      printSdlError ();
-      return false;
-    }
-  int imgInitFlags = (IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
-  if (IMG_Init (imgInitFlags) != imgInitFlags)
-    {
-      printf ("Failed to initialize SDL_Image because: %s\n", IMG_GetError ());
-      return false;
-    }
-  return true;
-}
-
-void
-hd::App::shutdown ()
-{
-  if (currentScene != NULL)
-    {
-      currentScene->unload ();
-      currentScene = NULL;
-    }
-  if (window != NULL)
-    {
-      SDL_DestroyWindow (window);
-      window = NULL;
-    }
-  if (SDL_WasInit (SDL_INIT_EVERYTHING) != 0)
-    {
-      SDL_Quit ();
-    }
-}
-
-void
-hd::App::printSdlError (const char *msg)
-{
-  const char *DEFAULT = "SDL Error";
-  const char *MSG;
-  if (msg != NULL)
-    {
-      MSG = msg;
-    }
-  else
-    {
-      MSG = DEFAULT;
-    }
-
-  fprintf (stderr, "%s: %s", MSG, SDL_GetError ());
-}
+    fprintf (stderr, "%s: %s\n", MSG, SDL_GetError ());
+  }
+} // namespace hd

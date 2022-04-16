@@ -1,3 +1,4 @@
+#include "hdEvents.hpp"
 /**
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
@@ -15,37 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdShared.hpp"
-#include "hdApp.hpp"
-namespace hd{
-Shared::Surface
-Shared::makeSurface (const char *path)
+namespace hd
 {
-  SDL_Surface *surface = IMG_Load (path);
-  if (surface == NULL)
-    {
-      return nullptr;
-    }
-  return Surface (surface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
-}
 
-Shared::Texture
-Shared::makeTexture (const char *path, SDL_Renderer *r)
-{
-  SDL_Surface *surface = IMG_Load (path);
-  if (surface == NULL)
-    {
-      App::printSdlError ();
-      return nullptr;
-    }
-  SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
-  SDL_FreeSurface (surface);
-  if (texture == NULL)
-    {
-      App::printSdlError ();
+  int
+  SDL_EventPolicies::getEvent (const SDL_Event &e)
+  {
+    return e.type;
+  }
+/*
+  void SDL_EventTypeDispatcher::operator() (const SDL_Event &e){
+    dispatch (e);
+  }
+  **/
 
-      return nullptr;
-    }
-  return Texture (texture, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
-}
-}
+  SDL_Keycode
+  SDL_EventKeySymPolicies::getEvent (const SDL_Event &e)
+  {
+    return e.key.keysym.sym;
+  }
+  SDL_EventKeyDispatcher::SDL_EventKeyDispatcher(){
+    this->appendFilter ([] (const SDL_Event &e) -> bool {
+      return ((e.type == SDL_KEYDOWN)) || ((e.type == SDL_KEYUP));
+    });
+  }
+} // namespace hd

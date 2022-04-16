@@ -17,31 +17,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hdScene.hpp"
+#include "hdEvents.hpp"
 #include <stdio.h>
-
+/**
+ * @brief holodeck?
+ */
 namespace hd
 {
+
   /**
-   *
+   * @brief Apply what we know
    */
   class App
   {
 public:
+    /** Start applying **/
     App ();
+    /** Finish applying **/
     ~App ();
+    /** Start our work.**/
     bool startup ();
+    /** Clean up our workspace.**/
     void shutdown ();
+    /** Perform a step of our work.**/
     void frameLoop ();
+    /** Change our workspace.**/
     void setScene (Scene *);
+    /** Print out what went wrong with SDL2.
+     * \deprecated someone else should just do this. **/
     static void printSdlError (const char *msg = NULL);
+    /** Event Type Dispatcher **/
+    SDL_EventTypeDispatcher on;
 
 private:
+    /** Ensure we are responsive to changes to our environment. */
     int handleEvents ();
-
+    /** Where are we? */
     Scene *currentScene;
+    /** How fast are we working?*/
     FPSmanager fpsMan;
+    /** What can we see?*/
     SDL_Window *window;
+    /** How do we see? */
     SDL_Renderer *renderer;
+    /** Should we keep on working? */
     bool quit = false;
   };
 } // namespace hd

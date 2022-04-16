@@ -17,34 +17,40 @@
  */
 
 #include "hdSplashScene.hpp"
-bool
-hd::SplashScene::load (SDL_Renderer *r)
+#include <filesystem>
+namespace hd
 {
-  splash = Shared::makeTexture ("splash.bmp", r);
-  if (splash != NULL)
-    {
-      return true;
-    }
-  else
-    {
-      return false;
-    }
-}
-void
-hd::SplashScene::unload ()
-{
-  if (splash != NULL)
-    {
-      splash = nullptr;
-      splash = NULL;
-    }
-}
+  bool
+  SplashScene::load (SDL_Renderer *r)
+  {
+    std::filesystem::path p;
+    splash = Shared::makeTexture ("splash.bmp", r);
+    if (splash != NULL)
+      {
+        return true;
+      }
+    else
+      {
+        return false;
+      }
+  }
+  void
+  SplashScene::unload ()
+  {
+    if (splash != NULL)
+      {
+        splash = nullptr;
+        splash = NULL;
+      }
+  }
 
-void
-hd::SplashScene::render (SDL_Renderer *r)
-{
-  SDL_Rect dstBox = { 0, 0};
-  SDL_GetRendererOutputSize (r, &dstBox.w, &dstBox.h);
-  printf("dstBox@(%d,%d)of(%d,%d)\n",dstBox.x,dstBox.y,dstBox.w,dstBox.h);
-  SDL_RenderCopy (r, splash.get(), NULL, &dstBox);
-}
+  void
+  SplashScene::render (SDL_Renderer *r)
+  {
+    SDL_Rect dstBox = { 0, 0 };
+    SDL_GetRendererOutputSize (r, &dstBox.w, &dstBox.h);
+    printf ("dstBox@(%d,%d)of(%d,%d)\n", dstBox.x, dstBox.y, dstBox.w,
+            dstBox.h);
+    SDL_RenderCopy (r, splash.get (), NULL, &dstBox);
+  }
+} // namespace hd
