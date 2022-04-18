@@ -1,4 +1,4 @@
-/**
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -15,19 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdApp.hpp"
+#include "hd/App.hpp"
 
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
+/** **/
 namespace hd
 {
   /** Some boring details about how to construct an application. **/
-  App::App () {
-    on.append ([this] (const SDL_Event &e) { onType.dispatch (e); });
+  App::App ()
+  {
+    on.append (onType.pipe);
     onType.appendListener (SDL_QUIT,
                            [this] (const SDL_Event &e) { quit = true; });
-    auto keyForward = [this] (const SDL_Event &e) { onKey.dispatch (e); };
-    onType.appendListener (SDL_KEYUP, keyForward);
-    onType.appendListener (SDL_KEYDOWN, keyForward);
+    onType.appendListener (SDL_KEYUP, onKey.pipe);
+    onType.appendListener (SDL_KEYDOWN, onKey.pipe);
   }
   /** **/
   App::~App () {}
@@ -67,7 +68,7 @@ namespace hd
     SDL_Event e;
     while (SDL_PollEvent (&e) != 0)
       {
-        //on.dispatch (e);
+        // on.dispatch (e);
         on (e);
         // switch (e.type)
         //   {

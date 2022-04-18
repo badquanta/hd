@@ -1,5 +1,4 @@
-#pragma once
-/**
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -16,24 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdCommon.hpp"
+#include "hd/Scene.hpp"
 namespace hd
 {
-
-  /**
-   *
-   */
-  class Scene
+  void
+  Scene::handleEvent (SDL_Event &e)
   {
-
-protected:
-public:
-    /** \pure **/
-    virtual bool load (SDL_Renderer *renderer) = 0;
-    /** \pure **/
-    virtual void unload () = 0;
-    /** \pure **/
-    virtual void render (SDL_Renderer *r) = 0;
-    virtual void handleEvent (SDL_Event &e);
-  };
+    return;
+  }
 } // namespace hd

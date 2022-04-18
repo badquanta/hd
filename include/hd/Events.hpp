@@ -1,5 +1,5 @@
 #pragma once
-/**
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdCommon.hpp"
+#include "hd/Common.hpp"
 #include <eventpp/eventdispatcher.h>
 #include <eventpp/mixins/mixinfilter.h>
+/** **/
 namespace hd
 {
   namespace sdl
@@ -30,7 +31,10 @@ namespace hd
       {
       };
 
-
+      template <typename BASE> class Pipe : public BASE {
+        public:
+            std::function<void (const SDL_Event&e)> pipe = [this] (const SDL_Event &e) { this->dispatch (e); };
+      };
       /** Help eventpp extract event types from SDL_Event
        * @see
        * https://github.com/wqking/eventpp/blob/master/doc/tutorial_eventdispatcher.md
@@ -39,7 +43,7 @@ namespace hd
       {
         static int getEvent (const SDL_Event &e);
         using Mixins
-            = eventpp::MixinList<eventpp::MixinFilter>;
+            = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
       };
 
       /** SDL_Event.type dispatcher **/
@@ -57,7 +61,7 @@ namespace hd
         {
           static int getEvent (const SDL_Event &e);
           using Mixins
-              = eventpp::MixinList<eventpp::MixinFilter>;
+              = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
         };
         /** dispatcher for SDL_KEY{DOWN,UP} KeySyms **/
         class CodeDispatcher

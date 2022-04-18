@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <hdEvents.hpp>
+#include <hd/Events.hpp>
 // Demonstrate some basic assertions.
 TEST (keycode, getsCalled)
 {
@@ -8,14 +8,15 @@ TEST (keycode, getsCalled)
   hd::sdl::event::TypeDispatcher type;
   hd::sdl::event::key::CodeDispatcher keyDispatcher;
   //list.append (type);
-  list.append ([&type] (const SDL_Event &e) { type.dispatch (e); });
+  //list.append ([&type] (const SDL_Event &e) { type.dispatch (e); });
+  list.append (type.pipe);
   type.appendListener (SDL_KEYDOWN,
                        [] (const SDL_Event &e) { printf ("KEYDOWN\n"); });
   //printf ("SDL_KEYDOWN = %d\n", SDL_KEYDOWN);
   auto forward
       = [&keyDispatcher] (const SDL_Event &e) { keyDispatcher.dispatch (e); };
-  type.appendListener (SDL_KEYDOWN, forward);
-  type.appendListener (SDL_KEYUP, forward);
+  type.appendListener (SDL_KEYDOWN, keyDispatcher.pipe);
+  type.appendListener (SDL_KEYUP, keyDispatcher.pipe);
   bool called = false;
   keyDispatcher.appendListener (
       SDLK_0, [&called] (const SDL_Event &e) { called = true; });

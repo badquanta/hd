@@ -1,4 +1,4 @@
-/**
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdShared.hpp"
-#include "hdApp.hpp"
+#include "hd/Shared.hpp"
+#include "hd/App.hpp"
 namespace hd{
   std::list<std::filesystem::path> Shared::searchPaths;
   Shared::Surface

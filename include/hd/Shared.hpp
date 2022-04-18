@@ -1,4 +1,5 @@
-/**
+#pragma once
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -15,4 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdCommon.hpp"
+#include "hd/Common.hpp"
+#include <memory>
+#include <list>
+#include <string>
+#include <filesystem>
+/** **/
+namespace hd
+{
+  /**
+   *
+   */
+  class Shared
+  {
+public:
+    typedef std::shared_ptr<SDL_Surface> Surface;
+    typedef std::shared_ptr<SDL_Texture> Texture;
+    static Surface makeSurface (const char *path);
+    static Texture makeTexture (const char *path, SDL_Renderer *);
+    static Texture makeTexture (Surface, SDL_Renderer *);
+    static std::list<std::filesystem::path> searchPaths;
+  };
+} // namespace hd

@@ -1,4 +1,5 @@
-/**
+#include "hd/Events.hpp"
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -15,42 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "hdSplashScene.hpp"
-#include <filesystem>
+ /** **/
 namespace hd
 {
-  bool
-  SplashScene::load (SDL_Renderer *r)
+  namespace sdl
   {
-    std::filesystem::path p;
-    splash = Shared::makeTexture ("splash.bmp", r);
-    if (splash != NULL)
+    namespace event
+    {
+      int
+      TypeDispatchPolicy::getEvent (const SDL_Event &e)
       {
-        return true;
+        return e.type;
       }
-    else
-      {
-        return false;
-      }
-  }
-  void
-  SplashScene::unload ()
-  {
-    if (splash != NULL)
-      {
-        splash = nullptr;
-        splash = NULL;
-      }
-  }
 
-  void
-  SplashScene::render (SDL_Renderer *r)
-  {
-    SDL_Rect dstBox = { 0, 0 };
-    SDL_GetRendererOutputSize (r, &dstBox.w, &dstBox.h);
-    printf ("dstBox@(%d,%d)of(%d,%d)\n", dstBox.x, dstBox.y, dstBox.w,
-            dstBox.h);
-    SDL_RenderCopy (r, splash.get (), NULL, &dstBox);
-  }
+      /*
+        void TypeDispatcher::operator() (const SDL_Event &e){
+          dispatch (e);
+        }
+        **/
+      namespace key
+      {
+        int
+        CodePolicy::getEvent (const SDL_Event &e)
+        {
+          return e.key.keysym.sym;
+        }
+        CodeDispatcher::CodeDispatcher ()
+        {
+          this->appendFilter ([] (const SDL_Event &e) -> bool {
+            return ((e.type == SDL_KEYDOWN)) || ((e.type == SDL_KEYUP));
+          });
+        }
+      } // namespace key
+    }   // namespace event
+  }     // namespace sdl
+
 } // namespace hd

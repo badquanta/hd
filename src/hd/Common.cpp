@@ -1,5 +1,4 @@
-#include "hdEvents.hpp"
-/**
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -16,38 +15,4 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace hd
-{
-  namespace sdl
-  {
-    namespace event
-    {
-      int
-      TypeDispatchPolicy::getEvent (const SDL_Event &e)
-      {
-        return e.type;
-      }
-
-      /*
-        void TypeDispatcher::operator() (const SDL_Event &e){
-          dispatch (e);
-        }
-        **/
-      namespace key
-      {
-        int
-        CodePolicy::getEvent (const SDL_Event &e)
-        {
-          return e.key.keysym.sym;
-        }
-        CodeDispatcher::CodeDispatcher ()
-        {
-          this->appendFilter ([] (const SDL_Event &e) -> bool {
-            return ((e.type == SDL_KEYDOWN)) || ((e.type == SDL_KEYUP));
-          });
-        }
-      } // namespace key
-    }   // namespace event
-  }     // namespace sdl
-
-} // namespace hd
+#include "hd/Common.hpp"

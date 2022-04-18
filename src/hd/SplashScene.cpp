@@ -1,5 +1,4 @@
-#pragma once
-/**
+/*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -16,23 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hdScene.hpp"
-#include "hdShared.hpp"
+
+#include "hd/SplashScene.hpp"
+#include <filesystem>
 namespace hd
 {
-
-
-  /**
-   *
-   */
-  class SplashScene : public Scene
+  bool
+  SplashScene::load (SDL_Renderer *r)
   {
-private:
-    Shared::Texture splash = NULL;
+    std::filesystem::path p;
+    splash = Shared::makeTexture ("splash.bmp", r);
+    if (splash != NULL)
+      {
+        return true;
+      }
+    else
+      {
+        return false;
+      }
+  }
+  void
+  SplashScene::unload ()
+  {
+    if (splash != NULL)
+      {
+        splash = nullptr;
+        splash = NULL;
+      }
+  }
 
-public:
-    virtual bool load (SDL_Renderer *) override;
-    virtual void unload () override;
-    virtual void render (SDL_Renderer *r) override;
-  };
-}
+  void
+  SplashScene::render (SDL_Renderer *r)
+  {
+    SDL_Rect dstBox = { 0, 0 };
+    SDL_GetRendererOutputSize (r, &dstBox.w, &dstBox.h);
+    printf ("dstBox@(%d,%d)of(%d,%d)\n", dstBox.x, dstBox.y, dstBox.w,
+            dstBox.h);
+    SDL_RenderCopy (r, splash.get (), NULL, &dstBox);
+  }
+} // namespace hd
