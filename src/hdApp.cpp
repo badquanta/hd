@@ -67,7 +67,7 @@ namespace hd
     while (SDL_PollEvent (&e) != 0)
       {
         //on.dispatch (e);
-        onType (e);
+        on (e);
         // switch (e.type)
         //   {
         //   case SDL_QUIT:
