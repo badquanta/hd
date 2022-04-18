@@ -18,6 +18,9 @@
  */
 #include "hdCommon.hpp"
 #include <memory>
+#include <list>
+#include <string>
+#include <filesystem>
 namespace hd
 {
   /**
@@ -31,5 +34,6 @@ public:
     static Surface makeSurface (const char *path);
     static Texture makeTexture (const char *path, SDL_Renderer *);
     static Texture makeTexture (Surface, SDL_Renderer *);
+    static std::list<std::filesystem::path> searchPaths;
   };
 } // namespace hd

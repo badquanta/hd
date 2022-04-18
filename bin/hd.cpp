@@ -20,12 +20,13 @@
 
 
 
+
 void printVersion( const SDL_version*v ,const char* of = "SDL"){
   printf ("%s version %d.%d.%d\n", of, v->major, v->minor, v->patch);
 }
 void printVersions(){
     SDL_version sdlver;
-    SDL_GetVersion(&sdlver);    
+    SDL_GetVersion(&sdlver);
     printVersion (&sdlver);
     printVersion (IMG_Linked_Version(), "SDL_image");
 }
@@ -33,6 +34,8 @@ void printVersions(){
 int main(int argc, char **argv)
 {
   printVersions ();
+  hd::Shared::searchPaths.push_back (
+      std::filesystem::canonical(std::filesystem::path (argv[0]).parent_path ()/"../patterns"));
   hd::App app;
   hd::SplashScene splash;
   if (app.startup ())

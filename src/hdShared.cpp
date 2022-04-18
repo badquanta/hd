@@ -18,21 +18,33 @@
 #include "hdShared.hpp"
 #include "hdApp.hpp"
 namespace hd{
-Shared::Surface
-Shared::makeSurface (const char *path)
-{
-  SDL_Surface *surface = IMG_Load (path);
-  if (surface == NULL)
-    {
-      return nullptr;
-    }
-  return Surface (surface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
+  std::list<std::filesystem::path> Shared::searchPaths;
+  Shared::Surface
+  Shared::makeSurface (const char *path)
+  {
+    SDL_Surface *surface = IMG_Load (path);
+    if (surface == NULL)
+      {
+        return nullptr;
+      }
+    return Surface (surface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
 }
 
 Shared::Texture
 Shared::makeTexture (const char *path, SDL_Renderer *r)
 {
-  SDL_Surface *surface = IMG_Load (path);
+  std::filesystem::path realPath = path;
+
+  for(auto const&base : searchPaths){
+    std::filesystem::path thisPath = base / realPath;
+    printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
+    if (std::filesystem::exists (thisPath))
+      {
+        realPath = thisPath;
+        break;
+      }
+  }
+  SDL_Surface *surface = IMG_Load (realPath.generic_string().c_str());
   if (surface == NULL)
     {
       App::printSdlError ();

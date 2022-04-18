@@ -22,11 +22,12 @@ namespace hd
 {
   /** Some boring details about how to construct an application. **/
   App::App () {
-    on.append (onType);
+    on.append ([this] (const SDL_Event &e) { onType.dispatch (e); });
     onType.appendListener (SDL_QUIT,
                            [this] (const SDL_Event &e) { quit = true; });
-    onType.appendListener (SDL_KEYUP, onKey);
-    onType.appendListener (SDL_KEYDOWN, onKey);
+    auto keyForward = [this] (const SDL_Event &e) { onKey.dispatch (e); };
+    onType.appendListener (SDL_KEYUP, keyForward);
+    onType.appendListener (SDL_KEYDOWN, keyForward);
   }
   /** **/
   App::~App () {}

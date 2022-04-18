@@ -29,15 +29,7 @@ namespace hd
       class List : public eventpp::CallbackList<void (const SDL_Event &)>
       {
       };
-      template <typename BASE> class CallableDispatcher : public BASE
-      {
-    public:
-        void
-        operator() (const SDL_Event &e)
-        {
-          this->dispatch (e);
-        }
-      };
+
 
       /** Help eventpp extract event types from SDL_Event
        * @see
@@ -47,7 +39,7 @@ namespace hd
       {
         static int getEvent (const SDL_Event &e);
         using Mixins
-            = eventpp::MixinList<eventpp::MixinFilter, CallableDispatcher>;
+            = eventpp::MixinList<eventpp::MixinFilter>;
       };
 
       /** SDL_Event.type dispatcher **/
@@ -65,7 +57,7 @@ namespace hd
         {
           static int getEvent (const SDL_Event &e);
           using Mixins
-              = eventpp::MixinList<eventpp::MixinFilter, CallableDispatcher>;
+              = eventpp::MixinList<eventpp::MixinFilter>;
         };
         /** dispatcher for SDL_KEY{DOWN,UP} KeySyms **/
         class CodeDispatcher
