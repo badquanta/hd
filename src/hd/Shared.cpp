@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Shared.hpp"
-#include "hd/App.hpp"
-namespace hd{
+#include "hd/Program.hpp"
+namespace hd
+{
   std::list<std::filesystem::path> Shared::searchPaths;
   Shared::Surface
   Shared::makeSurface (const char *path)
@@ -28,36 +29,37 @@ namespace hd{
         return nullptr;
       }
     return Surface (surface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
-}
-
-Shared::Texture
-Shared::makeTexture (const char *path, SDL_Renderer *r)
-{
-  std::filesystem::path realPath = path;
-
-  for(auto const&base : searchPaths){
-    std::filesystem::path thisPath = base / realPath;
-    printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
-    if (std::filesystem::exists (thisPath))
-      {
-        realPath = thisPath;
-        break;
-      }
   }
-  SDL_Surface *surface = IMG_Load (realPath.generic_string().c_str());
-  if (surface == NULL)
-    {
-      App::printSdlError ();
-      return nullptr;
-    }
-  SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
-  SDL_FreeSurface (surface);
-  if (texture == NULL)
-    {
-      App::printSdlError ();
 
-      return nullptr;
-    }
-  return Texture (texture, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
-}
+  Shared::Texture
+  Shared::makeTexture (const char *path, SDL_Renderer *r)
+  {
+    std::filesystem::path realPath = path;
+
+    for (auto const &base : searchPaths)
+      {
+        std::filesystem::path thisPath = base / realPath;
+        printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
+        if (std::filesystem::exists (thisPath))
+          {
+            realPath = thisPath;
+            break;
+          }
+      }
+    SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
+    if (surface == NULL)
+      {
+        Program::printSdlError ();
+        return nullptr;
+      }
+    SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
+    SDL_FreeSurface (surface);
+    if (texture == NULL)
+      {
+        Program::printSdlError ();
+
+        return nullptr;
+      }
+    return Texture (texture, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
+  }
 }

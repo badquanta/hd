@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Scene.hpp"
 #include "hd/Events.hpp"
+#include "hd/Scene.hpp"
+#include "hd/Shared.hpp"
 #include <stdio.h>
+
 /**
  * @brief holodeck?
  */
@@ -28,13 +30,16 @@ namespace hd
   /**
    * @brief Apply what we know
    */
-  class App
+  class Program
   {
-public:
+  public:
     /** Start applying **/
-    App ();
+    Program ();
+    Program (int, char **);
     /** Finish applying **/
-    ~App ();
+    ~Program ();
+    /** Configure **/
+    void configure (int, char **);
     /** Start our work.**/
     bool startup ();
     /** Clean up our workspace.**/
@@ -47,13 +52,13 @@ public:
      * \deprecated someone else should just do this. **/
     static void printSdlError (const char *msg = NULL);
     /** Callback list for any/all events. **/
-    sdl::event::List on;
+    sdl::event::Tree on;
     /** Event Type Dispatcher **/
     sdl::event::TypeDispatcher onType;
     /** Event Dispatcher for KEY{UP,DOWN} events by Key Code. **/
     sdl::event::key::CodeDispatcher onKey;
 
-private:
+  private:
     /** Ensure we are responsive to changes to our environment. */
     int handleEvents ();
     /** Where are we? */

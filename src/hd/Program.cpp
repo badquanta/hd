@@ -15,33 +15,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/App.hpp"
+#include "hd/Program.hpp"
 
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 /** **/
 namespace hd
 {
   /** Some boring details about how to construct an application. **/
-  App::App ()
+  Program::Program () {}
+  Program::Program (int argc, char **argv) { configure (argc, argv); }
+  /** Setup some basic options based on the command line **/
+  void
+  Program::configure (int argc, char **argv)
   {
-    on.append (onType.pipe);
-    onType.appendListener (SDL_QUIT,
-                           [this] (const SDL_Event &e) { quit = true; });
-    onType.appendListener (SDL_KEYUP, onKey.pipe);
-    onType.appendListener (SDL_KEYDOWN, onKey.pipe);
+    sdl::event::TypeDispatcher clearList;
+    on.type.swap (clearList);
+    on.type.appendListener (SDL_QUIT, [this] (const SDL_Event &e) { quit = true; });
+
+
+    Shared::searchPaths.clear ();
+    Shared::searchPaths.push_back (std::filesystem::canonical (
+        std::filesystem::path (argv[0]).parent_path () / "../assets"));
   }
   /** **/
-  App::~App () {}
+  Program::~Program () {}
   /** **/
   void
-  App::setScene (Scene *s)
+  Program::setScene (Scene *s)
   {
     currentScene = s;
     s->load (renderer);
   }
   /** **/
   void
-  App::frameLoop ()
+  Program::frameLoop ()
   {
     quit = false;
     while (!quit)
@@ -62,7 +69,7 @@ namespace hd
   }
   /** **/
   int
-  App::handleEvents ()
+  Program::handleEvents ()
   {
     int evtCnt = 0;
     SDL_Event e;
@@ -86,7 +93,7 @@ namespace hd
   }
   /** **/
   bool
-  App::startup ()
+  Program::startup ()
   {
     if (SDL_Init (SDL_INIT_EVERYTHING) != 0)
       {
@@ -114,7 +121,7 @@ namespace hd
   }
   /** **/
   void
-  App::shutdown ()
+  Program::shutdown ()
   {
     if (currentScene != NULL)
       {
@@ -133,7 +140,7 @@ namespace hd
   }
   /** **/
   void
-  App::printSdlError (const char *msg)
+  Program::printSdlError (const char *msg)
   {
     const char *DEFAULT = "SDL Error";
     const char *MSG;

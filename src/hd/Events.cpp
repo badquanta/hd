@@ -16,13 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- /** **/
+/** **/
 namespace hd
 {
   namespace sdl
   {
     namespace event
     {
+      Tree::Tree ()
+      {
+        append (type.pipe);
+        type.appendListener (SDL_KEYDOWN, keyCode.pipe);
+        type.appendListener (SDL_KEYUP, keyCode.pipe);
+      }
+
       int
       TypeDispatchPolicy::getEvent (const SDL_Event &e)
       {

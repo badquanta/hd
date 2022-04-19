@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Common.hpp"
-#include <memory>
-#include <list>
-#include <string>
 #include <filesystem>
+#include <list>
+#include <memory>
+#include <string>
 /** **/
 namespace hd
 {
@@ -29,7 +29,7 @@ namespace hd
    */
   class Shared
   {
-public:
+  public:
     typedef std::shared_ptr<SDL_Surface> Surface;
     typedef std::shared_ptr<SDL_Texture> Texture;
     static Surface makeSurface (const char *path);

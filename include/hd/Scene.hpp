@@ -27,8 +27,8 @@ namespace hd
   class Scene
   {
 
-protected:
-public:
+  protected:
+  public:
     /** \pure **/
     virtual bool load (SDL_Renderer *renderer) = 0;
     /** \pure **/

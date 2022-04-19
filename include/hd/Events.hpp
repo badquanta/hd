@@ -27,13 +27,11 @@ namespace hd
     namespace event
     {
 
-      class List : public eventpp::CallbackList<void (const SDL_Event &)>
+      template <typename BASE> class Pipe : public BASE
       {
-      };
-
-      template <typename BASE> class Pipe : public BASE {
-        public:
-            std::function<void (const SDL_Event&e)> pipe = [this] (const SDL_Event &e) { this->dispatch (e); };
+      public:
+        std::function<void (const SDL_Event &e)> pipe
+            = [this] (const SDL_Event &e) { this->dispatch (e); };
       };
       /** Help eventpp extract event types from SDL_Event
        * @see
@@ -42,8 +40,7 @@ namespace hd
       struct TypeDispatchPolicy
       {
         static int getEvent (const SDL_Event &e);
-        using Mixins
-            = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
+        using Mixins = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
       };
 
       /** SDL_Event.type dispatcher **/
@@ -51,7 +48,7 @@ namespace hd
           : public eventpp::EventDispatcher<int, void (const SDL_Event &),
                                             TypeDispatchPolicy>
       {
-    public:
+      public:
         // void operator() (const SDL_Event &e);
       };
       namespace key
@@ -60,20 +57,29 @@ namespace hd
         struct CodePolicy
         {
           static int getEvent (const SDL_Event &e);
-          using Mixins
-              = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
+          using Mixins = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
         };
         /** dispatcher for SDL_KEY{DOWN,UP} KeySyms **/
         class CodeDispatcher
-            : public eventpp::EventDispatcher<
-                  int, void (const SDL_Event &e), CodePolicy>
+            : public eventpp::EventDispatcher<int, void (const SDL_Event &e),
+                                              CodePolicy>
         {
-      public:
+        public:
           CodeDispatcher ();
           // void operator() (const SDL_Event &e);
         };
       } // namespace key
-    }   // namespace event
-  }     // namespace sdl
+      class List : public eventpp::CallbackList<void (const SDL_Event &)>
+      {
+      };
+      class Tree : public List
+      {
+      public:
+        TypeDispatcher type;
+        key::CodeDispatcher keyCode;
+        Tree ();
+      };
+    } // namespace event
+  }   // namespace sdl
 
 } // namespace hd

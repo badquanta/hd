@@ -6,15 +6,8 @@
 TEST (keycode, getsCalled)
 {
   testing::MockFunction<void (const SDL_Event &e)> test;
-  hd::sdl::event::List list;
-  hd::sdl::event::TypeDispatcher type;
-  hd::sdl::event::key::CodeDispatcher keyDispatcher;
-  list.append (type.pipe);
-  type.appendListener (SDL_KEYDOWN,
-                       [] (const SDL_Event &e) { printf ("KEYDOWN\n"); });
-  type.appendListener (SDL_KEYDOWN, keyDispatcher.pipe);
-  type.appendListener (SDL_KEYUP, keyDispatcher.pipe);
-  keyDispatcher.appendListener (SDLK_0, test.AsStdFunction());
+  hd::sdl::event::Tree list;
+  list.keyCode.appendListener (SDLK_0, test.AsStdFunction());
 
   SDL_Event e;
   e.type = SDL_KEYDOWN;

@@ -22,16 +22,15 @@
 namespace hd
 {
 
-
   /**
    *
    */
   class SplashScene : public Scene
   {
-private:
+  private:
     Shared::Texture splash = NULL;
 
-public:
+  public:
     virtual bool load (SDL_Renderer *) override;
     virtual void unload () override;
     virtual void render (SDL_Renderer *r) override;
