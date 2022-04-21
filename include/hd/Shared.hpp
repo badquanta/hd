@@ -24,6 +24,7 @@
 /** **/
 namespace hd
 {
+
   /**
    *
    */
@@ -32,9 +33,14 @@ namespace hd
   public:
     typedef std::shared_ptr<SDL_Surface> Surface;
     typedef std::shared_ptr<SDL_Texture> Texture;
-    static Surface makeSurface (const char *path);
-    static Texture makeTexture (const char *path, SDL_Renderer *);
+    typedef std::shared_ptr<TTF_Font> Font;
+    static Surface makeSurface (const char *);
+    static Texture makeTexture (const char *, SDL_Renderer *);
     static Texture makeTexture (Surface, SDL_Renderer *);
+    static Texture makeTexture (SDL_Surface *, SDL_Renderer *);
+    static Font loadFont (const char *, int);
+    static Texture renderText (SDL_Renderer*, Font, std::string_view, SDL_Color);
+    static std::filesystem::path findRealPath (std::filesystem::path);
     static std::list<std::filesystem::path> searchPaths;
   };
 } // namespace hd

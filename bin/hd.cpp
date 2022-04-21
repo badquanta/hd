@@ -40,7 +40,7 @@ main (int argc, char **argv)
   hd::SplashScene splash;
   if (program.startup ())
     {
-      program.onKey.appendListener (
+      program.on.keyCode.appendListener (
           SDLK_UP, [] (const SDL_Event &e) { printf ("Got Up key.\n"); });
       program.setScene (&splash);
       program.frameLoop ();

@@ -23,12 +23,18 @@ namespace hd
   {
     namespace event
     {
-      Tree::Tree ()
+      void
+      Tree::reset ()
       {
+        List clearList;
+        swap (clearList);
+        TypeDispatcher clearDispatcher;
+        type.swap (clearDispatcher);
         append (type.pipe);
         type.appendListener (SDL_KEYDOWN, keyCode.pipe);
         type.appendListener (SDL_KEYUP, keyCode.pipe);
       }
+      Tree::Tree () { reset (); }
 
       int
       TypeDispatchPolicy::getEvent (const SDL_Event &e)

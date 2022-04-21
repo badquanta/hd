@@ -28,11 +28,9 @@ namespace hd
   void
   Program::configure (int argc, char **argv)
   {
-    sdl::event::TypeDispatcher clearList;
-    on.type.swap (clearList);
-    on.type.appendListener (SDL_QUIT, [this] (const SDL_Event &e) { quit = true; });
-
-
+    on.reset ();
+    on.type.appendListener (SDL_QUIT,
+                            [this] (const SDL_Event &e) { quit = true; });
     Shared::searchPaths.clear ();
     Shared::searchPaths.push_back (std::filesystem::canonical (
         std::filesystem::path (argv[0]).parent_path () / "../assets"));
@@ -59,7 +57,7 @@ namespace hd
           {
             currentScene->render (renderer);
             SDL_RenderPresent (renderer);
-            SDL_Delay (SDL_framerateDelay (&fpsMan));
+            SDL_Delay (10/**SDL_framerateDelay (&fpsMan)**/);
           }
         else
           {
@@ -77,6 +75,7 @@ namespace hd
       {
         // on.dispatch (e);
         on (e);
+        currentScene->on (e);
         // switch (e.type)
         //   {
         //   case SDL_QUIT:
@@ -117,6 +116,10 @@ namespace hd
                 IMG_GetError ());
         return false;
       }
+    if (TTF_Init()==-1){
+      printf ("SDL_TTF failed to initialize because: %s\n", TTF_GetError ());
+      return false;
+    }
     return true;
   }
   /** **/

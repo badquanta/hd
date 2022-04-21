@@ -75,6 +75,7 @@ namespace hd
       class Tree : public List
       {
       public:
+        void reset ();
         TypeDispatcher type;
         key::CodeDispatcher keyCode;
         Tree ();

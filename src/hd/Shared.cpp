@@ -17,49 +17,110 @@
  */
 #include "hd/Shared.hpp"
 #include "hd/Program.hpp"
-namespace hd
-{
+namespace hd {
   std::list<std::filesystem::path> Shared::searchPaths;
   Shared::Surface
   Shared::makeSurface (const char *path)
   {
     SDL_Surface *surface = IMG_Load (path);
-    if (surface == NULL)
-      {
-        return nullptr;
-      }
+    if (surface == NULL) {
+      return nullptr;
+    }
     return Surface (surface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
+  }
+  /** Load an image from disk into a Texture **/
+  Shared::Texture
+  Shared::makeTexture (const char *aPath, SDL_Renderer *r)
+  {
+    std::filesystem::path realPath = aPath;
+
+    for (auto const &base : searchPaths) {
+      std::filesystem::path thisPath = base / realPath;
+      printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
+      if (std::filesystem::exists (thisPath)) {
+        realPath = thisPath;
+        break;
+      }
+    }
+    SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
+    if (surface == NULL) {
+      Program::printSdlError ();
+      return nullptr;
+    }
+    SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
+    SDL_FreeSurface (surface);
+    if (texture == NULL) {
+      Program::printSdlError ();
+
+      return nullptr;
+    }
+    return Texture (texture, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
   }
 
   Shared::Texture
-  Shared::makeTexture (const char *path, SDL_Renderer *r)
+  Shared::makeTexture (SDL_Surface *aSurface, SDL_Renderer *aRenderer)
   {
-    std::filesystem::path realPath = path;
+    if((aSurface == NULL) || (aRenderer == NULL)){
+      return NULL;
+    }
+    SDL_Texture* tmp = SDL_CreateTextureFromSurface(aRenderer,aSurface);
+    if(tmp==NULL) {
+      Program::printSdlError ();
+      return NULL;
+    }
+    return Texture(tmp,[](SDL_Texture*t){
+      SDL_DestroyTexture (t);});
+  }
+  /** Locate the canonical path for the given path.
+   * If the path is already absolute; it will simply return the same path
+   *given. If it is not, it will attempt to find the actual file by appending
+   *searchPaths and checking if it exists; then returning the 'canonical' path.
+   *
+   * @return aPath IF `aPath` is already absolute OR it cannot find this path
+   *within `searchPaths`
+   **/
+  std::filesystem::path
+  Shared::findRealPath (std::filesystem::path aPath)
+  {
+    if (aPath.is_absolute ()) {
+      return aPath;
+    }
+    std::filesystem::path realPath = aPath;
+    for (auto const &base : searchPaths) {
+      std::filesystem::path thisPath = base / realPath;
+      printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
+      if (std::filesystem::exists (thisPath)) {
+        return std::filesystem::canonical (thisPath);
+      }
+    }
+    return aPath;
+  }
 
-    for (auto const &base : searchPaths)
-      {
-        std::filesystem::path thisPath = base / realPath;
-        printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
-        if (std::filesystem::exists (thisPath))
-          {
-            realPath = thisPath;
-            break;
-          }
-      }
-    SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
-    if (surface == NULL)
-      {
-        Program::printSdlError ();
-        return nullptr;
-      }
-    SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
-    SDL_FreeSurface (surface);
-    if (texture == NULL)
-      {
-        Program::printSdlError ();
+  Shared::Font
+  Shared::loadFont (const char *aPath, int aSize)
+  {
+    TTF_Font *font = TTF_OpenFont (
+        findRealPath (aPath).generic_string ().c_str (), aSize);
+    if (font != NULL) {
+      return Font (font, [] (TTF_Font *f) { TTF_CloseFont (f); });
+    } else {
+      return NULL;
+    }
+  }
 
-        return nullptr;
-      }
-    return Texture (texture, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
+  Shared::Texture
+  Shared::renderText (SDL_Renderer *aRenderer,
+                      Font aFont,
+                      std::string_view aChars,
+                      SDL_Color aColor)
+  {
+    SDL_Surface *textSurface
+        = TTF_RenderText_Blended (aFont.get (), aChars.data (), aColor);
+    Texture texture = NULL;
+    if (textSurface != NULL) {
+      texture = makeTexture (textSurface, aRenderer);
+      SDL_FreeSurface (textSurface);
+    }
+    return texture;
   }
 }

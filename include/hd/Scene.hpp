@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Common.hpp"
+#include "hd/Events.hpp"
 /** **/
 namespace hd
 {
@@ -36,5 +37,6 @@ namespace hd
     /** \pure **/
     virtual void render (SDL_Renderer *r) = 0;
     virtual void handleEvent (SDL_Event &e);
+    sdl::event::Tree on;
   };
 } // namespace hd

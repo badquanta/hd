@@ -28,11 +28,15 @@ namespace hd
   class SplashScene : public Scene
   {
   private:
-    Shared::Texture splash = NULL;
+    Shared::Texture splash, up, down, left, right,textMsg;
+    const Uint8 *keyState;
+    Shared::Font font;
 
   public:
+    SplashScene ();
     virtual bool load (SDL_Renderer *) override;
     virtual void unload () override;
     virtual void render (SDL_Renderer *r) override;
+
   };
 }
