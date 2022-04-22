@@ -19,6 +19,7 @@
 #include "hd/Events.hpp"
 #include "hd/Scene.hpp"
 #include "hd/Shared.hpp"
+#include "hd/glProgram.hpp"
 #include <stdio.h>
 
 /**
@@ -67,9 +68,19 @@ namespace hd
     FPSmanager fpsMan;
     /** What can we see?*/
     SDL_Window *window;
-    /** How do we see? */
-    SDL_Renderer *renderer;
+    /** OpenGL Context **/
+    SDL_GLContext context;
     /** Should we keep on working? */
     bool quit = false;
+    /** GLSL Program ID */
+    gl::Program shaderProgram;
+    // GLuint programId = 0;
+    GLint vertexPos2dLocation = -1;
+    GLuint vao = 0;
+    GLuint vbo = 0;
+    GLuint ibo = 0;
+
+    void printShaderLog (GLuint shader);
+    void printProgramLog (GLuint program);
   };
 } // namespace hd
