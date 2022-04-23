@@ -18,11 +18,17 @@
 #include "hd/Shared.hpp"
 #include "hd/Engine.hpp"
 namespace hd {
-  std::list<std::filesystem::path> Shared::searchPaths;
+  std::list<std::filesystem::path> Shared::searchPaths({
+#if HD_DEBUG_BUILD == 1
+  HD_SOURCE_ASSETS,
+#endif
+  "./"
+  });
   Shared::Surface
   Shared::makeSurface (const char *path)
   {
-    SDL_Surface *surface = IMG_Load (path);
+    std::filesystem::path realPath = findRealPath (path);
+    SDL_Surface *surface = IMG_Load (realPath.generic_string().c_str());
     if (surface == NULL) {
       return nullptr;
     }

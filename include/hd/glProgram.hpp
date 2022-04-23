@@ -24,6 +24,7 @@ namespace hd {
       bool Bind ();
       void unbind ();
       void printLog (FILE *);
+      void printAttribues (FILE *);
       GLuint getId ();
       GLint getAttribLocation (const GLchar *);
       GLint getUniformLocation (const GLchar *);

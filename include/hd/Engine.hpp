@@ -86,5 +86,7 @@ namespace hd
     gl::EBO ebo;
     // GLuint ibo = 0;
     GLint scaleLocation = -1;
+    GLint tex0Uni = -1;
+    GLuint texture;
   };
 } // namespace hd

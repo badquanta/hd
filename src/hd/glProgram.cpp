@@ -132,4 +132,20 @@ namespace hd::gl {
       fprintf (stream, "Name %d is not a program\n", ID);
     }
   }
+  void
+  Program::printAttribues(FILE*stream=stdout){
+    GLint count;
+    glGetProgramiv (ID, GL_ACTIVE_ATTRIBUTES, &count);
+    fprintf (stream, "Active Attribute count: %d\n", count);
+    const GLsizei maxNameLength = 32;
+    GLint size;
+    GLenum type;
+    GLchar name[maxNameLength];
+    GLsizei length;
+    for (int i = 0; i < count; i++) {
+      glGetActiveAttrib (
+          ID, (GLuint)i, maxNameLength, &length, &size, &type, name);
+      fprintf (stream, "Attribute#%d Type: %u Name: %s\n", i, type, name);
+    }
+  }
 }

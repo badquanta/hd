@@ -19,26 +19,17 @@
 
 // Vertices coordinates
 GLfloat vertexData[] = {
-  //               COORDINATES                  /     COLORS           //
-  -0.5f,  -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
-  0.02f, // Lower left corner
-  0.5f,   -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
-  0.02f, // Lower right corner
-  0.0f,   0.5f * float (sqrt (3)) * 2 / 3,  0.0f, 1.0f, 0.6f,
-  0.32f, // Upper corner
-  -0.25f, 0.5f * float (sqrt (3)) * 1 / 6,  0.0f, 0.9f, 0.45f,
-  0.17f, // Inner left
-  0.25f,  0.5f * float (sqrt (3)) * 1 / 6,  0.0f, 0.9f, 0.45f,
-  0.17f, // Inner right
-  0.0f,   -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
-  0.02f // Inner down
+  //     COORDINATES/        COLORS   /   TexCoord  //
+  -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // Lower left corner
+  -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // Upper left corner
+  0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // Upper right corner
+  0.5f,  -0.5f, 0.0f, 0.05f, 0.05f, 0.05f, 1.0f, 0.0f  // Lower right corner
 };
 
 // Indices for vertices order
 GLuint indexData[] = {
-  0, 3, 5, // Lower left triangle
-  3, 2, 4, // Lower right triangle
-  5, 4, 1  // Upper triangle
+  0, 2, 1, // Upper triangle
+  0, 3, 2  // Lower triangle
 };
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 /** **/
@@ -61,7 +52,7 @@ namespace hd {
         glViewport (0, 0, e.window.data1, e.window.data2);
       }
     });
-    Shared::searchPaths.clear ();
+    // Shared::searchPaths.clear ();
     Shared::searchPaths.push_back (std::filesystem::canonical (
         std::filesystem::path (argv[0]).parent_path () / "../assets"));
   }
@@ -88,6 +79,8 @@ namespace hd {
       // glUseProgram (programId);
       shaderProgram.Bind ();
       glUniform1f (scaleLocation, 0.5f);
+      glUniform1i (tex0Uni, 0);
+      glBindTexture (GL_TEXTURE_2D, texture);
       vbo.Bind ();
       // glVertexAttribPointer (
       //     aPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
@@ -133,6 +126,19 @@ namespace hd {
       printSdlError ();
       return false;
     }
+    int imgInitFlags
+        = (IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
+    if (IMG_Init (imgInitFlags) != imgInitFlags) {
+      printf ("Failed to initialize SDL_Image because: %s\n", IMG_GetError ());
+      SDL_Quit ();
+      return false;
+    }
+    if (TTF_Init () == -1) {
+      IMG_Quit ();
+      SDL_Quit ();
+      printf ("SDL_TTF failed to initialize because: %s\n", TTF_GetError ());
+      return false;
+    }
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK,
@@ -174,6 +180,7 @@ namespace hd {
       return false;
     };
     scaleLocation = shaderProgram.getUniformLocation ("scale");
+    tex0Uni = shaderProgram.getUniformLocation ("tex0");
     glClearColor (0.f, 0.f, 0.f, 1.f);
     // create vao
     vao.Create ();
@@ -185,37 +192,60 @@ namespace hd {
     vbo.Bind ();
     // create ibo
     ebo.Create (indexData, sizeof (indexData));
+    shaderProgram.printAttribues (stdout);
     if ((!vao.LinkAttrib (vbo,
                           shaderProgram,
                           "aPos",
                           3,
                           GL_FLOAT,
-                          6 * sizeof (GLfloat),
+                          8 * sizeof (GLfloat),
                           (void *)0))
         || (!vao.LinkAttrib (vbo,
                              shaderProgram,
                              "aColor",
                              3,
                              GL_FLOAT,
-                             6 * sizeof (GLfloat),
-                             (void *)(3 * sizeof (GLfloat))))) {
+                             8 * sizeof (GLfloat),
+                             (void *)(3 * sizeof (GLfloat))))
+        || (!vao.LinkAttrib (vbo,
+                             shaderProgram,
+                             "aTex",
+                             2,
+                             GL_FLOAT,
+                             8 * sizeof (GLfloat),
+                             (void *)(6 * sizeof (GLfloat))))) {
       fprintf (stderr, "Failed to link aPos to the shader program.\n");
       SDL_Quit ();
       return false;
     };
-    int imgInitFlags
-        = (IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
-    if (IMG_Init (imgInitFlags) != imgInitFlags) {
-      printf ("Failed to initialize SDL_Image because: %s\n", IMG_GetError ());
+    Shared::Surface image
+        = Shared::makeSurface ("textures/pattern_16/diffus.tga");
+    if(image == NULL){
+      fprintf (stderr, "Failed to load texture.\n");
       SDL_Quit ();
       return false;
     }
-    if (TTF_Init () == -1) {
-      IMG_Quit ();
-      SDL_Quit ();
-      printf ("SDL_TTF failed to initialize because: %s\n", TTF_GetError ());
-      return false;
-    }
+    fprintf (stderr,
+             "Texture pixel format name: %s\n",
+             SDL_GetPixelFormatName (image->format->format));
+    glGenTextures (1, &texture);
+    glActiveTexture (GL_TEXTURE0);
+    glBindTexture (GL_TEXTURE_2D, texture);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D (GL_TEXTURE_2D,
+                  0,
+                  GL_RGB,
+                  image->w,
+                  image->h,
+                  0,
+                  GL_BGR,
+                  GL_UNSIGNED_BYTE,
+                  image->pixels);
+    image = NULL;
+    glGenerateMipmap (GL_TEXTURE_2D);
     return true;
   }
   /** **/
