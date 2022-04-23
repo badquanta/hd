@@ -85,5 +85,6 @@ namespace hd
     // GLuint vbo = 0;
     gl::EBO ebo;
     // GLuint ibo = 0;
+    GLint scaleLocation = -1;
   };
 } // namespace hd

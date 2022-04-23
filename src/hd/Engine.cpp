@@ -17,6 +17,29 @@
  */
 #include "hd/Engine.hpp"
 
+// Vertices coordinates
+GLfloat vertexData[] = {
+  //               COORDINATES                  /     COLORS           //
+  -0.5f,  -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
+  0.02f, // Lower left corner
+  0.5f,   -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
+  0.02f, // Lower right corner
+  0.0f,   0.5f * float (sqrt (3)) * 2 / 3,  0.0f, 1.0f, 0.6f,
+  0.32f, // Upper corner
+  -0.25f, 0.5f * float (sqrt (3)) * 1 / 6,  0.0f, 0.9f, 0.45f,
+  0.17f, // Inner left
+  0.25f,  0.5f * float (sqrt (3)) * 1 / 6,  0.0f, 0.9f, 0.45f,
+  0.17f, // Inner right
+  0.0f,   -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
+  0.02f // Inner down
+};
+
+// Indices for vertices order
+GLuint indexData[] = {
+  0, 3, 5, // Lower left triangle
+  3, 2, 4, // Lower right triangle
+  5, 4, 1  // Upper triangle
+};
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 /** **/
 namespace hd {
@@ -63,16 +86,15 @@ namespace hd {
       glClear (GL_COLOR_BUFFER_BIT);
       // SDL_RenderPresent (renderer);
       // glUseProgram (programId);
-      shaderProgram.bind ();
-      //glEnableVertexAttribArray (aPos);
-      //glBindBuffer (GL_ARRAY_BUFFER, vbo);
+      shaderProgram.Bind ();
+      glUniform1f (scaleLocation, 0.5f);
       vbo.Bind ();
-      //glVertexAttribPointer (
-      //    aPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
-      //glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
+      // glVertexAttribPointer (
+      //     aPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
+      // glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
       ebo.Bind ();
       glDrawElements (GL_TRIANGLES, 9, GL_UNSIGNED_INT, NULL);
-      //glDisableVertexAttribArray (aPos);
+      // glDisableVertexAttribArray (aPos);
       shaderProgram.unbind ();
       SDL_GL_SwapWindow (window);
       // SDL_RenderPresent (renderer);
@@ -145,38 +167,39 @@ namespace hd {
     if (SDL_GL_SetSwapInterval (1) < 0) {
       printf ("Warning: Unable to set VSync because: %s", SDL_GetError ());
     }
-    if (!shaderProgram.create ("shaders/default.vert","shaders/default.frag")) {
+    if (!shaderProgram.create ("shaders/default.vert",
+                               "shaders/default.frag")) {
       fprintf (stderr, "Failed to create Shader Program\n");
       SDL_Quit ();
       return false;
     };
-
+    scaleLocation = shaderProgram.getUniformLocation ("scale");
     glClearColor (0.f, 0.f, 0.f, 1.f);
-    GLfloat vertexData[]{
-      -0.5f,     -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower left corner
-      0.5f,      -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower right corner
-      0.0f,      0.5f * float (sqrt (3)) * 2 / 3, 0.0f, // Upper corner
-      -0.5f / 2, 0.5f * float (sqrt (3)) / 6,     0.0f, // Inner left
-      0.5f / 2,  0.5f * float (sqrt (3)) / 6,     0.0f, // Inner right
-      0.0f,      -0.5f * float (sqrt (3)) / 3,    0.0f  // Inner down
-    };
-    GLuint indexData[] = {
-      0, 3, 5, // LL
-      3, 2, 4, // LR
-      5, 4, 1  // UP
-    };
     // create vao
     vao.Create ();
     // bind the vao
     vao.Bind ();
     //  create vbo
-    vbo.Create (vertexData, sizeof(vertexData));
+    vbo.Create (vertexData, sizeof (vertexData));
     // bind the vbo
     vbo.Bind ();
     // create ibo
     ebo.Create (indexData, sizeof (indexData));
-    if(!vao.LinkVBO (vbo, shaderProgram, "aPos")){
-      fprintf (stderr,"Failed to link aPos to the shader program.\n");
+    if ((!vao.LinkAttrib (vbo,
+                          shaderProgram,
+                          "aPos",
+                          3,
+                          GL_FLOAT,
+                          6 * sizeof (GLfloat),
+                          (void *)0))
+        || (!vao.LinkAttrib (vbo,
+                             shaderProgram,
+                             "aColor",
+                             3,
+                             GL_FLOAT,
+                             6 * sizeof (GLfloat),
+                             (void *)(3 * sizeof (GLfloat))))) {
+      fprintf (stderr, "Failed to link aPos to the shader program.\n");
       SDL_Quit ();
       return false;
     };

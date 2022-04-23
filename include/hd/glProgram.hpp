@@ -21,11 +21,12 @@ namespace hd {
        **/
       bool create (std::filesystem::path, std::filesystem::path);
       void free ();
-      bool bind ();
+      bool Bind ();
       void unbind ();
       void printLog (FILE *);
       GLuint getId ();
       GLint getAttribLocation (const GLchar *);
+      GLint getUniformLocation (const GLchar *);
     };
   }
 }

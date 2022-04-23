@@ -7,21 +7,21 @@ namespace hd::gl {
     glGenVertexArrays (1, &ID);
   }
   void
-  VAO::LinkVBO (VBO &aVbo, GLuint aLayout)
+  VAO::LinkAttrib (VBO &aVbo, GLuint aLayout,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset)
   {
     aVbo.Bind ();
-    glVertexAttribPointer (aLayout, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+    glVertexAttribPointer (aLayout, aNumComponents, aType, GL_FALSE, aStride, aOffset);
     glEnableVertexAttribArray (aLayout);
     aVbo.Unbind ();
   }
   bool
-  VAO::LinkVBO (VBO &aVbo, Program &aProgram, std::string aName){
-    GLint aLayout = aProgram.getAttribLocation (aName.c_str());
+  VAO::LinkAttrib (VBO &aVbo, Program &aProgram, GLchar* aName,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset){
+    GLint aLayout = aProgram.getAttribLocation (aName);
     if(aLayout==-1){
-      fprintf (stderr,"Failed to get variable named %s\n", aName.c_str ());
+      fprintf (stderr,"Failed to get variable named %s\n", aName);
       return false;
     }
-    LinkVBO (aVbo, aLayout);
+    LinkAttrib (aVbo, aLayout,aNumComponents,aType,aStride,aOffset);
     return true;
   }
   void

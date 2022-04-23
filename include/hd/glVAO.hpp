@@ -10,7 +10,7 @@ namespace hd {
       public:
       VAO();
       void Create ();
-      void LinkVBO (VBO &VBO, GLuint layout);
+      void LinkAttrib (VBO &VBO, GLuint layout, GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset);
       /**
        * @brief
        *
@@ -20,7 +20,7 @@ namespace hd {
        * @return true
        * @return false
        */
-      bool LinkVBO (VBO &aVBO, Program &aProgram, std::string aName);
+      bool LinkAttrib (VBO &aVBO, Program &aProgram, GLchar* aName,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset);
       void Bind ();
       void Unbind();
       void Delete();

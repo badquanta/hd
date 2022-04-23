@@ -84,8 +84,16 @@ namespace hd::gl {
     }
     return result;
   }
+  GLint
+  Program::getUniformLocation(const GLchar *name){
+    GLint result = glGetUniformLocation (ID, name);
+    if(result == -1){
+      fprintf (stderr, "Invalid uniform name '%s'.\n", name);
+    }
+    return result;
+  }
   bool
-  Program::bind ()
+  Program::Bind ()
   {
     if (ID == 0) {
       return false;
