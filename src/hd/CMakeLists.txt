@@ -1,4 +1,4 @@
-list(APPEND LIBHD_COMPONENTS Common.cpp Scene.cpp Shared.cpp SplashScene.cpp Engine.cpp Events.cpp glProgram.cpp glShader.cpp glVAO.cpp glVBO.cpp glEBO.cpp)
+list(APPEND LIBHD_COMPONENTS Common.cpp Scene.cpp Shared.cpp SplashScene.cpp Engine.cpp Events.cpp glTexture.cpp glProgram.cpp glShader.cpp glVAO.cpp glVBO.cpp glEBO.cpp)
 #add_executable(hddemo hd.cpp ${LIBHD_COMPONENTS})
 add_library(hd ${LIBHD_COMPONENTS} )
 #target_link_libraries(hddemo SDL2::Main SDL2::Image SDL2::TTF SDL2::Net SDL2::Mixer SDL2::GFX)

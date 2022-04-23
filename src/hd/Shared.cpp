@@ -18,36 +18,49 @@
 #include "hd/Shared.hpp"
 #include "hd/Engine.hpp"
 namespace hd {
-  std::list<std::filesystem::path> Shared::searchPaths({
+  std::list<std::filesystem::path> Shared::searchPaths ({
 #if HD_DEBUG_BUILD == 1
-  HD_SOURCE_ASSETS,
+    HD_SOURCE_ASSETS,
 #endif
-  "./"
+        "./"
   });
   Shared::Surface
-  Shared::makeSurface (const char *path)
+  Shared::makeSurface (SDL_Surface *aSurface)
+  {
+    if (aSurface == NULL)
+      return NULL;
+    return Surface (aSurface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
+  }
+  Shared::Surface
+  Shared::ConvertSurface(Shared::Surface aSurface, SDL_PixelFormatEnum aFormat){
+    if(aSurface == NULL) {
+      return NULL;
+    }
+    SDL_Surface *converted
+        = SDL_ConvertSurfaceFormat (aSurface.get (), aFormat, 0);
+    if(converted == NULL){
+      fprintf (stderr,
+               "Failed to convert pixel format of surface because: %s\n",
+               SDL_GetError ());
+      return NULL;
+    }
+    return makeSurface (converted);
+  }
+  Shared::Surface
+  Shared::makeSurface (std::filesystem::path path)
   {
     std::filesystem::path realPath = findRealPath (path);
-    SDL_Surface *surface = IMG_Load (realPath.generic_string().c_str());
+    SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
     if (surface == NULL) {
       return nullptr;
     }
-    return Surface (surface, [] (SDL_Surface *s) { SDL_FreeSurface (s); });
+    return makeSurface (surface);
   }
   /** Load an image from disk into a Texture **/
   Shared::Texture
   Shared::makeTexture (const char *aPath, SDL_Renderer *r)
   {
-    std::filesystem::path realPath = aPath;
-
-    for (auto const &base : searchPaths) {
-      std::filesystem::path thisPath = base / realPath;
-      printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
-      if (std::filesystem::exists (thisPath)) {
-        realPath = thisPath;
-        break;
-      }
-    }
+    std::filesystem::path realPath = findRealPath (aPath);
     SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
     if (surface == NULL) {
       Engine::printSdlError ();
@@ -66,16 +79,15 @@ namespace hd {
   Shared::Texture
   Shared::makeTexture (SDL_Surface *aSurface, SDL_Renderer *aRenderer)
   {
-    if((aSurface == NULL) || (aRenderer == NULL)){
+    if ((aSurface == NULL) || (aRenderer == NULL)) {
       return NULL;
     }
-    SDL_Texture* tmp = SDL_CreateTextureFromSurface(aRenderer,aSurface);
-    if(tmp==NULL) {
+    SDL_Texture *tmp = SDL_CreateTextureFromSurface (aRenderer, aSurface);
+    if (tmp == NULL) {
       Engine::printSdlError ();
       return NULL;
     }
-    return Texture(tmp,[](SDL_Texture*t){
-      SDL_DestroyTexture (t);});
+    return Texture (tmp, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
   }
   /** Locate the canonical path for the given path.
    * If the path is already absolute; it will simply return the same path
@@ -120,8 +132,8 @@ namespace hd {
                       std::string_view aChars,
                       SDL_Color aColor)
   {
-    SDL_Surface *textSurface
-        = TTF_RenderText_Blended_Wrapped (aFont.get (), aChars.data (), aColor, 640);
+    SDL_Surface *textSurface = TTF_RenderText_Blended_Wrapped (
+        aFont.get (), aChars.data (), aColor, 640);
     Texture texture = NULL;
     if (textSurface != NULL) {
       texture = makeTexture (textSurface, aRenderer);

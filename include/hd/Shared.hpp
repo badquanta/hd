@@ -34,7 +34,9 @@ namespace hd
     typedef std::shared_ptr<SDL_Surface> Surface;
     typedef std::shared_ptr<SDL_Texture> Texture;
     typedef std::shared_ptr<TTF_Font> Font;
-    static Surface makeSurface (const char *);
+    static Surface makeSurface (SDL_Surface *);
+    static Surface ConvertSurface (Surface, SDL_PixelFormatEnum=SDL_PIXELFORMAT_RGBA32);
+    static Surface makeSurface (std::filesystem::path);
     static Texture makeTexture (const char *, SDL_Renderer *);
     static Texture makeTexture (Surface, SDL_Renderer *);
     static Texture makeTexture (SDL_Surface *, SDL_Renderer *);

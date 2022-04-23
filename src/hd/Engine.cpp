@@ -80,7 +80,8 @@ namespace hd {
       shaderProgram.Bind ();
       glUniform1f (scaleLocation, 0.5f);
       glUniform1i (tex0Uni, 0);
-      glBindTexture (GL_TEXTURE_2D, texture);
+      //glBindTexture (GL_TEXTURE_2D, texture);
+      texture.Bind ();
       vbo.Bind ();
       // glVertexAttribPointer (
       //     aPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
@@ -214,38 +215,14 @@ namespace hd {
                              GL_FLOAT,
                              8 * sizeof (GLfloat),
                              (void *)(6 * sizeof (GLfloat))))) {
-      fprintf (stderr, "Failed to link aPos to the shader program.\n");
+      fprintf (stderr, "Failed to link attributes to the shader program.\n");
       SDL_Quit ();
       return false;
     };
-    Shared::Surface image
-        = Shared::makeSurface ("textures/pattern_16/diffus.tga");
-    if(image == NULL){
-      fprintf (stderr, "Failed to load texture.\n");
-      SDL_Quit ();
-      return false;
-    }
-    fprintf (stderr,
-             "Texture pixel format name: %s\n",
-             SDL_GetPixelFormatName (image->format->format));
-    glGenTextures (1, &texture);
-    glActiveTexture (GL_TEXTURE0);
-    glBindTexture (GL_TEXTURE_2D, texture);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D (GL_TEXTURE_2D,
-                  0,
-                  GL_RGB,
-                  image->w,
-                  image->h,
-                  0,
-                  GL_BGR,
-                  GL_UNSIGNED_BYTE,
-                  image->pixels);
-    image = NULL;
-    glGenerateMipmap (GL_TEXTURE_2D);
+
+    texture.Create (
+        "textures/pattern_16/diffus.tga", GL_TEXTURE_2D, GL_TEXTURE0);
+    texture.Assign (shaderProgram, "tex0", 0);
     return true;
   }
   /** **/

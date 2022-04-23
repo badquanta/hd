@@ -23,6 +23,7 @@
 #include "hd/glVAO.hpp"
 #include "hd/glVBO.hpp"
 #include "hd/glEBO.hpp"
+#include "hd/glTexture.hpp"
 #include <stdio.h>
 
 /**
@@ -57,10 +58,7 @@ namespace hd
     static void printSdlError (const char *msg = NULL);
     /** Callback list for any/all events. **/
     sdl::event::Tree on;
-    /** Event Type Dispatcher **/
-    sdl::event::TypeDispatcher onType;
-    /** Event Dispatcher for KEY{UP,DOWN} events by Key Code. **/
-    sdl::event::key::CodeDispatcher onKey;
+
 
   private:
     /** Ensure we are responsive to changes to our environment. */
@@ -87,6 +85,6 @@ namespace hd
     // GLuint ibo = 0;
     GLint scaleLocation = -1;
     GLint tex0Uni = -1;
-    GLuint texture;
+    gl::Texture texture;
   };
 } // namespace hd
