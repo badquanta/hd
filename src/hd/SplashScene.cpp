@@ -82,5 +82,6 @@ namespace hd {
     SDL_QueryTexture (textMsg.get(), NULL, NULL, &texW, &texH);
     dstBox = { 0, 0, texW, texH };
     SDL_RenderCopy (r, textMsg.get (), NULL, &dstBox);
+
   }
 } // namespace hd

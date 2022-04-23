@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Program.hpp"
+#include "hd/Engine.hpp"
 #include "hd/SplashScene.hpp"
 
 void
@@ -30,13 +30,14 @@ printVersions ()
   SDL_GetVersion (&sdlver);
   printVersion (&sdlver);
   printVersion (IMG_Linked_Version (), "SDL_image");
+  printVersion (TTF_Linked_Version (), "SDL_TTF");
 }
 
 int
 main (int argc, char **argv)
 {
   printVersions ();
-  hd::Program program (argc, argv);
+  hd::Engine program (argc, argv);
   hd::SplashScene splash;
   if (program.startup ())
     {

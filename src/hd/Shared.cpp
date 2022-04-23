@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Shared.hpp"
-#include "hd/Program.hpp"
+#include "hd/Engine.hpp"
 namespace hd {
   std::list<std::filesystem::path> Shared::searchPaths;
   Shared::Surface
@@ -44,13 +44,13 @@ namespace hd {
     }
     SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
     if (surface == NULL) {
-      Program::printSdlError ();
+      Engine::printSdlError ();
       return nullptr;
     }
     SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
     SDL_FreeSurface (surface);
     if (texture == NULL) {
-      Program::printSdlError ();
+      Engine::printSdlError ();
 
       return nullptr;
     }
@@ -65,7 +65,7 @@ namespace hd {
     }
     SDL_Texture* tmp = SDL_CreateTextureFromSurface(aRenderer,aSurface);
     if(tmp==NULL) {
-      Program::printSdlError ();
+      Engine::printSdlError ();
       return NULL;
     }
     return Texture(tmp,[](SDL_Texture*t){
@@ -115,7 +115,7 @@ namespace hd {
                       SDL_Color aColor)
   {
     SDL_Surface *textSurface
-        = TTF_RenderText_Blended (aFont.get (), aChars.data (), aColor);
+        = TTF_RenderText_Blended_Wrapped (aFont.get (), aChars.data (), aColor, 640);
     Texture texture = NULL;
     if (textSurface != NULL) {
       texture = makeTexture (textSurface, aRenderer);

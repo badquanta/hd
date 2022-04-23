@@ -20,6 +20,9 @@
 #include "hd/Scene.hpp"
 #include "hd/Shared.hpp"
 #include "hd/glProgram.hpp"
+#include "hd/glVAO.hpp"
+#include "hd/glVBO.hpp"
+#include "hd/glEBO.hpp"
 #include <stdio.h>
 
 /**
@@ -31,14 +34,14 @@ namespace hd
   /**
    * @brief Apply what we know
    */
-  class Program
+  class Engine
   {
   public:
     /** Start applying **/
-    Program ();
-    Program (int, char **);
+    Engine ();
+    Engine (int, char **);
     /** Finish applying **/
-    ~Program ();
+    ~Engine ();
     /** Configure **/
     void configure (int, char **);
     /** Start our work.**/
@@ -75,12 +78,12 @@ namespace hd
     /** GLSL Program ID */
     gl::Program shaderProgram;
     // GLuint programId = 0;
-    GLint vertexPos2dLocation = -1;
-    GLuint vao = 0;
-    GLuint vbo = 0;
-    GLuint ibo = 0;
-
-    void printShaderLog (GLuint shader);
-    void printProgramLog (GLuint program);
+    //GLint aPos = -1;
+    gl::VAO vao;
+    // GLuint vao = 0;
+    gl::VBO vbo;
+    // GLuint vbo = 0;
+    gl::EBO ebo;
+    // GLuint ibo = 0;
   };
 } // namespace hd

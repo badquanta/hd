@@ -12,12 +12,49 @@ namespace hd::gl {
     ID = glCreateProgram ();
     return ID != 0;
   }
+  bool
+  Program::create (std::filesystem::path aVertexSource,
+                   std::filesystem::path aFragmentSource)
+  {
+    create ();
+    Shader vertex (GL_VERTEX_SHADER), fragment (GL_FRAGMENT_SHADER);
+    if (!vertex.loadSource (aVertexSource)) {
+      fprintf (stderr,
+               "Failed to load Vertex Shader Source from '%s'\n",
+               aVertexSource.generic_string ().c_str ());
+      return false;
+    };
+    if (!fragment.loadSource (aFragmentSource)) {
+      fprintf (stderr,
+               "Failed to load Fragment Shader Source from '%s'\n",
+               aFragmentSource.generic_string ().c_str ());
+      return false;
+    }
+    if(!vertex.compile()){
+      fprintf (stderr, "Failed to compile Vertex Shader, log:\n");
+      vertex.printLog (stderr);
+      return false;
+    }
+    if(!fragment.compile()){
+      fprintf (stderr, "Failed to compile Fragment Shader, log:\n");
+      fragment.printLog (stderr);
+      return false;
+    }
+    attach (vertex);
+    attach (fragment);
+    if(!link ()){
+      fprintf (stderr, "Failed to link shader program %d, log:\n", ID);
+      printLog (stderr);
+      return false;
+    }
+    return true;
+  }
   void
   Program::free ()
   {
     if (ID != 0) {
       glDeleteProgram (ID);
-      ID = NULL;
+      ID = 0;
     }
   }
   void
@@ -50,7 +87,7 @@ namespace hd::gl {
   bool
   Program::bind ()
   {
-    if (ID == NULL) {
+    if (ID == 0) {
       return false;
     }
 

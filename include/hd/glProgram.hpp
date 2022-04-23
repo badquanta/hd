@@ -14,6 +14,12 @@ namespace hd {
       void attach (GLuint);
       bool link ();
       bool create ();
+      /** This will:
+       * 1. Load aVertexSource, aFragmentSource files into shaders.
+       * 2. Compile them.
+       * 3. And link them to the Program.
+       **/
+      bool create (std::filesystem::path, std::filesystem::path);
       void free ();
       bool bind ();
       void unbind ();
