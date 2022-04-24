@@ -86,5 +86,6 @@ namespace hd
     GLint scaleLocation = -1;
     GLint tex0Uni = -1;
     gl::Texture texture;
+    int scrW = 800, scrH = 800;
   };
 } // namespace hd

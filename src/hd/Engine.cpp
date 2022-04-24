@@ -19,17 +19,22 @@
 
 // Vertices coordinates
 GLfloat vertexData[] = {
-  //     COORDINATES/        COLORS   /   TexCoord  //
-  -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // Lower left corner
-  -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // Upper left corner
-  0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // Upper right corner
-  0.5f,  -0.5f, 0.0f, 0.05f, 0.05f, 0.05f, 1.0f, 0.0f  // Lower right corner
+  //     COORDINATES     /        COLORS      /   TexCoord  //
+  -0.5f, 0.0f, 0.5f,  0.83f, 0.70f, 0.44f, 0.0f, 0.0f, //
+  -0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 1.0f, 0.0f, //
+  0.5f,  0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, //
+  0.5f,  0.0f, 0.5f,  0.83f, 0.70f, 0.44f, 1.0f, 0.0f, //
+  0.0f,  0.8f, 0.0f,  0.92f, 0.86f, 0.76f, 0.5f, 1.0f  //
 };
 
 // Indices for vertices order
 GLuint indexData[] = {
-  0, 2, 1, // Upper triangle
-  0, 3, 2  // Lower triangle
+  0, 1, 2, //
+  0, 2, 3, //
+  0, 1, 4, //
+  1, 2, 4, //
+  2, 3, 4, //
+  3, 0, 4  //
 };
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 /** **/
@@ -47,9 +52,11 @@ namespace hd {
     on.type.appendListener (SDL_WINDOWEVENT, [this] (const SDL_Event &e) {
       // printf ("WINDOW EVENT\n");
       if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-        printf (
-            "WINDOW SIZE CHANGED TO %dx%d\n", e.window.data1, e.window.data2);
-        glViewport (0, 0, e.window.data1, e.window.data2);
+        scrW = e.window.data1;
+        scrH = e.window.data2;
+        printf ("WINDOW SIZE CHANGED TO %dx%d\n", scrW, scrH);
+
+        glViewport (0, 0, scrW, scrH);
       }
     });
     // Shared::searchPaths.clear ();
@@ -74,20 +81,36 @@ namespace hd {
       handleEvents ();
       // SDL_Renderer *renderer = SDL_GetRenderer (window);
       glClearColor (0.f, 0.f, 0.f, 1.f);
-      glClear (GL_COLOR_BUFFER_BIT);
+      glEnable (GL_DEPTH_TEST);
+      glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       // SDL_RenderPresent (renderer);
       // glUseProgram (programId);
       shaderProgram.Bind ();
+      glm::mat4 model (1.0f);
+      glm::mat4 view (1.0f);
+      glm::mat4 proj (1.0f);
+      float rotation = SDL_GetTicks () / 100;
+      model = glm::rotate (
+          model, glm::radians (rotation), glm::vec3 (0.0f, 1.0f, 0.0f));
+      view = glm::translate (view, glm::vec3 (0.0f, -0.5f, -2.0f));
+      proj = glm::perspective (
+          glm::radians (45.0f), (float)scrW / (float)scrH, 0.1f, 100.0f);
+      GLint modelLoc = shaderProgram.getUniformLocation ("model");
+      glUniformMatrix4fv (modelLoc, 1, GL_FALSE, glm::value_ptr (model));
+      GLint viewLoc = shaderProgram.getUniformLocation ("view");
+      glUniformMatrix4fv (viewLoc, 1, GL_FALSE, glm::value_ptr (view));
+      GLint projLoc = shaderProgram.getUniformLocation ("proj");
+      glUniformMatrix4fv (projLoc, 1, GL_FALSE, glm::value_ptr (proj));
       glUniform1f (scaleLocation, 0.5f);
       glUniform1i (tex0Uni, 0);
-      //glBindTexture (GL_TEXTURE_2D, texture);
+      // glBindTexture (GL_TEXTURE_2D, texture);
       texture.Bind ();
       vbo.Bind ();
       // glVertexAttribPointer (
       //     aPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
       // glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
       ebo.Bind ();
-      glDrawElements (GL_TRIANGLES, 9, GL_UNSIGNED_INT, NULL);
+      glDrawElements (GL_TRIANGLES, sizeof(indexData) / sizeof(GLuint), GL_UNSIGNED_INT, NULL);
       // glDisableVertexAttribArray (aPos);
       shaderProgram.unbind ();
       SDL_GL_SwapWindow (window);
@@ -149,8 +172,8 @@ namespace hd {
     window = SDL_CreateWindow ("hd opengl window",
                                SDL_WINDOWPOS_UNDEFINED,
                                SDL_WINDOWPOS_UNDEFINED,
-                               800,
-                               800,
+                               scrW,
+                               scrH,
                                SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
                                    | SDL_WINDOW_RESIZABLE);
     if ((window == NULL)) {
