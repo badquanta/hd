@@ -57,7 +57,7 @@ namespace hd
      * \deprecated someone else should just do this. **/
     static void printSdlError (const char *msg = NULL);
     /** Callback list for any/all events. **/
-    sdl::event::Tree on;
+    TypeEvent on;
 
 
   private:

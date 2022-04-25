@@ -37,6 +37,6 @@ namespace hd
     /** \pure **/
     virtual void render (SDL_Renderer *r) = 0;
     virtual void handleEvent (SDL_Event &e);
-    sdl::event::Tree on;
+    TypeEvent on;
   };
 } // namespace hd

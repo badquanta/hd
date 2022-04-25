@@ -41,8 +41,7 @@ main (int argc, char **argv)
   hd::SplashScene splash;
   if (program.startup ())
     {
-      program.on.keyCode.appendListener (
-          SDLK_UP, [] (const SDL_Event &e) { printf ("Got Up key.\n"); });
+      program.on.Key.Keycode[SDLK_UP].Add([] (const SDL_Event &e) { printf ("Got Up key.\n"); });
       program.setScene (&splash);
       program.frameLoop ();
       program.shutdown ();

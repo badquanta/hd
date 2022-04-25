@@ -46,10 +46,8 @@ namespace hd {
   void
   Engine::configure (int argc, char **argv)
   {
-    on.reset ();
-    on.type.appendListener (SDL_QUIT,
-                            [this] (const SDL_Event &e) { quit = true; });
-    on.type.appendListener (SDL_WINDOWEVENT, [this] (const SDL_Event &e) {
+    on.Quit.Add([this] (const SDL_Event &e) { quit = true; });
+    on.Window.Add([this] (const SDL_Event &e) {
       // printf ("WINDOW EVENT\n");
       if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
         scrW = e.window.data1;
@@ -126,8 +124,8 @@ namespace hd {
     SDL_Event e;
     while (SDL_PollEvent (&e) != 0) {
       // on.dispatch (e);
-      on (e);
-      currentScene->on (e);
+      on.Trigger(e);
+      //currentScene->on (e);
       // switch (e.type)
       //   {
       //   case SDL_QUIT:

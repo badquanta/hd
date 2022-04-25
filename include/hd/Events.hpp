@@ -17,70 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Common.hpp"
-#include <eventpp/eventdispatcher.h>
-#include <eventpp/mixins/mixinfilter.h>
+#include <functional>
+#include <map>
 /** **/
-namespace hd
-{
-  namespace sdl
-  {
-    namespace event
-    {
+namespace hd {
+  /** **/
+  class Event {
+  public:
+    typedef std::function<void (const SDL_Event &)> Handler;
+    virtual void Trigger (const SDL_Event &);
+    unsigned int Add (Handler);
+    bool Delete (unsigned int);
+    // Pipes are used to attach one event to the trigger of another.
+    const Handler pipe;
+  private:
+    unsigned int nextId = 0;
+    std::map<int, Handler> handlers;
+  };
+  class KeyEvent : public Event {
+    public:
+    Event Up, Down;
+    virtual void Trigger (const SDL_Event &) override;
+  };
+  class KeyboardEvent : public Event {
+    public:
+    std::map<SDL_Scancode, KeyEvent> Scancode;
+    std::map<SDL_Keycode, KeyEvent> Keycode;
+    Event MapChange;
+    virtual void Trigger (const SDL_Event &) override;
+  };
+  /** **/
+  class MouseButtonEvent : public Event {
+  public:
+    Event Up, Down;
+    virtual void Trigger (const SDL_Event &) override;
+  };
+  /** **/
+  class MouseEvent  : public Event {
+  public:
+    Event Motion, Wheel;
+    std::map<Uint8,MouseButtonEvent> Button;
+    virtual void Trigger (const SDL_Event &) override;
+  };
+  /** **/
+  class TypeEvent  : public Event {
+  public:
+    Event Quit, App, Window, SysWM, Text, Mouse, Joy, Controller,
+        Finger, Dollar, Clipboard, Drop, Audio, Render, User;
+    KeyboardEvent Key;
 
-      template <typename BASE> class Pipe : public BASE
-      {
-      public:
-        std::function<void (const SDL_Event &e)> pipe
-            = [this] (const SDL_Event &e) { this->dispatch (e); };
-      };
-      /** Help eventpp extract event types from SDL_Event
-       * @see
-       * https://github.com/wqking/eventpp/blob/master/doc/tutorial_eventdispatcher.md
-       * **/
-      struct TypeDispatchPolicy
-      {
-        static int getEvent (const SDL_Event &e);
-        using Mixins = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
-      };
-
-      /** SDL_Event.type dispatcher **/
-      class TypeDispatcher
-          : public eventpp::EventDispatcher<int, void (const SDL_Event &),
-                                            TypeDispatchPolicy>
-      {
-      public:
-        // void operator() (const SDL_Event &e);
-      };
-      namespace key
-      {
-        /** Policy for SDL_KEY{DOWN,UP} **/
-        struct CodePolicy
-        {
-          static int getEvent (const SDL_Event &e);
-          using Mixins = eventpp::MixinList<eventpp::MixinFilter, Pipe>;
-        };
-        /** dispatcher for SDL_KEY{DOWN,UP} KeySyms **/
-        class CodeDispatcher
-            : public eventpp::EventDispatcher<int, void (const SDL_Event &e),
-                                              CodePolicy>
-        {
-        public:
-          CodeDispatcher ();
-          // void operator() (const SDL_Event &e);
-        };
-      } // namespace key
-      class List : public eventpp::CallbackList<void (const SDL_Event &)>
-      {
-      };
-      class Tree : public List
-      {
-      public:
-        void reset ();
-        TypeDispatcher type;
-        key::CodeDispatcher keyCode;
-        Tree ();
-      };
-    } // namespace event
-  }   // namespace sdl
-
+    virtual void Trigger (const SDL_Event &) override;
+  };
 } // namespace hd
