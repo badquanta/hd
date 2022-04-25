@@ -37,7 +37,8 @@ int
 main (int argc, char **argv)
 {
   printVersions ();
-  hd::Engine program (argc, argv);
+  hd::Engine program;
+  program.configure (argc, argv);
   hd::SplashScene splash;
   if (program.startup ())
     {

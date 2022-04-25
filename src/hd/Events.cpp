@@ -18,6 +18,7 @@
  */
 /** **/
 namespace hd {
+
   void
   Event::Trigger (const SDL_Event &e)
   {

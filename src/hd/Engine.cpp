@@ -40,13 +40,9 @@ GLuint indexData[] = {
 /** **/
 namespace hd {
   /** Some boring details about how to construct an application. **/
-  Engine::Engine () {}
-  Engine::Engine (int argc, char **argv) { configure (argc, argv); }
-  /** Setup some basic options based on the command line **/
-  void
-  Engine::configure (int argc, char **argv)
-  {
-    on.Quit.Add([this] (const SDL_Event &e) { quit = true; });
+  Engine::Engine () :camera(scrW, scrH, glm::vec3(0.0f, 0.0f, 2.0f)){
+    on.Add (camera.on.pipe);
+    on.Quit.Add ([this] (const SDL_Event &e) { quit = true; });
     on.Window.Add([this] (const SDL_Event &e) {
       // printf ("WINDOW EVENT\n");
       if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
@@ -57,6 +53,13 @@ namespace hd {
         glViewport (0, 0, scrW, scrH);
       }
     });
+  }
+  //Engine::Engine (int argc, char **argv) { configure (argc, argv); }
+  /** Setup some basic options based on the command line **/
+  void
+  Engine::configure (int argc, char **argv)
+  {
+
     // Shared::searchPaths.clear ();
     Shared::searchPaths.push_back (std::filesystem::canonical (
         std::filesystem::path (argv[0]).parent_path () / "../assets"));
@@ -84,21 +87,13 @@ namespace hd {
       // SDL_RenderPresent (renderer);
       // glUseProgram (programId);
       shaderProgram.Bind ();
-      glm::mat4 model (1.0f);
-      glm::mat4 view (1.0f);
-      glm::mat4 proj (1.0f);
-      float rotation = SDL_GetTicks () / 100;
-      model = glm::rotate (
-          model, glm::radians (rotation), glm::vec3 (0.0f, 1.0f, 0.0f));
-      view = glm::translate (view, glm::vec3 (0.0f, -0.5f, -2.0f));
-      proj = glm::perspective (
-          glm::radians (45.0f), (float)scrW / (float)scrH, 0.1f, 100.0f);
-      GLint modelLoc = shaderProgram.getUniformLocation ("model");
-      glUniformMatrix4fv (modelLoc, 1, GL_FALSE, glm::value_ptr (model));
-      GLint viewLoc = shaderProgram.getUniformLocation ("view");
-      glUniformMatrix4fv (viewLoc, 1, GL_FALSE, glm::value_ptr (view));
-      GLint projLoc = shaderProgram.getUniformLocation ("proj");
-      glUniformMatrix4fv (projLoc, 1, GL_FALSE, glm::value_ptr (proj));
+      //GLint modelLoc = shaderProgram.getUniformLocation ("model");
+      //glUniformMatrix4fv (modelLoc, 1, GL_FALSE, glm::value_ptr (model));
+      //GLint viewLoc = shaderProgram.getUniformLocation ("view");
+      //glUniformMatrix4fv (viewLoc, 1, GL_FALSE, glm::value_ptr (view));
+      //GLint projLoc = shaderProgram.getUniformLocation ("proj");
+      //glUniformMatrix4fv (projLoc, 1, GL_FALSE, glm::value_ptr (proj));
+      camera.Matrix (45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
       glUniform1f (scaleLocation, 0.5f);
       glUniform1i (tex0Uni, 0);
       // glBindTexture (GL_TEXTURE_2D, texture);

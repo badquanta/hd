@@ -29,16 +29,21 @@ namespace hd {
     unsigned int Add (Handler);
     bool Delete (unsigned int);
     // Pipes are used to attach one event to the trigger of another.
-    const Handler pipe;
+    const Handler pipe = [this] (const SDL_Event &e) {
+      this->Trigger (e);
+    };
+
   private:
     unsigned int nextId = 0;
     std::map<int, Handler> handlers;
   };
+  /** **/
   class KeyEvent : public Event {
     public:
     Event Up, Down;
     virtual void Trigger (const SDL_Event &) override;
   };
+  /** **/
   class KeyboardEvent : public Event {
     public:
     std::map<SDL_Scancode, KeyEvent> Scancode;
@@ -62,9 +67,10 @@ namespace hd {
   /** **/
   class TypeEvent  : public Event {
   public:
-    Event Quit, App, Window, SysWM, Text, Mouse, Joy, Controller,
+    Event Quit, App, Window, SysWM, Text, Joy, Controller,
         Finger, Dollar, Clipboard, Drop, Audio, Render, User;
     KeyboardEvent Key;
+    MouseEvent Mouse;
 
     virtual void Trigger (const SDL_Event &) override;
   };

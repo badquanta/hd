@@ -24,6 +24,7 @@
 #include "hd/glVBO.hpp"
 #include "hd/glEBO.hpp"
 #include "hd/glTexture.hpp"
+#include "hd/glCamera.hpp"
 #include <stdio.h>
 
 /**
@@ -40,7 +41,6 @@ namespace hd
   public:
     /** Start applying **/
     Engine ();
-    Engine (int, char **);
     /** Finish applying **/
     ~Engine ();
     /** Configure **/
@@ -87,5 +87,6 @@ namespace hd
     GLint tex0Uni = -1;
     gl::Texture texture;
     int scrW = 800, scrH = 800;
+    gl::Camera camera;
   };
 } // namespace hd
