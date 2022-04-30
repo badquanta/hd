@@ -1,5 +1,6 @@
 #pragma once
 #include "hd/Config.hpp"
+#include <stdio.h>
 
 #define hdDebug(MESSAGE, ...)                                                 \
   fprintf (stderr, "%s:%d\t", __FILE__, __LINE__);                            \

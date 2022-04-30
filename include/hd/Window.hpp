@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
-#include "hd/Common.hpp"
 #include "hd/Shared.hpp"
 #include "hd/evt/VoidDispatch.hpp"
 #include "hd/evt/WindowDispatch.hpp"

@@ -19,9 +19,7 @@
 #include "hd/Shared.hpp"
 #include "hd/evt/EngineDispatch.hpp"
 #include "hd/evt/IntDispatch.hpp"
-#include "hd/evt/VoidDispatch.hpp"
 #include <memory>
-#include <stdio.h>
 /**
  * @brief holodeck?
  */

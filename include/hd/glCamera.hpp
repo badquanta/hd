@@ -1,5 +1,4 @@
 #pragma once
-#include "hd/Common.hpp"
 #include "hd/evt/WindowDispatch.hpp"
 #include "hd/glProgram.hpp"
 

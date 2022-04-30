@@ -1,5 +1,4 @@
 #pragma once
-#include "hd/Common.hpp"
 #include "hd/glShader.hpp"
 namespace hd {
   namespace gl {
