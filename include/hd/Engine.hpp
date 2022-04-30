@@ -16,77 +16,71 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Events.hpp"
-#include "hd/Scene.hpp"
 #include "hd/Shared.hpp"
-#include "hd/glProgram.hpp"
-#include "hd/glVAO.hpp"
-#include "hd/glVBO.hpp"
-#include "hd/glEBO.hpp"
-#include "hd/glTexture.hpp"
-#include "hd/glCamera.hpp"
+#include "hd/evt/EngineDispatch.hpp"
+#include "hd/evt/IntDispatch.hpp"
+#include "hd/evt/VoidDispatch.hpp"
+#include <memory>
 #include <stdio.h>
-
 /**
  * @brief holodeck?
  */
-namespace hd
-{
-
+namespace hd {
   /**
-   * @brief Apply what we know
+   * @brief Initializes SDL, helps finds files, and dispatches events.
    */
-  class Engine
-  {
+  class Engine {
   public:
-    /** Start applying **/
-    Engine ();
+    typedef std::shared_ptr<Engine> Mount;
+    /**
+     * @brief Initializes or simply returns an already initialized engine.
+     *
+     * @return Mount `std::shared_ptr<Engine>`, NULL if initialization error.
+     */
+    static Mount Get ();
+    static void PrintVersion (const SDL_version *,
+                              const char *of = "SDL",
+                              FILE *aFile = stdout);
+    static void PrintVersions (FILE *aFile = stdout);
+    /** Sets up engine options from Command Line Environment **/
+    static void Configure (int, char **);
+    /** Returns the program's name, `Configure()` needs to have been called.
+     *  @return A character string with the program's name.
+     *  @return "" if `Configure(argc, argv)` has not be called
+     * **/
+    static const char *ProgramName ();
     /** Finish applying **/
     ~Engine ();
-    /** Configure **/
-    void configure (int, char **);
-    /** Start our work.**/
-    bool startup ();
-    /** Clean up our workspace.**/
-    void shutdown ();
-    /** Perform a step of our work.**/
-    void frameLoop ();
-    /** Change our workspace.**/
-    void setScene (Scene *);
+    /** Signal to the engine we wish to exit the main loop **/
+    void Quit ();
+    void Start ();
     /** Print out what went wrong with SDL2.
      * \deprecated someone else should just do this. **/
-    static void printSdlError (const char *msg = NULL);
+    static void PrintSdlError (const char *msg = NULL);
     /** Callback list for any/all events. **/
-    TypeEvent on;
-
-
+    evt::EngineDispatch on;
+    evt::IntDispatch eachFrame;
+    evt::VoidDispatch beforeStart;
+    /** @todo remove from Engine gl::Camera camera; **/
   private:
+    /**
+     * @brief Construct a new Engine object
+     * @attention This method is private and one needs to call it through
+     * `Engine::Get()`
+     */
+    Engine ();
+    /** Singleton instance storage **/
+    static std::weak_ptr<Engine> instance;
+    /** Pre-constructor initialization, called by Get() before construction.
+     * **/
+    static Mount Initialize ();
+    /** Clean up our workspace.**/
+    static void Shutdown ();
+    /** Perform a step of our work.**/
+    void FrameLoop ();
     /** Ensure we are responsive to changes to our environment. */
-    int handleEvents ();
-    /** Where are we? */
-    Scene *currentScene;
-    /** How fast are we working?*/
-    FPSmanager fpsMan;
-    /** What can we see?*/
-    SDL_Window *window;
-    /** OpenGL Context **/
-    SDL_GLContext context;
+    int HandleEvents ();
     /** Should we keep on working? */
     bool quit = false;
-    /** GLSL Program ID */
-    gl::Program shaderProgram;
-    // GLuint programId = 0;
-    //GLint aPos = -1;
-    gl::VAO vao;
-    // GLuint vao = 0;
-    gl::VBO vbo;
-    // GLuint vbo = 0;
-    gl::EBO ebo;
-    // GLuint ibo = 0;
-    GLint scaleLocation = -1;
-    GLint tex0Uni = -1;
-    gl::Texture texture;
-    int scrW = 800, scrH = 800;
-    gl::Camera camera;
   };
 } // namespace hd

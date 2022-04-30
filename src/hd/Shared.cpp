@@ -63,13 +63,13 @@ namespace hd {
     std::filesystem::path realPath = findRealPath (aPath);
     SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
     if (surface == NULL) {
-      Engine::printSdlError ();
+      Engine::PrintSdlError ();
       return nullptr;
     }
     SDL_Texture *texture = SDL_CreateTextureFromSurface (r, surface);
     SDL_FreeSurface (surface);
     if (texture == NULL) {
-      Engine::printSdlError ();
+      Engine::PrintSdlError ();
 
       return nullptr;
     }
@@ -84,7 +84,7 @@ namespace hd {
     }
     SDL_Texture *tmp = SDL_CreateTextureFromSurface (aRenderer, aSurface);
     if (tmp == NULL) {
-      Engine::printSdlError ();
+      Engine::PrintSdlError ();
       return NULL;
     }
     return Texture (tmp, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });

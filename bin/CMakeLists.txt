@@ -1,11 +1,5 @@
-list(
-  APPEND
-  LIBHD_COMPONENTS
-  hdCommon.cpp
-  hdScene.cpp
-  hdShared.cpp
-  hdSplashScene.cpp
-  hdApp.cpp
-  hdEvents.cpp)
 add_executable(hddemo hd.cpp)
 target_link_libraries(hddemo hd)
+add_executable(hd1 hd1.cpp)
+target_link_libraries(hd1 hd)
+install(TARGETS hddemo RUNTIME DESTINATION bin )

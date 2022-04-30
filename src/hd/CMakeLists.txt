@@ -1,10 +1,27 @@
 list(APPEND LIBHD_COMPONENTS
   Common.cpp
+  evt/AbstractDispatch.cpp
+  evt/ControllerDeviceDispatch.cpp
+  evt/ControllerDispatch.cpp
+  evt/DropDispatch.cpp
+  evt/EngineDispatch.cpp
+  evt/IntDispatch.cpp
+  evt/JoyDeviceDispatch.cpp
+  evt/JoyDispatch.cpp
+  evt/KeyboardDispatch.cpp
+  evt/KeyDispatch.cpp
+  evt/MouseButtonDispatch.cpp
+  evt/MouseDispatch.cpp
+  evt/SDL_EventDispatch.cpp
+  evt/TextDispatch.cpp
+  evt/VoidDispatch.cpp
+  evt/WindowDispatch.cpp
+  evt/WindowIdDispatch.cpp
+  Window.cpp
   Scene.cpp
   Shared.cpp
   SplashScene.cpp
   Engine.cpp
-  Events.cpp
   glCamera.cpp
   glTexture.cpp
   glProgram.cpp
@@ -23,4 +40,7 @@ target_include_directories(hd
   "${PROJECT_SOURCE_DIR}/include/"
   "${PROJECT_SOURCE_DIR}/ext/eventpp/include"
   "${PROJECT_SOURCE_DIR}/ext/glm")
+
+if(HD_PRECOMPILE_HPP)
 target_precompile_headers(hd PRIVATE ../../include/hd/Common.hpp)
+endif()

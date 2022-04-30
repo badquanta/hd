@@ -1,59 +1,53 @@
 #include "hd/glCamera.hpp"
 namespace hd::gl {
-  Camera::Camera (int w, int h, glm::vec3 p)
-      : width (w), height (h), Position (p)
+
+  Camera::Camera (glm::vec3 p) : Position (p)
   {
-    on.Mouse.Button[0].Down.Add (
-        [this] (const SDL_Event &e) { SDL_SetRelativeMouseMode (SDL_TRUE); });
-    on.Mouse.Button[0].Up.Add (
-        [this] (const SDL_Event &e) { SDL_SetRelativeMouseMode (SDL_FALSE); });
-    on.Mouse.Motion.Add ([this] (const SDL_Event &e) {
-      if (e.motion.state & SDL_BUTTON_LMASK) {
-        glm::vec3 newOrientation
-            = glm::rotate (Orientation,
-                           glm::radians (sensitivity * (float)e.motion.xrel),
-                           glm::normalize (glm::cross (Orientation, Up)));
-        if (abs (glm::angle (newOrientation, Up) - glm::radians (90.0f))
-            <= glm::radians (85.0f)) {
-          Orientation = newOrientation;
-        }
-        Orientation
-            = glm::rotate (Orientation,
-                           glm::radians (sensitivity * (float)e.motion.yrel),
-                           Up);
-      }
-    });
-    on.Key.Keycode[SDLK_w].Down.Add (
-        [this] (const SDL_Event &e) { Position += speed * Orientation; });
-    on.Key.Keycode[SDLK_a].Down.Add ([this] (const SDL_Event &e) {
-      Position += speed * -glm::normalize (glm::cross (Orientation, Up));
-    });
-    on.Key.Keycode[SDLK_s].Down.Add (
-        [this] (const SDL_Event &e) { Position += speed * -Orientation; });
-    on.Key.Keycode[SDLK_d].Down.Add ([this] (const SDL_Event &e) {
-      Position += speed * glm::normalize (glm::cross (Orientation, Up));
-    });
-    on.Key.Keycode[SDLK_LCTRL].Down.Add (
-        [this] (const SDL_Event &e) { Position += speed * Up; });
-    on.Key.Keycode[SDLK_LSHIFT].Down.Add (
-        [this] (const SDL_Event &e) { speed = 0.4f; });
-    on.Key.Keycode[SDLK_LSHIFT].Up.Add (
-        [this] (const SDL_Event &e) { speed = 0.1f; });
+    hdDebugCall (NULL);
+    on.Mouse.Button[0].Down.Void.Add (StartTrackingMouse);
+    on.Mouse.Button[0].Up.Void.Add (StopTrackingMouse);
+    //on.Mouse.Motion.Add (TrackingListener);
+
+    on.Key.Keycode[SDLK_w].Down.Void.Add (MoveForward);
+    on.Key.Keycode[SDLK_s].Down.Void.Add (MoveBackward);
+    on.Key.Keycode[SDLK_a].Down.Void.Add (StrafeLeft);
+    on.Key.Keycode[SDLK_d].Down.Void.Add (StrafeRight);
+    on.Key.Keycode[SDLK_LCTRL].Down.Void.Add (MoveUp);
+    on.Key.Keycode[SDLK_SPACE].Down.Void.Add (MoveDown);
+    on.Key.Keycode[SDLK_LSHIFT].Down.Void.Add (RunSpeed);
+    on.Key.Keycode[SDLK_LSHIFT].Up.Void.Add (WalkSpeed);
   }
+
+
+  /**
+   * @brief
+   *
+   * @param aWidth Rendering width
+   * @param aHeight Rendering height
+   * @param aFovDeg Field of view in degrees
+   * @param aNearPlane Value to clip beyond in z axis.
+   * @param aFarPlane Value to clip near z axis.
+   * @param aProgram OpenGL Program to use.
+   * @param aUniformName Name of Program Uniform to update.
+   */
   void
-  Camera::Matrix (float aFOVdeg,
+  Camera::Matrix (int aWidth,
+                  int aHeight,
+                  float aFovDeg,
                   float aNearPlane,
                   float aFarPlane,
                   Program &aProgram,
                   const char *aUniformName)
   {
+    // load identity matrixes.
     glm::mat4 view = glm::mat4 (1.0f);
     glm::mat4 projection = glm::mat4 (1.0f);
+    //
+    float aspect = aWidth / aHeight;
+    //
     view = glm::lookAt (Position, Position + Orientation, Up);
-    projection = glm::perspective (glm::radians (aFOVdeg),
-                                   (float)width / (float)height,
-                                   aNearPlane,
-                                   aFarPlane);
+    projection = glm::perspective (
+        glm::radians (aFovDeg), aspect, aNearPlane, aFarPlane);
 
     glUniformMatrix4fv (aProgram.getUniformLocation (aUniformName),
                         1,

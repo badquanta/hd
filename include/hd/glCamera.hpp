@@ -1,7 +1,7 @@
 #pragma once
 #include "hd/Common.hpp"
+#include "hd/evt/WindowDispatch.hpp"
 #include "hd/glProgram.hpp"
-#include "hd/Events.hpp"
 
 namespace hd {
   namespace gl {
@@ -17,9 +17,75 @@ namespace hd {
       float sensitivity = 0.10f;
 
     public:
-      Camera (int, int, glm::vec3);
-      void Matrix (float, float, float, Program &, const char *);
-      TypeEvent on;
+      Camera (glm::vec3);
+      /**
+       * @brief Redefine the camera.
+       *
+       */
+      void Matrix (int, int, float, float, float, Program &, const char *);
+      evt::WindowDispatch on;
+
+      // Event Handlers
+      evt::VoidDispatch::Handler StartTrackingMouse = [this] () {
+        hdDebug ("Start Tracking Mouse");
+        SDL_SetRelativeMouseMode (SDL_TRUE);
+        TrackingListenerHandle = on.Mouse.Motion.Add(TrackingListener);
+      };
+      evt::VoidDispatch::Handler StopTrackingMouse = [this] () {
+        hdDebug ("Stop Tracking Mouse");
+        SDL_SetRelativeMouseMode (SDL_FALSE);
+        on.Mouse.Motion.Delete (TrackingListenerHandle);
+      };
+      evt::SDL_EventDispatch::Handler TrackingListener = [this] (const SDL_Event&e) {
+        hdDebug ("Tracking Listener");
+        if (e.motion.state & SDL_BUTTON_LMASK) {
+          glm::vec3 newOrientation
+              = glm::rotate (Orientation,
+                             glm::radians (sensitivity * (float)e.motion.yrel),
+                             glm::normalize (glm::cross (Orientation, Up)));
+          if (abs (glm::angle (newOrientation, Up) - glm::radians (90.0f))
+              <= glm::radians (85.0f)) {
+            Orientation = newOrientation;
+          }
+          Orientation
+              = glm::rotate (Orientation,
+                             glm::radians (sensitivity * (float)e.motion.xrel),
+                             Up);
+        }
+      };
+      evt::SDL_EventDispatch::Handle TrackingListenerHandle;
+      evt::VoidDispatch::Handler MoveForward = [this] () {
+        hdDebug ("Move Forward");
+        Position += speed * Orientation;
+      };
+      evt::VoidDispatch::Handler MoveBackward = [this] () {
+        hdDebug ("Move Backward");
+        Position += speed * -Orientation;
+      };
+      evt::VoidDispatch::Handler StrafeLeft = [this] () {
+        hdDebug ("Strafe Left");
+        Position += speed * -glm::normalize (glm::cross (Orientation, Up));
+      };
+      evt::VoidDispatch::Handler StrafeRight = [this] () {
+        hdDebug ("Strafe Right");
+        Position += speed * glm::normalize (glm::cross (Orientation, Up));
+      };
+      evt::VoidDispatch::Handler MoveUp = [this] () {
+        hdDebug ("Move Up");
+        Position += speed * Up;
+      };
+      evt::VoidDispatch::Handler MoveDown = [this] () {
+        hdDebug ("Move Down");
+        Position += speed * -Up;
+      };
+      evt::VoidDispatch::Handler WalkSpeed = [this] () {
+        hdDebug ("Walk Speed");
+        speed = 0.1f;
+      };
+      evt::VoidDispatch::Handler RunSpeed = [this] () {
+        hdDebug ("Run Speed");
+        speed = 0.4f;
+      };
     };
   }
 }

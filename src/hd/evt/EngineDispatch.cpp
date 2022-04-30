@@ -1,4 +1,4 @@
-#include "hd/Events.hpp"
+#include "hd/evt/EngineDispatch.hpp"
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
@@ -17,32 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /** **/
-namespace hd {
-
+namespace hd::evt {
   void
-  Event::Trigger (const SDL_Event &e)
+  EngineDispatch::Trigger (const SDL_Event &e)
   {
-    for (std::pair<int, Handler> pair : handlers) {
-      pair.second (e);
-    }
-  }
-  unsigned int
-  Event::Add (Event::Handler aHandler)
-  {
-    unsigned int id = nextId;
-    nextId++;
-    handlers[id] = aHandler;
-    return id;
-  }
-  bool
-  Event::Delete (unsigned int aId)
-  {
-    return handlers.erase (aId) == 1;
-  }
-  void
-  TypeEvent::Trigger (const SDL_Event &e)
-  {
-    Event::Trigger (e);
+    // hdDebugCall ("%p, type%d", &e,e.type);
+    SDL_EventDispatch::Trigger (e);
     switch (e.type) {
     case SDL_QUIT: // user-requested quit; see Remarks for details
       Quit.Trigger (e);
@@ -55,29 +35,31 @@ namespace hd {
     case SDL_APP_DIDENTERFOREGROUND:  // application entered foreground
       App.Trigger (e);
       break;
-    case SDL_WINDOWEVENT: // window state change
-      Window.Trigger (e);
-      break;
+
     case SDL_SYSWMEVENT: // system specific event
       SysWM.Trigger (e);
       break;
-    case SDL_KEYDOWN:       // key pressed
-    case SDL_KEYUP:         // key released
     case SDL_KEYMAPCHANGED: // keymap changed due to a system event such as an
                             // input language or keyboard layout change (>=
                             // SDL 2.0.4)
-      Key.Trigger (e);
+      KeymapChange.Trigger (e);
       break;
-    case SDL_TEXTEDITING: // keyboard text editing (composition)
-    case SDL_TEXTINPUT:   // keyboard text input
-      Text.Trigger (e);
-      break;
-
+    // All events with a Window ID
+    case SDL_WINDOWEVENT:  // window state change
+    case SDL_KEYDOWN:         // key pressed
+    case SDL_KEYUP:           // key released
+    case SDL_TEXTEDITING:     // keyboard text editing (composition)
+    case SDL_TEXTINPUT:       // keyboard text input
     case SDL_MOUSEMOTION:     // mouse moved
     case SDL_MOUSEBUTTONDOWN: // mouse button pressed
     case SDL_MOUSEBUTTONUP:   // mouse button released
     case SDL_MOUSEWHEEL:      // mouse wheel motion
-      Mouse.Trigger (e);
+    case SDL_DROPFILE:        // the system requests a file open
+    case SDL_DROPTEXT:        // text/plain drag-and-drop event
+    case SDL_DROPBEGIN:       // a new set of drops is beginning (>= SDL 2.0.5)
+    case SDL_DROPCOMPLETE:    // current set of drops is now complete (>=
+                              // SDL 2.0.5)
+      Windows.Trigger (e);
       break;
     case SDL_JOYAXISMOTION:    // joystick axis motion
     case SDL_JOYBALLMOTION:    // joystick trackball motion
@@ -86,7 +68,7 @@ namespace hd {
     case SDL_JOYBUTTONUP:      // joystick button released
     case SDL_JOYDEVICEADDED:   // joystick connected
     case SDL_JOYDEVICEREMOVED: // joystick disconnected
-      Joy.Trigger (e);
+      Joysticks.Trigger (e);
       break;
     case SDL_CONTROLLERAXISMOTION:     // controller axis motion
     case SDL_CONTROLLERBUTTONDOWN:     // controller button pressed
@@ -94,7 +76,7 @@ namespace hd {
     case SDL_CONTROLLERDEVICEADDED:    // controller connected
     case SDL_CONTROLLERDEVICEREMOVED:  // controller disconnected
     case SDL_CONTROLLERDEVICEREMAPPED: // controller mapping updated
-      Controller.Trigger (e);
+      Controllers.Trigger (e);
       break;
     case SDL_FINGERDOWN:   // user has touched input device
     case SDL_FINGERUP:     // user stopped touching input device
@@ -109,13 +91,7 @@ namespace hd {
     case SDL_CLIPBOARDUPDATE: // the clipboard changed
       Clipboard.Trigger (e);
       break;
-    case SDL_DROPFILE:     // the system requests a file open
-    case SDL_DROPTEXT:     // text/plain drag-and-drop event
-    case SDL_DROPBEGIN:    // a new set of drops is beginning (>= SDL 2.0.5)
-    case SDL_DROPCOMPLETE: // current set of drops is now complete (>=
-                           // SDL 2.0.5)
-      Drop.Trigger (e);
-      break;
+
     case SDL_AUDIODEVICEADDED:   // a new audio device is available (>=
                                  // SDL 2.0.4)
     case SDL_AUDIODEVICEREMOVED: // an audio device has been removed (>=
@@ -135,80 +111,8 @@ namespace hd {
       User.Trigger (e);
       break;
     default:
-      fprintf (stderr, "Unknown Event %d\n", e.type);
+      hdError ("Unknown Event type %d\n", e.type);
     }
-  }
-  void
-  MouseEvent::Trigger (const SDL_Event &e)
-  {
-    Event::Trigger (e);
-    switch (e.type) {
-    case SDL_MOUSEMOTION: // mouse moved
-      Motion.Trigger (e);
-      break;
-    case SDL_MOUSEBUTTONDOWN: // mouse button pressed
-    case SDL_MOUSEBUTTONUP:   // mouse button released
-      Button[e.button.button].Trigger (e);
-      break;
-    case SDL_MOUSEWHEEL: // mouse wheel motion
-      Wheel.Trigger (e);
-      break;
-    default:
-      fprintf (stderr, "Unknown MouseEvent %d\n", e.type);
-    }
-  }
-  void
-  MouseButtonEvent::Trigger (const SDL_Event &e)
-  {
-    Event::Trigger (e);
-    switch (e.type) {
-    case SDL_MOUSEBUTTONDOWN: // mouse button pressed
-      Down.Trigger (e);
-      break;
-    case SDL_MOUSEBUTTONUP: // mouse button released
-      Up.Trigger (e);
-      break;
-    default:
-      fprintf (stderr, "Unknown MouseButtonEvent %d\n", e.type);
-    }
-  }
-  void
-  KeyboardEvent::Trigger (const SDL_Event &e)
-  {
-    Event::Trigger (e);
-    switch (e.type) {
-    case SDL_KEYDOWN: // key pressed
-    case SDL_KEYUP:   // key released
-      if (Scancode.find (e.key.keysym.scancode) != Scancode.end ()) {
-        Scancode[e.key.keysym.scancode].Trigger (e);
-      }
-      if (Keycode.find (e.key.keysym.sym) != Keycode.end ()) {
-        Keycode[e.key.keysym.sym].Trigger (e);
-      }
-      break;
-    case SDL_KEYMAPCHANGED: // keymap changed due to a system event such as an
-                            // input language or keyboard layout change (>=
-                            // SDL 2.0.4)
-      MapChange.Trigger (e);
-      break;
-    default:
-      fprintf (stderr, "Unknown Keyboard event %d\n", e.type);
-    }
-  }
-  void
-  KeyEvent::Trigger (const SDL_Event &e)
-  {
-    Event::Trigger (e);
-    switch(e.type){
-      case SDL_KEYDOWN:
-        Down.Trigger(e);
-        break;
-      case SDL_KEYUP:
-        Up.Trigger (e);
-        break;
-      default:
-        fprintf (stderr, "Unknown Key event %d\n", e.type);
-      }
   }
 
-} // namespace hd
+}

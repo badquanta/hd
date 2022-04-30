@@ -1,4 +1,4 @@
-#pragma once
+#include "hd/evt/MouseDispatch.hpp"
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
@@ -16,27 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Common.hpp"
-#include "hd/evt/EngineDispatch.hpp"
 /** **/
-namespace hd
-{
-
-  /**
-   *
-   */
-  class Scene
+namespace hd::evt {
+    void
+  MouseDispatch::Trigger (const SDL_Event &e)
   {
+    SDL_EventDispatch::Trigger (e);
+    switch (e.type) {
+    case SDL_MOUSEMOTION: // mouse moved
+      //hdDebug ("Motion");
+      Motion.Trigger (e);
+      break;
+    case SDL_MOUSEBUTTONDOWN: // mouse button pressed
+    case SDL_MOUSEBUTTONUP:   // mouse button released
+      if (Button.find (e.button.button) != Button.end ()) {
+        Button[e.button.button].Trigger (e);
+      } else {
+        hdDebug ("No handlers for mouse button %d", e.button.button);
+      }
+      break;
+    case SDL_MOUSEWHEEL: // mouse wheel motion
+      //hdDebug ("Wheel");
+      Wheel.Trigger (e);
+      break;
+    default:
+      hdError ("Unknown MouseDispatch %d\n", e.type);
+    }
 
-  protected:
-  public:
-    /** \pure **/
-    virtual bool load (SDL_Renderer *renderer) = 0;
-    /** \pure **/
-    virtual void unload () = 0;
-    /** \pure **/
-    virtual void render (SDL_Renderer *r) = 0;
-    virtual void handleEvent (SDL_Event &e);
-    evt::EngineDispatch on;
-  };
-} // namespace hd
+  }
+
+}

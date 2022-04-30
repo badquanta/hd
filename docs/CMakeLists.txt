@@ -1,3 +1,4 @@
+find_package(Doxygen REQUIRED)
 if(DOXYGEN_FOUND)
   set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
   set(DOXYGEN_JAVADOC_BANNER NO)
@@ -54,5 +55,8 @@ if(DOXYGEN_FOUND)
   set(DOXYGEN_CALLER_GRAPH YES)
   set(DOXYGEN_GRAPHICAL_HIERARCHY NO)
   set(DOXYGEN_EXCLUDE_PATTERNS lgpl-3.0.md */cmake/* */ext/* */build/*)
-  doxygen_add_docs(doxygen README.md ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include COMMENT "Generate documentation.")
+  doxygen_add_docs(doxygen
+    ${PROJECT_SOURCE_DIR}/README.md
+    ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include
+    COMMENT "Generate documentation.")
 endif()

@@ -1,5 +1,4 @@
-#pragma once
-/*
+/**
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
@@ -16,18 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtx/rotate_vector.hpp"
-#include "glm/gtx/vector_angle.hpp"
-#include "hd/Config.hpp"
-#include "hd/Log.hpp"
-#include <GL/glew.h>
-#include <GL/glu.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_syswm.h>
-#include <SDL2/SDL2_framerate.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <filesystem>
+#include "hd/Engine.hpp"
+#include "hd/Window.hpp"
+
+hd::Window::Mount window;
+
+int
+main (int argc, char **argv)
+{
+  hd::Engine::PrintVersions ();
+  //hd::Engine::Mount engine = hd::Engine::Get ();
+  hd::Window::Mount window = hd::Window::Create (800, 600, "HD1");
+  window->onRender.Add ([&window] () {
+    window->MakeCurrent ();
+    glClear (GL_COLOR_BUFFER_BIT);
+    window->Swap ();
+  });
+  window->on.Close.Void.Add ([&window] () { window=NULL;});
+
+  hd::Window::Mount win2 = hd::Window::Create (320, 200, "HD2");
+  win2->on.Close.Void.Add ([&win2] () { win2 = NULL; });
+  // engine->configure (argc, argv);
+  hd::Engine::Get ()->Start ();
+  return 0;
+}

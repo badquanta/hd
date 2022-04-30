@@ -16,18 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtx/rotate_vector.hpp"
-#include "glm/gtx/vector_angle.hpp"
-#include "hd/Config.hpp"
-#include "hd/Log.hpp"
-#include <GL/glew.h>
-#include <GL/glu.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_syswm.h>
-#include <SDL2/SDL2_framerate.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <filesystem>
+#include "hd/evt/WindowIdDispatch.hpp"
+#include "hd/evt/ControllerDeviceDispatch.hpp"
+#include "hd/evt/JoyDeviceDispatch.hpp"
+namespace hd::evt {
+  /** **/
+  class EngineDispatch : public SDL_EventDispatch {
+  public:
+    SDL_EventDispatch Quit, App, SysWM, Finger, Dollar, Clipboard, Audio,
+        Render, User, KeymapChange;
+    WindowIdDispatch Windows;
+    JoyDeviceDispatch Joysticks;
+    ControllerDeviceDispatch Controllers;
+
+    virtual void Trigger (const SDL_Event &) override;
+  };
+
+}

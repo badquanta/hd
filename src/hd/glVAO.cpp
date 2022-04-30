@@ -1,14 +1,14 @@
 #include "hd/glVAO.hpp"
 namespace hd::gl {
-  VAO::VAO () {}
+  VAO::VAO () {hdDebugCall (NULL);}
   void
   VAO::Create ()
-  {
+  {hdDebugCall (NULL);
     glGenVertexArrays (1, &ID);
   }
   void
   VAO::LinkAttrib (VBO &aVbo, GLuint aLayout,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset)
-  {
+  {hdDebugCall (NULL);
     aVbo.Bind ();
     glVertexAttribPointer (aLayout, aNumComponents, aType, GL_FALSE, aStride, aOffset);
     glEnableVertexAttribArray (aLayout);
