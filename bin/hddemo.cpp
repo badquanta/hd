@@ -101,8 +101,10 @@ int
 main (int argc, char **argv)
 {
   hd::Engine::PrintVersions ();
-  hd::Engine::Mount engine = hd::Engine::Get ();
-  engine->Configure (argc, argv);
+  //hd::Engine::Mount engine = hd::Engine::Get ();
+  hd::Engine::Configure (argc, argv);
+  window = hd::Window::Create (hd::Engine::GetProgramName());
+
   engine->beforeStart.On ([&engine] () {
     window = hd::Window::Create (640, 480, "hddemo");
     if (!shaderProgram.Create ("shaders/default.vert",

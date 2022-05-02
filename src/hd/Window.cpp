@@ -33,11 +33,11 @@ namespace hd {
    * @return NULL on failure.
    */
   Window::Ptr
-  Window::Create (SDL_Rect *aRect, const char *aTitle, Uint32 aFlags)
+  Window::Create (const char *aTitle, SDL_Rect *aRect,  Uint32 aFlags)
   {
     assert (aRect != NULL);
     assert (aTitle != NULL);
-    Engine::Mount engine = Engine::Get ();
+    Engine::Ptr engine = Engine::Get ();
     hdDebugCall ("{%d, %d, %d, %d}, \"%s\", 0x%x",
                  aRect->x,
                  aRect->y,
@@ -113,8 +113,8 @@ namespace hd {
     assert (aWindow);
     assert (aContext);
     onHandle = engine->on.Windows[Id ()].On (on.pipe);
-    hdDebug (
-        "ID#%d aWindow = %p , aContext = 0x%p, ", Id (), aWindow, aContext);
+    hdDebugCall (
+        "id=%d winPtr=%p glCtxPr = %p, ", Id (), aWindow, aContext);
   }
   /** Destroys the underlying SDL_Window reference **/
   Window::~Window ()

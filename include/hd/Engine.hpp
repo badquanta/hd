@@ -29,13 +29,13 @@ namespace hd {
    */
   class Engine {
   public:
-    typedef std::shared_ptr<Engine> Mount;
+    typedef std::shared_ptr<Engine> Ptr;
     /**
      * @brief Initializes or simply returns an already initialized engine.
      *
      * @return Ptr `std::shared_ptr<Engine>`, NULL if initialization error.
      */
-    static Mount Get ();
+    static Ptr Get ();
     static void PrintVersion (const SDL_version *,
                               const char *of = "SDL",
                               FILE *aFile = stdout);
@@ -46,7 +46,7 @@ namespace hd {
      *  @return A character string with the program's name.
      *  @return "" if `Configure(argc, argv)` has not be called
      * **/
-    static const char *ProgramName ();
+    static const char *GetProgramName ();
     /** Finish applying **/
     ~Engine ();
     /** Signal to the engine we wish to exit the main loop **/
@@ -71,7 +71,7 @@ namespace hd {
     static std::weak_ptr<Engine> instance;
     /** Pre-constructor initialization, called by Get() before construction.
      * **/
-    static Mount Initialize ();
+    static Ptr Initialize ();
     /** Clean up our workspace.**/
     static void Shutdown ();
     /** Perform a step of our work.**/

@@ -44,11 +44,18 @@ main (int argc, char **argv)
     glClear (GL_COLOR_BUFFER_BIT);
     window->Swap ();
   });
-  window->on.Close.Void.On ([&window] () { window = NULL; });
+  window->on.Close.Void.On ([&window] () {
+    hd::Engine::Get()->eachFrame.Once( [&window](int){
+      window = NULL;
+    });
+  });
 
   hd::Window::Ptr win2 = hd::Window::Create (320, 200, "HD2");
   win2->on.Close.Void.On (
-      [&win2] () { hd::Engine::Get ()->eachFrame.Once ([&win2] (int) {win2 = NULL; }); });
+      [&win2] () { hd::Engine::Get ()->eachFrame.Once ([&win2] (int) {
+        win2 = NULL;
+      });
+  });
   // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();
   return 0;

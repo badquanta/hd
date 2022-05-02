@@ -19,12 +19,26 @@
 #include "hd/Window.hpp"
 
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
-/** **/
 namespace hd {
-
+  /**
+   * @brief weak_ptr reference to singleton instance.
+   * @attention auto destructs upon last dereference.
+   * @note windows keep a reference to engine. If a window reference is held
+   * then at least one engine reference is kept alive.
+   */
   std::weak_ptr<Engine> Engine::instance;
-  /** **/
-  Engine::Mount
+  /**
+   * @brief attempts to initialize SDL.
+   * @note creates a splash window in order to facilitate setting up opengl.
+   * @todo research if its possible to avoid this splash window step? the goal
+   * is to let the user define all windows and not have to define and destroy
+   * one for this reason.
+   *
+   * @return Engine::Ptr a smart_ptr reference to the constructed singleton
+   * engine instance.
+   * @return NULL on failure.
+   */
+  Engine::Ptr
   Engine::Initialize ()
   {
     hdDebugCall (NULL);
@@ -42,18 +56,18 @@ namespace hd {
     if (TTF_Init () == -1) {
       IMG_Quit ();
       SDL_Quit ();
-      hdError("SDL_TTF failed to initialize because: %s\n", TTF_GetError ());
+      hdError ("SDL_TTF failed to initialize because: %s\n", TTF_GetError ());
       return NULL;
     }
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK,
                          SDL_GL_CONTEXT_PROFILE_CORE);
-    Mount mounted = Mount (new Engine());
+    Ptr mounted = Mount (new Engine ());
     instance = mounted;
     // Apparently in order to initializes GLEW we *MUST* have a window created
     Window::Ptr splashWindow = Window::Create (320, 200, "Splash!");
-    if(!splashWindow){
+    if (!splashWindow) {
       hdError ("Failed to create splash window.");
       mounted = NULL;
       return NULL;
@@ -64,7 +78,7 @@ namespace hd {
     GLenum glewError = glewInit ();
     if (glewError != GLEW_OK) {
       hdError ("Failed to initialize GLEW because: %s\n",
-              glewGetErrorString (glewError));
+               glewGetErrorString (glewError));
       mounted = NULL;
       return NULL;
     }
@@ -75,53 +89,50 @@ namespace hd {
   }
 
   /**
-   *
+   * @brief Access the Engine singleton;
+   * @attention any reference attempts to initialize it.
+   * @attention shuts down if there are no references.
+   * @return Engine::Ptr If the engine fails to initialize this will be `NULL`.
+   * @return Engine::Ptr if the engine has been initialized this will be a
+   *smart_ptr reference to it.
    **/
-  Engine::Mount Engine::Get(){
-    Mount mounted = instance.lock();
-    if(mounted == NULL){
-        mounted = Initialize ();
+  Engine::Ptr
+  Engine::Get ()
+  {
+    Ptr mounted = instance.lock ();
+    if (mounted == NULL) {
+      mounted = Initialize ();
     }
     return mounted;
   }
-  /** **/
+  /** @brief helper to print out SDL_Version structures. **/
   void
-  Engine::PrintVersion (const SDL_version *v,
-                        const char *of,
-                        FILE *aFile)
+  Engine::PrintVersion (const SDL_version *v, const char *of, FILE *aFile)
   {
     fprintf (aFile, "%s version %d.%d.%d\n", of, v->major, v->minor, v->patch);
   }
+  /**
+   * @brief helper to print out versions of libraries used by this program
+   * @todo STANDING this should be kept in sync with what libraries are most
+   *being relied upon.
+   * @param aFile FILE* pointer to where to write this; defaults to `stdout`
+   **/
   void
   Engine::PrintVersions (FILE *aFile)
   {
-    fprintf(aFile,"HD version %s\n",PROJECT_VERSION);
+    fprintf (aFile, "HD version %s\n", PROJECT_VERSION);
     SDL_version sdlver;
     SDL_GetVersion (&sdlver);
-    PrintVersion (&sdlver,"SDL", aFile);
-    PrintVersion (IMG_Linked_Version (), "SDL_image",aFile);
-    PrintVersion (TTF_Linked_Version (), "SDL_TTF",aFile);
+    PrintVersion (&sdlver, "SDL", aFile);
+    PrintVersion (IMG_Linked_Version (), "SDL_image", aFile);
+    PrintVersion (TTF_Linked_Version (), "SDL_TTF", aFile);
   }
   /** Some boring details about how to construct an application. **/
   Engine::Engine () /* @todo :  remove camera (glm::vec3 (0.0f, 0.0f, 1.0f)) */
   {
     hdDebugCall (NULL);
-    /** @todo remove
-    on.Add (camera.on.pipe);
-    **/
     on.Quit.On ([this] (const SDL_Event &e) { quit = true; });
-    /** @todo remove
-    on.Windows.Add ([this] (const SDL_Event &e) {
-      // printf ("WINDOW EVENT\n");
-      if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-        scrW = e.window.data1;
-        scrH = e.window.data2;
-        printf ("WINDOW SIZE CHANGED TO %dx%d\n", scrW, scrH);
 
-        glViewport (0, 0, scrW, scrH);
-      }
-    });
-    **/
   }
   // Engine::Engine (int argc, char **argv) { configure (argc, argv); }
   /** Setup some basic options based on the command line **/
@@ -134,7 +145,9 @@ namespace hd {
         std::filesystem::path (argv[0]).parent_path () / "../assets"));
   }
   /** **/
-  Engine::~Engine () { hdDebugCall (NULL);
+  Engine::~Engine ()
+  {
+    hdDebugCall (NULL);
     Shutdown ();
   }
   /** **/
@@ -172,7 +185,7 @@ namespace hd {
   int
   Engine::HandleEvents ()
   {
-    //hdDebugCall (NULL);
+    // hdDebugCall (NULL);
     int evtCnt = 0;
     SDL_Event e;
     while (SDL_PollEvent (&e) != 0) {
@@ -185,8 +198,8 @@ namespace hd {
   Engine::Shutdown ()
   {
     hdDebugCall (NULL);
-    if (instance.lock()) {
-      instance.lock()->Quit();
+    if (instance.lock ()) {
+      instance.lock ()->Quit ();
     }
     TTF_Quit ();
     IMG_Quit ();
