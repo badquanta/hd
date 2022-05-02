@@ -126,9 +126,14 @@ namespace hd {
     void SetResizable (bool);
     /** @see https://wiki.libsdl.org/SDL_GetWindowFlags **/
     Uint32 GetFlags ();
-    /** **/
+    /** @brief Check Window flags for `SDL_WINDOW_FULLSCREEN`
+     * @return true if is set **/
     bool IsFullscreen ();
+    /** @brief Check Window flags for `SDL_WINDOW_FULLSCREEN_DESKTOP`
+     * @return true if is set **/
     bool IsFullscreenDesktop ();
+    /** @brief Check Window flags for `SDL_WINDOW_FULLSCREEN`
+     * @return true if is set **/
     bool IsOpenGl ();
     bool IsShown ();
     bool IsHidden ();
