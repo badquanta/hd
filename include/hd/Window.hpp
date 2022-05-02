@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
+#include "hd/Engine.hpp"
 #include "hd/Shared.hpp"
 #include "hd/evt/VoidDispatch.hpp"
 #include "hd/evt/WindowDispatch.hpp"
-#include "hd/Engine.hpp"
 #include <memory>
 namespace hd {
   class Window {
@@ -43,13 +43,14 @@ namespace hd {
      * @note Windows are always created with SDL_WINDOW_OPENGL flag set.
      * @return Window::Ptr
      */
-    static Window::Ptr Create (SDL_Rect *aRect = &Window::NextRect,
-                                 const char *aTitle = Window::NextTitle,
-                                 Uint32 aFlags = Window::NextFlags);
+    static Window::Ptr Create (const char *aTitle = Window::NextTitle,
+                               SDL_Rect *aRect = &Window::NextRect,
+
+                               Uint32 aFlags = Window::NextFlags);
     static Window::Ptr Create (int aWidth,
-                                 int aHeight,
-                                 const char *aTitle = Window::NextTitle,
-                                 Uint32 aFlags = Window::NextFlags);
+                               int aHeight,
+                               const char *aTitle = Window::NextTitle,
+                               Uint32 aFlags = Window::NextFlags);
     Uint32 Id ();
     void Swap ();
     /** @see https://wiki.libsdl.org/SDL_GL_SetSwapInterval **/
@@ -157,13 +158,13 @@ namespace hd {
     SDL_Window *m_Window;
     const SDL_GLContext m_Context;
 
-    static Ptr GetById(Uint32);
+    static Ptr GetById (Uint32);
     static Ptr GetByPtr (SDL_Window *);
     static Ptr GetByGlContext (SDL_GLContext);
     static void RenderAll ();
 
   private:
-    Engine::Mount engine;
+    Engine::Ptr engine;
     static std::map<SDL_Window *, std::weak_ptr<Window> > m_PtrCache;
     static std::map<Uint32, std::weak_ptr<Window> > m_IdCache;
     static std::map<SDL_GLContext, std::weak_ptr<Window> > m_ContextCache;
