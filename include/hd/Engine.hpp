@@ -33,7 +33,7 @@ namespace hd {
     /**
      * @brief Initializes or simply returns an already initialized engine.
      *
-     * @return Mount `std::shared_ptr<Engine>`, NULL if initialization error.
+     * @return Ptr `std::shared_ptr<Engine>`, NULL if initialization error.
      */
     static Mount Get ();
     static void PrintVersion (const SDL_version *,

@@ -52,7 +52,7 @@ namespace hd {
     Mount mounted = Mount (new Engine());
     instance = mounted;
     // Apparently in order to initializes GLEW we *MUST* have a window created
-    Window::Mount splashWindow = Window::Create (320, 200, "Splash!");
+    Window::Ptr splashWindow = Window::Create (320, 200, "Splash!");
     if(!splashWindow){
       hdError ("Failed to create splash window.");
       mounted = NULL;
@@ -109,7 +109,7 @@ namespace hd {
     /** @todo remove
     on.Add (camera.on.pipe);
     **/
-    on.Quit.Add ([this] (const SDL_Event &e) { quit = true; });
+    on.Quit.On ([this] (const SDL_Event &e) { quit = true; });
     /** @todo remove
     on.Windows.Add ([this] (const SDL_Event &e) {
       // printf ("WINDOW EVENT\n");

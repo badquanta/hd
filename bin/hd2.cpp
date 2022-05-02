@@ -17,24 +17,38 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/Window.hpp"
-
+#include "hd/glVAO.hpp"
+#include "hd/glProgram.hpp"
 hd::Window::Ptr window;
 
 int
 main (int argc, char **argv)
 {
-  hd::Engine::PrintVersions ();
-  //hd::Engine::Ptr engine = hd::Engine::Get ();
+  hd::Engine::Configure (argc, argv);
   hd::Window::Ptr window = hd::Window::Create (800, 600, "HD1");
+  // Vertices coordinates
+  GLfloat vertices[] = {
+    -0.5f, -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower left corner
+    0.5f,  -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower right corner
+    0.0f,  0.5f * float (sqrt (3)) * 2 / 3, 0.0f  // Upper corner
+  };
+  window->MakeCurrent ();
+  hd::gl::Program shaderProgram;
+  shaderProgram.Create ("shaders/hd2.vert","shaders/hd2.frag");
+  shaderProgram.Bind ();
+  hd::gl::VAO vao;
+  vao.Create ();
+
   window->onRender.On ([&window] () {
     window->MakeCurrent ();
     glClear (GL_COLOR_BUFFER_BIT);
     window->Swap ();
   });
-  window->on.Close.Void.On ([&window] () { window=NULL;});
+  window->on.Close.Void.On ([&window] () { window = NULL; });
 
   hd::Window::Ptr win2 = hd::Window::Create (320, 200, "HD2");
-  win2->on.Close.Void.On ([&win2] () { win2 = NULL; });
+  win2->on.Close.Void.On (
+      [&win2] () { hd::Engine::Get ()->eachFrame.Once ([&win2] (int) {win2 = NULL; }); });
   // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();
   return 0;
