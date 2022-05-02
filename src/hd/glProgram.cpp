@@ -4,7 +4,7 @@ namespace hd::gl {
   Program::Program () { ID = 0; }
   Program::~Program () { free (); }
   bool
-  Program::create ()
+  Program::Create ()
   {
     if (ID == 0) {
       free ();
@@ -13,10 +13,10 @@ namespace hd::gl {
     return ID != 0;
   }
   bool
-  Program::create (std::filesystem::path aVertexSource,
+  Program::Create (std::filesystem::path aVertexSource,
                    std::filesystem::path aFragmentSource)
   {
-    create ();
+    Create ();
     Shader vertex (GL_VERTEX_SHADER), fragment (GL_FRAGMENT_SHADER);
     if (!vertex.loadSource (aVertexSource)) {
       fprintf (stderr,

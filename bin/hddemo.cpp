@@ -17,6 +17,11 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/Window.hpp"
+#include "hd/glTexture.hpp"
+#include "hd/glVAO.hpp"
+#include "hd/glEBO.hpp"
+#include "hd/glEBO.hpp"
+#include "hd/glCamera.hpp"
 
 // Vertices coordinates
 GLfloat vertexData[] = {
@@ -51,7 +56,8 @@ GLint scaleLocation = -1;
 GLint tex0Uni = -1;
 hd::gl::Texture texture;
 
-hd::Window::Mount window;
+hd::Window::Ptr window;
+hd::gl::Camera camera;
 
 void
 drawFrame (int ticks)
@@ -72,7 +78,7 @@ drawFrame (int ticks)
   int w, h;
   window->GetDrawableSize (&w, &h);
   //hdDebug ("Drawable size: %dx%d", w, h);
-  hd::Engine::Get ()->camera.Matrix (
+  camera.Matrix (
       w, h, 45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
   glUniform1f (scaleLocation, 0.5f);
   glUniform1i (tex0Uni, 0);
@@ -96,10 +102,10 @@ main (int argc, char **argv)
 {
   hd::Engine::PrintVersions ();
   hd::Engine::Mount engine = hd::Engine::Get ();
-  engine->configure (argc, argv);
-  engine->beforeStart.Add ([&engine] () {
+  engine->Configure (argc, argv);
+  engine->beforeStart.On ([&engine] () {
     window = hd::Window::Create (640, 480, "hddemo");
-    if (!shaderProgram.create ("shaders/default.vert",
+    if (!shaderProgram.Create ("shaders/default.vert",
                                "shaders/default.frag")) {
       fprintf (stderr, "Failed to create Shader Program\n");
       engine->Quit ();
@@ -147,7 +153,7 @@ main (int argc, char **argv)
         "textures/pattern_16/diffus.tga", GL_TEXTURE_2D, GL_TEXTURE0);
     texture.Assign (shaderProgram, "tex0", 0);
   });
-  engine->eachFrame.Add (&drawFrame);
+  engine->eachFrame.On (&drawFrame);
   engine->Start ();
   return 0;
 }

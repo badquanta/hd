@@ -13,10 +13,10 @@ namespace hd {
   std::map<SDL_Window *, std::weak_ptr<Window> > Window::m_PtrCache;
   std::map<Uint32, std::weak_ptr<Window> > Window::m_IdCache;
   std::map<SDL_GLContext, std::weak_ptr<Window> > Window::m_ContextCache;
-  Window::Mount
+  Window::Ptr
   Window::Create (SDL_Window *aWindow, SDL_GLContext aContext)
   {
-    Mount created = Mount (new Window (aWindow, aContext));
+    Ptr created(new Window (aWindow, aContext));
     m_PtrCache[aWindow] = created;
     m_IdCache[created->Id ()] = created;
     m_ContextCache[aContext] = created;
@@ -32,11 +32,12 @@ namespace hd {
    * @return smart pointer to and instance of this class managing a window.
    * @return NULL on failure.
    */
-  Window::Mount
+  Window::Ptr
   Window::Create (SDL_Rect *aRect, const char *aTitle, Uint32 aFlags)
   {
     assert (aRect != NULL);
     assert (aTitle != NULL);
+    Engine::Mount engine = Engine::Get ();
     hdDebugCall ("{%d, %d, %d, %d}, \"%s\", 0x%x",
                  aRect->x,
                  aRect->y,
@@ -62,13 +63,13 @@ namespace hd {
     }
     return Create (created, created_context);
   }
-  Window::Mount
+  Window::Ptr
   Window::Create (int w, int h, const char *aTitle, Uint32 aFlags)
   {
     SDL_Rect aRect = { NextRect.x, NextRect.h, w, h };
     return Create (&aRect, aTitle, aFlags);
   }
-  Window::Mount
+  Window::Ptr
   Window::GetById (Uint32 aId)
   {
     if (m_IdCache.find (aId) != m_IdCache.end ()) {
@@ -76,7 +77,7 @@ namespace hd {
     }
     return NULL;
   }
-  Window::Mount
+  Window::Ptr
   Window::GetByPtr (SDL_Window *aWindow)
   {
     if (m_PtrCache.find (aWindow) != m_PtrCache.end ()) {
@@ -84,7 +85,7 @@ namespace hd {
     }
     return NULL;
   }
-  Window::Mount
+  Window::Ptr
   Window::GetByGlContext (SDL_GLContext aContext)
   {
     if (m_ContextCache.find (aContext) != m_ContextCache.end ()) {
@@ -96,7 +97,7 @@ namespace hd {
   Window::RenderAll ()
   {
     for (std::pair<Uint32, std::weak_ptr<Window> > pair : m_IdCache) {
-      Mount window = pair.second.lock ();
+      Ptr window = pair.second.lock ();
       if (window) {
         //hdDebug ("Rendering Window ID#%d", pair.first);
         window->onRender.Trigger ();
@@ -111,7 +112,7 @@ namespace hd {
     engine = Engine::Get ();
     assert (aWindow);
     assert (aContext);
-    onHandle = engine->on.Windows[Id ()].Add (on.pipe);
+    onHandle = engine->on.Windows[Id ()].On (on.pipe);
     hdDebug (
         "ID#%d aWindow = %p , aContext = 0x%p, ", Id (), aWindow, aContext);
   }
@@ -321,7 +322,7 @@ namespace hd {
     return true;
   }
   bool
-  Window::SetModalFor (Window::Mount aWindow)
+  Window::SetModalFor (Window::Ptr aWindow)
   {
     return SetModalFor (aWindow->m_Window);
   }

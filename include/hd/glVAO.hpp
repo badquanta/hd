@@ -1,5 +1,4 @@
 #pragma once
-#include "hd/Common.hpp"
 #include "hd/glVBO.hpp"
 #include "hd/glProgram.hpp"
 namespace hd {

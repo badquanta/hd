@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
-#include "hd/Common.hpp"
 #include "hd/Shared.hpp"
 #include "hd/evt/VoidDispatch.hpp"
 #include "hd/evt/WindowDispatch.hpp"
@@ -25,12 +24,12 @@
 namespace hd {
   class Window {
   public:
-    typedef std::shared_ptr<Window> Mount;
+    typedef std::shared_ptr<Window> Ptr;
     static SDL_Rect NextRect;
     static const char *NextTitle;
     static SDL_WindowFlags NextFlags;
     virtual ~Window ();
-    static Window::Mount Create (SDL_Window *, SDL_GLContext);
+    static Window::Ptr Create (SDL_Window *, SDL_GLContext);
     evt::VoidDispatch onRender;
     evt::WindowDispatch on;
     evt::SDL_EventDispatch::Handle onHandle;
@@ -42,12 +41,12 @@ namespace hd {
      * @param aTitle [const char*] used for the initial window title.
      * @param aFlags [Uint32] describing the window flags to use
      * @note Windows are always created with SDL_WINDOW_OPENGL flag set.
-     * @return Window::Mount
+     * @return Window::Ptr
      */
-    static Window::Mount Create (SDL_Rect *aRect = &Window::NextRect,
+    static Window::Ptr Create (SDL_Rect *aRect = &Window::NextRect,
                                  const char *aTitle = Window::NextTitle,
                                  Uint32 aFlags = Window::NextFlags);
-    static Window::Mount Create (int aWidth,
+    static Window::Ptr Create (int aWidth,
                                  int aHeight,
                                  const char *aTitle = Window::NextTitle,
                                  Uint32 aFlags = Window::NextFlags);
@@ -113,7 +112,7 @@ namespace hd {
     void GetMinimumSize (int *, int *);
     /** @see https://wiki.libsdl.org/SDL_SetWindowModalFor **/
     bool SetModalFor (SDL_Window *);
-    bool SetModalFor (Window::Mount);
+    bool SetModalFor (Window::Ptr);
     /** @see https://wiki.libsdl.org/SDL_SetWindowOpacity **/
     bool SetOpacity (float);
     /** @see https://wiki.libsdl.org/SDL_GetWindowOpacity **/
@@ -158,9 +157,9 @@ namespace hd {
     SDL_Window *m_Window;
     const SDL_GLContext m_Context;
 
-    static Mount GetById(Uint32);
-    static Mount GetByPtr (SDL_Window *);
-    static Mount GetByGlContext (SDL_GLContext);
+    static Ptr GetById(Uint32);
+    static Ptr GetByPtr (SDL_Window *);
+    static Ptr GetByGlContext (SDL_GLContext);
     static void RenderAll ();
 
   private:

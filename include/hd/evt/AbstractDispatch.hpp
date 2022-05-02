@@ -19,35 +19,55 @@
 #include <functional>
 #include <map>
 namespace hd::evt {
-     template <class...Signature> class AbstractDispatch {
-    public:
-      virtual ~AbstractDispatch (){};
-      typedef std::function<void (Signature...)> Handler;
-      typedef unsigned int Handle;
-      virtual void Trigger (Signature...Args){
-        for (std::pair<Handle, Handler> pair : m_Handlers) {
-          if(pair.second!=NULL){
-          pair.second (Args...);}
+  template <class... Signature> class AbstractDispatch {
+  public:
+    virtual ~AbstractDispatch (){};
+    typedef std::function<void (Signature...)> Handler;
+    typedef unsigned int Handle;
+    virtual void
+    Trigger (Signature... Args)
+    {
+      for (std::pair<Handle, Handler> pair : m_OnceHandlers) {
+        if (pair.second != NULL) {
+          pair.second (Args...);
         }
-      };
+      }
+      m_OnceHandlers.clear ();
+      for (std::pair<Handle, Handler> pair : m_Handlers) {
+        if (pair.second != NULL) {
+          pair.second (Args...);
+        }
+      }
+    };
 
+    Handle
+    On (Handler aHandler)
+    {
+      Handle id = nextId;
+      nextId++;
+      m_Handlers[id] = aHandler;
+      return id;
+    };
+    Handle
+    Once (Handler aHandler)
+    {
+      Handle id = nextId;
+      nextId++;
+      m_OnceHandlers[id] = aHandler;
+      return id;
+    };
 
-       Handle Add (Handler aHandler)
-      {
-        Handle id = nextId;
-        nextId++;
-        m_Handlers[id] = aHandler;
-        return id;
-      };
+    bool
+    Delete (Handle aId)
+    {
+      return m_Handlers.erase (aId) == 1;
+    };
+    const Handler pipe = [this] (Signature... e) { this->Trigger (e...); };
 
-      bool Delete(Handle aId){
-        return m_Handlers.erase (aId) == 1;
-      };
-      const Handler pipe = [this] (Signature... e) { this->Trigger (e...); };
-
-    private:
-      std::map<Handle,Handler> m_Handlers;
-      Handle nextId = 1;
+  private:
+    std::map<Handle, Handler> m_Handlers;
+    std::map<Handle, Handler> m_OnceHandlers;
+    Handle nextId = 1;
   };
 
 }

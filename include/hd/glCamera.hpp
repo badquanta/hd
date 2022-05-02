@@ -1,5 +1,4 @@
 #pragma once
-#include "hd/Common.hpp"
 #include "hd/evt/WindowDispatch.hpp"
 #include "hd/glProgram.hpp"
 
@@ -17,7 +16,7 @@ namespace hd {
       float sensitivity = 0.10f;
 
     public:
-      Camera (glm::vec3);
+      Camera (glm::vec3 p = {0.0f,0.0f,1.0f});
       /**
        * @brief Redefine the camera.
        *
@@ -29,7 +28,7 @@ namespace hd {
       evt::VoidDispatch::Handler StartTrackingMouse = [this] () {
         hdDebug ("Start Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_TRUE);
-        TrackingListenerHandle = on.Mouse.Motion.Add(TrackingListener);
+        TrackingListenerHandle = on.Mouse.Motion.On(TrackingListener);
       };
       evt::VoidDispatch::Handler StopTrackingMouse = [this] () {
         hdDebug ("Stop Tracking Mouse");

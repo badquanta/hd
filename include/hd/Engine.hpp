@@ -19,9 +19,7 @@
 #include "hd/Shared.hpp"
 #include "hd/evt/EngineDispatch.hpp"
 #include "hd/evt/IntDispatch.hpp"
-#include "hd/evt/VoidDispatch.hpp"
 #include <memory>
-#include <stdio.h>
 /**
  * @brief holodeck?
  */
@@ -35,7 +33,7 @@ namespace hd {
     /**
      * @brief Initializes or simply returns an already initialized engine.
      *
-     * @return Mount `std::shared_ptr<Engine>`, NULL if initialization error.
+     * @return Ptr `std::shared_ptr<Engine>`, NULL if initialization error.
      */
     static Mount Get ();
     static void PrintVersion (const SDL_version *,

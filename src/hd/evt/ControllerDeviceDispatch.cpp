@@ -45,7 +45,9 @@ namespace hd::evt {
       return;
     }
     SDL_EventDispatch::Trigger (e);
-    at (controllerId).Trigger (e);
+    if (find (controllerId) != end ()) {
+      at (controllerId).Trigger (e);
+    }
   }
 
 }

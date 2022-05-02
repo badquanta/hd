@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Common.hpp"
-#include <filesystem>
 #include <list>
 #include <memory>
 #include <string>
