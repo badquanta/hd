@@ -22,18 +22,37 @@
 #include "hd/evt/WindowDispatch.hpp"
 #include <memory>
 namespace hd {
+  /** future
+   * @todo https://wiki.libsdl.org/SDL_SetWindowHitTest
+   * @todo https://wiki.libsdl.org/SDL_SetWindowHitTest
+   * @todo https://wiki.libsdl.org/SDL_IsScreenSaverEnabled
+   **/
   class Window {
   public:
+    /** Smart pointer reference. **/
     typedef std::shared_ptr<Window> Ptr;
+    /** `Create` uses this position and size if none are defined. **/
     static SDL_Rect NextRect;
+    /** `Create` uses this title if none is defined. **/
     static const char *NextTitle;
+    /** `Create()` uses these flags if none are defined. **/
     static SDL_WindowFlags NextFlags;
+    /** Destroy a window and its associated OpenGL Context.**/
     virtual ~Window ();
-    static Window::Ptr Create (SDL_Window *, SDL_GLContext);
+  public: // events
+    /** Automatically (dis)connected to/from engine output event. **/
     evt::IntDispatch output;
+    /** Automatically (dis)connected to/from engine input event. **/
     evt::WindowDispatch input;
+  private: // handles used to disconnect on destruct.
     evt::SDL_EventDispatch::Handle onHandle;
     evt::IntDispatch::Handle outputHandle;
+  public: // Create window pointer utilities.
+    /** Given an existing SDL_Windowand SDL_GLContext pointer construct
+     * a Window::Ptr
+     * @todo make this check the caches?
+     ***/
+    static Window::Ptr Create (SDL_Window *, SDL_GLContext);
     /**
      * @brief
      *
@@ -52,12 +71,15 @@ namespace hd {
                                int aHeight,
                                const char *aTitle = Window::NextTitle,
                                Uint32 aFlags = Window::NextFlags);
-    Uint32 Id ();
+  public: // Window state modifiers:
     void Swap ();
     /** @see https://wiki.libsdl.org/SDL_GL_SetSwapInterval **/
     bool SetSwapInterval (int);
     /** @see https://wiki.libsdl.org/SDL_GL_MakeCurrent **/
     bool MakeCurrent ();
+  public: // Window attribute accessors
+    /** Return the window Identifier integer. **/
+    Uint32 Id ();
     /** @see https://wiki.libsdl.org/SDL_GL_GetDrawableSize **/
     void GetDrawableSize (int *, int *);
     /** @see https://wiki.libsdl.org/SDL_HideWindow **/
@@ -72,9 +94,6 @@ namespace hd {
     void Restore ();
     /** @see https://wiki.libsdl.org/SDL_MinimizeWindow **/
     void Minimize ();
-    /** future @todo https://wiki.libsdl.org/SDL_SetWindowHitTest **/
-    /** future @todo https://wiki.libsdl.org/SDL_SetWindowHitTest **/
-    /** future @todo https://wiki.libsdl.org/SDL_IsScreenSaverEnabled **/
     /** @see https://wiki.libsdl.org/SDL_SetWindowBordered **/
     void SetBordered (bool);
     /** @see https://wiki.libsdl.org/SDL_SetWindowData **/

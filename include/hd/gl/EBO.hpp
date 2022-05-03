@@ -7,7 +7,10 @@ namespace hd {
         GLuint ID;
       public:
         EBO();
+        EBO (GLuint *data, GLsizeiptr size);
+
         void Create (GLuint *, GLsizeiptr);
+
         void Bind ();
         void Unbind();
         void Delete();

@@ -1,6 +1,6 @@
 #pragma once
-#include "hd/glVBO.hpp"
-#include "hd/glProgram.hpp"
+#include "hd/gl/VBO.hpp"
+#include "hd/gl/ShaderProgram.hpp"
 namespace hd {
   namespace gl {
     class VAO {
@@ -19,7 +19,7 @@ namespace hd {
        * @return true
        * @return false
        */
-      bool LinkAttrib (VBO &aVBO, Program &aProgram, GLchar* aName,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset);
+      bool LinkAttrib (VBO &aVBO, ShaderProgram &aProgram, GLchar* aName,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset);
       void Bind ();
       void Unbind();
       void Delete();

@@ -15,7 +15,7 @@ namespace hd {
   /** Destroys the underlying SDL_Window reference **/
   Window::~Window ()
   {
-    hdDebugCall ("id#%d");
+    hdDebugCall ("id#%d",Id());
     engine->input.Windows[Id ()].Delete (onHandle);
     engine->output.Delete (outputHandle);
     m_IdCache.erase (Id ());

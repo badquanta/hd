@@ -22,13 +22,13 @@ list(APPEND LIBHD_COMPONENTS
   Shared.cpp
   SplashScene.cpp
   Engine.cpp
-  glCamera.cpp
-  glTexture.cpp
-  glProgram.cpp
-  glShader.cpp
-  glVAO.cpp
-  glVBO.cpp
-  glEBO.cpp
+  gl/Camera.cpp
+  gl/Texture.cpp
+  gl/ShaderProgram.cpp
+  gl/Shader.cpp
+  gl/VAO.cpp
+  gl/VBO.cpp
+  gl/EBO.cpp
 )
 #add_executable(hddemo hd.cpp ${LIBHD_COMPONENTS})
 add_library(hd ${LIBHD_COMPONENTS} )
@@ -41,6 +41,6 @@ target_include_directories(hd
   "${PROJECT_SOURCE_DIR}/ext/eventpp/include"
   "${PROJECT_SOURCE_DIR}/ext/glm")
 
-if(HD_PRECOMPILE_HPP)
+if(HD_COMPILE_COMMON_HPP)
 target_precompile_headers(hd PRIVATE ../../include/hd/Common.hpp)
 endif()

@@ -17,8 +17,8 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/Window.hpp"
-#include "hd/glVAO.hpp"
-#include "hd/glProgram.hpp"
+#include "hd/gl/VAO.hpp"
+#include "hd/gl/ShaderProgram.hpp"
 hd::Window::Ptr window;
 
 int
@@ -33,7 +33,7 @@ main (int argc, char **argv)
     0.0f,  0.5f * float (sqrt (3)) * 2 / 3, 0.0f  // Upper corner
   };
   window->MakeCurrent ();
-  hd::gl::Program shaderProgram;
+  hd::gl::ShaderProgram shaderProgram;
   shaderProgram.Create ("shaders/hd2.vert","shaders/hd2.frag");
   shaderProgram.Bind ();
   hd::gl::VAO vao;

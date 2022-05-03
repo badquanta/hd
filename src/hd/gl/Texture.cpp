@@ -1,4 +1,4 @@
-#include "hd/glTexture.hpp"
+#include "hd/gl/Texture.hpp"
 #include "hd/Shared.hpp"
 namespace hd::gl {
   bool Texture::Create(std::filesystem::path aPath, GLenum aType, GLenum aSlot){
@@ -34,7 +34,7 @@ namespace hd::gl {
     return true;
   }
 
-  void Texture::Assign(Program&aProgram,const char*aUniform,GLuint aUnit){
+  void Texture::Assign(ShaderProgram&aProgram,const char*aUniform,GLuint aUnit){
     GLint texUni = aProgram.getUniformLocation (aUniform);
     aProgram.Bind ();
     glUniform1i (texUni, aUnit);

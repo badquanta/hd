@@ -1,6 +1,10 @@
-#include "hd/glVBO.hpp"
+#include "hd/gl/VBO.hpp"
 namespace hd::gl {
   VBO::VBO () {}
+  VBO::VBO (GLfloat *aVertices, GLsizeiptr aSize)
+  {
+    Create (aVertices, aSize);
+  }
   void
   VBO::Create (GLfloat *aVertices, GLsizeiptr aSize)
   {

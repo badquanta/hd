@@ -14,9 +14,9 @@ namespace hd {
       bool loadSource (std::filesystem::path);
       bool compile ();
       void printLog (FILE *);
-      GLuint getId ();
+      GLuint GetId ();
       void create (GLenum type);
-      void free ();
+      void Free ();
     };
   }
 }

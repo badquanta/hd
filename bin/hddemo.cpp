@@ -17,10 +17,10 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/Window.hpp"
-#include "hd/glCamera.hpp"
-#include "hd/glEBO.hpp"
-#include "hd/glTexture.hpp"
-#include "hd/glVAO.hpp"
+#include "hd/gl/Camera.hpp"
+#include "hd/gl/EBO.hpp"
+#include "hd/gl/Texture.hpp"
+#include "hd/gl/VAO.hpp"
 
 // Vertices coordinates
 GLfloat vertexData[] = {
@@ -42,7 +42,7 @@ GLuint indexData[] = {
   3, 0, 4  //
 };
 /** GLSL Program ID */
-hd::gl::Program shaderProgram;
+hd::gl::ShaderProgram shaderProgram;
 // GLuint programId = 0;
 // GLint aPos = -1;
 hd::gl::VAO vao;
@@ -93,7 +93,7 @@ drawFrame (int ticks)
                   GL_UNSIGNED_INT,
                   NULL);
   // glDisableVertexAttribArray (aPos);
-  shaderProgram.unbind ();
+  shaderProgram.Unbind ();
   window->Swap ();
 }
 
@@ -129,7 +129,7 @@ main (int argc, char **argv)
     vbo.Bind ();
     // create ibo
     ebo.Create (indexData, sizeof (indexData));
-    shaderProgram.printAttribues (stdout);
+    shaderProgram.PrintAttribues (stdout);
     if ((!vao.LinkAttrib (vbo,
                           shaderProgram,
                           "aPos",

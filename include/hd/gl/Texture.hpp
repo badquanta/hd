@@ -1,5 +1,5 @@
 #pragma once
-#include "hd/glProgram.hpp"
+#include "hd/gl/ShaderProgram.hpp"
 namespace hd{
   namespace gl{
     class Texture {
@@ -8,7 +8,7 @@ namespace hd{
         GLenum type;
       public:
         bool Create (std::filesystem::path, GLenum, GLenum);
-        void Assign (Program &, const char *, GLuint);
+        void Assign (ShaderProgram &, const char *, GLuint);
         void Bind ();
         void Unbind ();
         void Delete ();

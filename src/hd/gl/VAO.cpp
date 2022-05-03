@@ -1,4 +1,4 @@
-#include "hd/glVAO.hpp"
+#include "hd/gl/VAO.hpp"
 namespace hd::gl {
   VAO::VAO () {hdDebugCall (NULL);}
   void
@@ -15,8 +15,8 @@ namespace hd::gl {
     aVbo.Unbind ();
   }
   bool
-  VAO::LinkAttrib (VBO &aVbo, Program &aProgram, GLchar* aName,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset){
-    GLint aLayout = aProgram.getAttribLocation (aName);
+  VAO::LinkAttrib (VBO &aVbo, ShaderProgram &aProgram, GLchar* aName,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset){
+    GLint aLayout = aProgram.GetAttribLocation (aName);
     if(aLayout==-1){
       fprintf (stderr,"Failed to get variable named %s\n", aName);
       return false;

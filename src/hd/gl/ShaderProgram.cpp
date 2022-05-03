@@ -1,99 +1,119 @@
-#include "hd/glProgram.hpp"
+#include "hd/gl/ShaderProgram.hpp"
 
 namespace hd::gl {
-  Program::Program () { ID = 0; }
-  Program::~Program () { free (); }
-  bool
-  Program::Create ()
+  ShaderProgram::ShaderProgram ()
   {
-    if (ID == 0) {
-      free ();
+    hdDebugCall (NULL);
+    ID = 0;
+  }
+  ShaderProgram::~ShaderProgram ()
+  {
+    hdDebugCall (NULL);
+    Free ();
+  }
+  bool
+  ShaderProgram::Create ()
+  {
+    hdDebugCall (NULL);
+    if (ID != 0) {
+      Free ();
     }
     ID = glCreateProgram ();
     return ID != 0;
   }
   bool
-  Program::Create (std::filesystem::path aVertexSource,
-                   std::filesystem::path aFragmentSource)
+  ShaderProgram::Create (std::filesystem::path aVertexSource,
+                         std::filesystem::path aFragmentSource)
   {
     Create ();
     Shader vertex (GL_VERTEX_SHADER), fragment (GL_FRAGMENT_SHADER);
     if (!vertex.loadSource (aVertexSource)) {
-      fprintf (stderr,
-               "Failed to load Vertex Shader Source from '%s'\n",
+      hdError ("Failed to load Vertex Shader Source from '%s'\n",
                aVertexSource.generic_string ().c_str ());
       return false;
     };
     if (!fragment.loadSource (aFragmentSource)) {
-      fprintf (stderr,
-               "Failed to load Fragment Shader Source from '%s'\n",
+      hdError ("Failed to load Fragment Shader Source from '%s'\n",
                aFragmentSource.generic_string ().c_str ());
       return false;
     }
-    if(!vertex.compile()){
-      fprintf (stderr, "Failed to compile Vertex Shader, log:\n");
+    if (!vertex.compile ()) {
+      hdError ("Failed to compile Vertex Shader, log:\n");
       vertex.printLog (stderr);
       return false;
     }
-    if(!fragment.compile()){
-      fprintf (stderr, "Failed to compile Fragment Shader, log:\n");
+    if (!fragment.compile ()) {
+      hdError ("Failed to compile Fragment Shader, log:\n");
       fragment.printLog (stderr);
       return false;
     }
-    attach (vertex);
-    attach (fragment);
-    if(!link ()){
-      fprintf (stderr, "Failed to link shader program %d, log:\n", ID);
-      printLog (stderr);
+    Attach (vertex);
+    Attach (fragment);
+    if (!Link ()) {
+      hdError ("Failed to link shader program %d, log:\n", ID);
+      PrintLog (stderr);
       return false;
     }
     return true;
   }
   void
-  Program::free ()
+  ShaderProgram::Free ()
   {
+    hdDebugCall (NULL);
     if (ID != 0) {
       glDeleteProgram (ID);
       ID = 0;
     }
   }
   void
-  Program::attach (Shader aShader)
+  ShaderProgram::Attach (Shader aShader)
   {
-    attach (aShader.getId ());
+    Attach (aShader.GetId ());
   }
   void
-  Program::attach (GLuint aShaderId)
+  ShaderProgram::Attach (GLuint aShaderId)
   {
+    hdDebugCall ("shader#%d", aShaderId);
     glAttachShader (ID, aShaderId);
   }
   bool
-  Program::link ()
+  ShaderProgram::Link ()
   {
+    hdDebugCall (NULL);
+
     glLinkProgram (ID);
     GLint success = GL_FALSE;
     glGetProgramiv (ID, GL_LINK_STATUS, &success);
+    if(success != GL_TRUE){
+      hdError ("Unable to link program.");
+      PrintLog (stderr);
+      hdDebugReturn ("false");
+    }
     return (success == GL_TRUE);
   }
   GLint
-  Program::getAttribLocation (const GLchar *name)
+  ShaderProgram::GetAttribLocation (const GLchar *name)
   {
+    hdDebugCall ("%s", name);
     GLint result = glGetAttribLocation (ID, name);
     if (result == -1) {
-      fprintf (stderr, "Invalid attribute name '%s'\n", name);
+      hdError ("Invalid attribute name '%s'\n", name);
+      PrintAttribues (stderr);
     }
     return result;
   }
   GLint
-  Program::getUniformLocation(const GLchar *name){
+  ShaderProgram::getUniformLocation (const GLchar *name)
+  {
+    hdDebugCall ("%s", name);
     GLint result = glGetUniformLocation (ID, name);
-    if(result == -1){
-      fprintf (stderr, "Invalid uniform name '%s'.\n", name);
+    if (result == -1) {
+      hdError ("Invalid uniform name '%s'.\n", name);
     }
     return result;
   }
   bool
-  Program::Bind ()
+  ShaderProgram::Bind ()
   {
     if (ID == 0) {
       return false;
@@ -102,22 +122,23 @@ namespace hd::gl {
     glUseProgram (ID);
     GLenum error = glGetError ();
     if (error != GL_NO_ERROR) {
-      fprintf (stderr,
-               "Failed binding shader program (%d) because: %s\n",
+      hdError ("Failed binding shader program (%d) because: %s\n",
                ID,
                gluErrorString (error));
-      printLog (stderr);
+      PrintLog (stderr);
+      hdDebugReturn ("FALSE");
       return false;
     }
+    //hdDebugReturn ("true");
     return true;
   }
   void
-  Program::unbind ()
+  ShaderProgram::Unbind ()
   {
     glUseProgram (0);
   }
   void
-  Program::printLog (FILE *stream = stdout)
+  ShaderProgram::PrintLog (FILE *stream = stdout)
   {
     if (glIsProgram (ID)) {
       int logLength = 0, maxLength = 0;
@@ -133,7 +154,8 @@ namespace hd::gl {
     }
   }
   void
-  Program::printAttribues(FILE*stream=stdout){
+  ShaderProgram::PrintAttribues (FILE *stream = stdout)
+  {
     GLint count;
     glGetProgramiv (ID, GL_ACTIVE_ATTRIBUTES, &count);
     fprintf (stream, "Active Attribute count: %d\n", count);

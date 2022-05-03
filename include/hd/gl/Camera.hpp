@@ -1,6 +1,6 @@
 #pragma once
 #include "hd/evt/WindowDispatch.hpp"
-#include "hd/glProgram.hpp"
+#include "hd/gl/ShaderProgram.hpp"
 
 namespace hd {
   namespace gl {
@@ -21,7 +21,7 @@ namespace hd {
        * @brief Redefine the camera.
        *
        */
-      void Matrix (int, int, float, float, float, Program &, const char *);
+      void Matrix (int, int, float, float, float, ShaderProgram &, const char *);
       evt::WindowDispatch input;
 
       // Event Handlers

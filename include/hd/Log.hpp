@@ -24,3 +24,11 @@
     fprintf (stderr, MESSAGE, ##__VA_ARGS__);                                 \
   }                                                                           \
   fprintf (stderr, ")\n")
+
+#define hdDebugReturn(MESSAGE, ...)                                             \
+  fprintf (stderr, "%s:%d ", __FILE__, __LINE__);                       \
+  fprintf (stderr, "%s () returns `", __FUNCTION__);                           \
+  if (MESSAGE != NULL) {                                                      \
+    fprintf (stderr, MESSAGE, ##__VA_ARGS__);                                 \
+  }                                                                           \
+  fprintf (stderr, "`\n")

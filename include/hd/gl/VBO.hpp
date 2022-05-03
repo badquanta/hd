@@ -8,6 +8,7 @@ namespace hd {
 
     public:
       VBO ();
+      VBO (GLfloat*,GLsizeiptr);
       void Create (GLfloat *, GLsizeiptr);
       void Bind ();
       void Unbind ();

@@ -1,4 +1,4 @@
-#include "hd/glCamera.hpp"
+#include "hd/gl/Camera.hpp"
 namespace hd::gl {
 
   Camera::Camera (glm::vec3 p) : Position (p)
@@ -36,7 +36,7 @@ namespace hd::gl {
                   float aFovDeg,
                   float aNearPlane,
                   float aFarPlane,
-                  Program &aProgram,
+                  ShaderProgram &aProgram,
                   const char *aUniformName)
   {
     // load identity matrixes.
