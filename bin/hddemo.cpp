@@ -17,11 +17,10 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/Window.hpp"
+#include "hd/glCamera.hpp"
+#include "hd/glEBO.hpp"
 #include "hd/glTexture.hpp"
 #include "hd/glVAO.hpp"
-#include "hd/glEBO.hpp"
-#include "hd/glEBO.hpp"
-#include "hd/glCamera.hpp"
 
 // Vertices coordinates
 GLfloat vertexData[] = {
@@ -77,9 +76,9 @@ drawFrame (int ticks)
   // glUniformMatrix4fv (projLoc, 1, GL_FALSE, glm::value_ptr (proj));
   int w, h;
   window->GetDrawableSize (&w, &h);
-  //hdDebug ("Drawable size: %dx%d", w, h);
-  camera.Matrix (
-      w, h, 45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
+  // hdDebug ("Drawable size: %dx%d", w, h);
+  glViewport (0, 0, w, h);
+  camera.Matrix (w, h, 45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
   glUniform1f (scaleLocation, 0.5f);
   glUniform1i (tex0Uni, 0);
   // glBindTexture (GL_TEXTURE_2D, texture);
@@ -102,13 +101,16 @@ int
 main (int argc, char **argv)
 {
   hd::Engine::PrintVersions ();
-  //hd::Engine::Mount engine = hd::Engine::Get ();
+  // hd::Engine::Mount engine = hd::Engine::Get ();
   hd::Engine::Configure (argc, argv);
-  window = hd::Window::Create (hd::Engine::GetProgramName());
-
+  window = hd::Window::Create (hd::Engine::GetProgramName ());
+  window->input.On (camera.input.pipe);
+  window->input.Close.Void.Once ([] () {
+    hd::Engine::Get ()->process.Void.Once ([] () { window = NULL; });
+  });
   hd::Engine::Get ()->process.Void.Once ([] () {
+    window->MakeCurrent ();
     hd::Engine::Ptr engine = hd::Engine::Get ();
-    window = hd::Window::Create (640, 480, "hddemo");
     if (!shaderProgram.Create ("shaders/default.vert",
                                "shaders/default.frag")) {
       fprintf (stderr, "Failed to create Shader Program\n");
@@ -158,6 +160,6 @@ main (int argc, char **argv)
     texture.Assign (shaderProgram, "tex0", 0);
   });
   window->output.On (&drawFrame);
-  hd::Engine::Get()->Start ();
+  hd::Engine::Get ()->Start ();
   return 0;
 }

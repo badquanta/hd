@@ -22,18 +22,18 @@ namespace hd {
        *
        */
       void Matrix (int, int, float, float, float, Program &, const char *);
-      evt::WindowDispatch on;
+      evt::WindowDispatch input;
 
       // Event Handlers
       evt::VoidDispatch::Handler StartTrackingMouse = [this] () {
         hdDebug ("Start Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_TRUE);
-        TrackingListenerHandle = on.Mouse.Motion.On(TrackingListener);
+        TrackingListenerHandle = input.Mouse.Motion.On(TrackingListener);
       };
       evt::VoidDispatch::Handler StopTrackingMouse = [this] () {
         hdDebug ("Stop Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_FALSE);
-        on.Mouse.Motion.Delete (TrackingListenerHandle);
+        input.Mouse.Motion.Delete (TrackingListenerHandle);
       };
       evt::SDL_EventDispatch::Handler TrackingListener = [this] (const SDL_Event&e) {
         hdDebug ("Tracking Listener");
