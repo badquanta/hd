@@ -21,6 +21,45 @@
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 namespace hd {
   /**
+   * @details hd mainloop, while `m_Quit` false do:
+   * - input dispatching
+   * - process dispatching
+   * - output dispatching
+   * - delay / wait
+   * - repeat.
+   * @todo make duration of input dispatching limitable?
+   * @todo make duration of delay / wait limitable?
+   ***/
+  void
+  Engine::FrameLoop ()
+  {
+    hdDebugCall (NULL);
+    while (!m_Quit) {
+      int frameStartTicks = SDL_GetTicks ();
+      HandleEvents ();
+      // SDL_Renderer *renderer = SDL_GetRenderer (window);
+      process.Trigger (frameStartTicks);
+      output.Trigger (frameStartTicks);
+      // SDL_RenderPresent (renderer);
+      SDL_Delay (10 /**SDL_framerateDelay (&fpsMan)**/);
+    }
+  }
+  /**
+   * @details process pending events until there are no more events.
+   * @todo make how many events are process configurable (count/duration of processing.)
+   **/
+  int
+  Engine::HandleEvents ()
+  {
+    // hdDebugCall (NULL);
+    int evtCnt = 0;
+    SDL_Event e;
+    while (SDL_PollEvent (&e) != 0) {
+      input.Trigger (e);
+    }
+    return evtCnt;
+  }
+  /**
    * @brief weak_ptr reference to singleton instance.
    * @attention auto destructs upon last dereference.
    * @note windows keep a reference to engine. If a window reference is held
@@ -63,7 +102,7 @@ namespace hd {
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK,
                          SDL_GL_CONTEXT_PROFILE_CORE);
-    Ptr mounted = Mount (new Engine ());
+    Ptr mounted = Ptr (new Engine ());
     instance = mounted;
     // Apparently in order to initializes GLEW we *MUST* have a window created
     Window::Ptr splashWindow = Window::Create (320, 200, "Splash!");
@@ -131,18 +170,31 @@ namespace hd {
   Engine::Engine () /* @todo :  remove camera (glm::vec3 (0.0f, 0.0f, 1.0f)) */
   {
     hdDebugCall (NULL);
-    on.Quit.On ([this] (const SDL_Event &e) { quit = true; });
-
+    input.Quit.On ([this] (const SDL_Event &e) { m_Quit = true; });
   }
+  int Engine::m_Argc = 0;
+
+  char **Engine::m_Argv = NULL;
   // Engine::Engine (int argc, char **argv) { configure (argc, argv); }
   /** Setup some basic options based on the command line **/
   void
   Engine::Configure (int argc, char **argv)
   {
+    m_Argc = argc;
+    m_Argv = argv;
     hdDebugCall ("argc=%d, argv=%p", argc, argv);
     // Shared::searchPaths.clear ();
     Shared::searchPaths.push_back (std::filesystem::canonical (
         std::filesystem::path (argv[0]).parent_path () / "../assets"));
+  }
+  char *
+  Engine::GetProgramName ()
+  {
+    if (m_Argc > 0) {
+      return m_Argv[0];
+    } else {
+      return NULL;
+    }
   }
   /** **/
   Engine::~Engine ()
@@ -156,7 +208,7 @@ namespace hd {
   Engine::Quit ()
   {
     hdDebugCall (NULL);
-    quit = true;
+    m_Quit = true;
   }
   /** **/
 
@@ -164,35 +216,10 @@ namespace hd {
   Engine::Start ()
   {
     hdDebugCall (NULL);
-    quit = false;
+    m_Quit = false;
     FrameLoop ();
   }
-  /** **/
-  void
-  Engine::FrameLoop ()
-  {
-    hdDebugCall (NULL);
-    while (!quit) {
-      HandleEvents ();
-      // SDL_Renderer *renderer = SDL_GetRenderer (window);
-      eachFrame.Trigger (SDL_GetTicks ());
-      Window::RenderAll ();
-      // SDL_RenderPresent (renderer);
-      SDL_Delay (10 /**SDL_framerateDelay (&fpsMan)**/);
-    }
-  }
-  /** **/
-  int
-  Engine::HandleEvents ()
-  {
-    // hdDebugCall (NULL);
-    int evtCnt = 0;
-    SDL_Event e;
-    while (SDL_PollEvent (&e) != 0) {
-      on.Trigger (e);
-    }
-    return evtCnt;
-  }
+
   /** **/
   void
   Engine::Shutdown ()

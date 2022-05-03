@@ -1,4 +1,4 @@
-#include "hd/evt/AbstractDispatch.hpp"
+#include "hd/evt/IntDispatch.hpp"
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
@@ -18,4 +18,8 @@
  */
 /** **/
 namespace hd::evt {
+    void IntDispatch::Trigger(int aInt){
+      Void.Trigger ();
+      AbstractDispatch<int>::Trigger (aInt);
+    }
 }

@@ -46,7 +46,7 @@ namespace hd {
      *  @return A character string with the program's name.
      *  @return "" if `Configure(argc, argv)` has not be called
      * **/
-    static const char *GetProgramName ();
+    static char *GetProgramName ();
     /** Finish applying **/
     ~Engine ();
     /** Signal to the engine we wish to exit the main loop **/
@@ -55,12 +55,16 @@ namespace hd {
     /** Print out what went wrong with SDL2.
      * \deprecated someone else should just do this. **/
     static void PrintSdlError (const char *msg = NULL);
-    /** Callback list for any/all events. **/
-    evt::EngineDispatch on;
-    evt::IntDispatch eachFrame;
-    evt::VoidDispatch beforeStart;
+    /** `SDL_Event&` Callback list for events. **/
+    evt::EngineDispatch input;
+    /** Callback list for logical processing. **/
+    evt::IntDispatch process;
+    /** Callback list for rendering. **/
+    evt::IntDispatch output;
     /** @todo remove from Engine gl::Camera camera; **/
   private:
+    static int m_Argc;
+    static char **m_Argv;
     /**
      * @brief Construct a new Engine object
      * @attention This method is private and one needs to call it through
@@ -79,6 +83,6 @@ namespace hd {
     /** Ensure we are responsive to changes to our environment. */
     int HandleEvents ();
     /** Should we keep on working? */
-    bool quit = false;
+    bool m_Quit = false;
   };
 } // namespace hd

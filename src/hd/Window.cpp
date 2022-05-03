@@ -1,5 +1,38 @@
 #include "hd/Window.hpp"
 namespace hd {
+  /** Creates an SDL Window with an OpenGL context
+   * @note use `Create` instead of directly calling this constructor **/
+  Window::Window (SDL_Window *aWindow, SDL_GLContext aContext)
+      : m_Window (aWindow), m_Context (aContext)
+  {
+    engine = Engine::Get ();
+    assert (aWindow);
+    assert (aContext);
+    onHandle = engine->input.Windows[Id ()].On (input.pipe);
+    outputHandle = engine->output.On (output.pipe);
+    hdDebugCall ("id=%d winPtr=%p glCtxPr = %p, ", Id (), aWindow, aContext);
+  }
+  /** Destroys the underlying SDL_Window reference **/
+  Window::~Window ()
+  {
+    hdDebugCall ("id#%d");
+    engine->input.Windows[Id ()].Delete (onHandle);
+    engine->output.Delete (outputHandle);
+    m_IdCache.erase (Id ());
+    m_ContextCache.erase (m_Context);
+    m_PtrCache.erase (m_Window);
+    if (m_Window) {
+      hdDebug ("Destroying Window ID%d", Id ());
+      SDL_DestroyWindow (m_Window);
+    } else {
+      hdDebug ("NULL");
+    }
+    if (m_Context != NULL) {
+      hdDebug ("Deleting GL Context");
+      SDL_GL_DeleteContext (m_Context);
+    }
+  }
+
   /** Defines the shape of the next window if no shape is specified. **/
   SDL_Rect Window::NextRect
       = { SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 320, 240 };
@@ -10,8 +43,11 @@ namespace hd {
    */
   SDL_WindowFlags Window::NextFlags
       = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+  /** SDL_Window* -> Smart Pointer cache. **/
   std::map<SDL_Window *, std::weak_ptr<Window> > Window::m_PtrCache;
+  /** Uint32 (SDL_WindowID) -> Smart pointer cache. **/
   std::map<Uint32, std::weak_ptr<Window> > Window::m_IdCache;
+  /** SDL_GLContext pointer -> Window Smart pointer cache. **/
   std::map<SDL_GLContext, std::weak_ptr<Window> > Window::m_ContextCache;
   Window::Ptr
   Window::Create (SDL_Window *aWindow, SDL_GLContext aContext)
@@ -67,7 +103,7 @@ namespace hd {
   Window::Create (int w, int h, const char *aTitle, Uint32 aFlags)
   {
     SDL_Rect aRect = { NextRect.x, NextRect.h, w, h };
-    return Create (&aRect, aTitle, aFlags);
+    return Create ( aTitle, &aRect, aFlags);
   }
   Window::Ptr
   Window::GetById (Uint32 aId)
@@ -92,47 +128,6 @@ namespace hd {
       return m_ContextCache.at (aContext).lock ();
     }
     return NULL;
-  }
-  void
-  Window::RenderAll ()
-  {
-    for (std::pair<Uint32, std::weak_ptr<Window> > pair : m_IdCache) {
-      Ptr window = pair.second.lock ();
-      if (window) {
-        //hdDebug ("Rendering Window ID#%d", pair.first);
-        window->onRender.Trigger ();
-      }
-    }
-  }
-  /** Creates an SDL Window with an OpenGL context
-   * @note use `Create` instead of directly calling this constructor **/
-  Window::Window (SDL_Window *aWindow, SDL_GLContext aContext)
-      : m_Window (aWindow), m_Context (aContext)
-  {
-    engine = Engine::Get ();
-    assert (aWindow);
-    assert (aContext);
-    onHandle = engine->on.Windows[Id ()].On (on.pipe);
-    hdDebugCall (
-        "id=%d winPtr=%p glCtxPr = %p, ", Id (), aWindow, aContext);
-  }
-  /** Destroys the underlying SDL_Window reference **/
-  Window::~Window ()
-  {
-    engine->on.Windows[Id ()].Delete (onHandle);
-    m_IdCache.erase (Id ());
-    m_ContextCache.erase (m_Context);
-    m_PtrCache.erase (m_Window);
-    if (m_Window) {
-      hdDebug ("Destroying Window ID%d", Id ());
-      SDL_DestroyWindow (m_Window);
-    } else {
-      hdDebug ("NULL");
-    }
-    if (m_Context != NULL) {
-      hdDebug ("Deleting GL Context");
-      SDL_GL_DeleteContext (m_Context);
-    }
   }
 
   Uint32

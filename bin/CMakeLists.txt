@@ -5,5 +5,5 @@ endfunction()
 hd_exec(hddemo)
 hd_exec(hd1)
 hd_exec(hd2)
-
+hd_exec(hd3)
 #install(TARGETS hddemo RUNTIME DESTINATION bin )

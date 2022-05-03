@@ -62,7 +62,7 @@ hd::gl::Camera camera;
 void
 drawFrame (int ticks)
 {
-
+  window->MakeCurrent ();
   glClearColor (0.f, 0.f, 0.f, 1.f);
   glEnable (GL_DEPTH_TEST);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -95,6 +95,7 @@ drawFrame (int ticks)
                   NULL);
   // glDisableVertexAttribArray (aPos);
   shaderProgram.unbind ();
+  window->Swap ();
 }
 
 int
@@ -105,7 +106,8 @@ main (int argc, char **argv)
   hd::Engine::Configure (argc, argv);
   window = hd::Window::Create (hd::Engine::GetProgramName());
 
-  engine->beforeStart.On ([&engine] () {
+  hd::Engine::Get ()->process.Void.Once ([] () {
+    hd::Engine::Ptr engine = hd::Engine::Get ();
     window = hd::Window::Create (640, 480, "hddemo");
     if (!shaderProgram.Create ("shaders/default.vert",
                                "shaders/default.frag")) {
@@ -155,7 +157,7 @@ main (int argc, char **argv)
         "textures/pattern_16/diffus.tga", GL_TEXTURE_2D, GL_TEXTURE0);
     texture.Assign (shaderProgram, "tex0", 0);
   });
-  engine->eachFrame.On (&drawFrame);
-  engine->Start ();
+  window->output.On (&drawFrame);
+  hd::Engine::Get()->Start ();
   return 0;
 }

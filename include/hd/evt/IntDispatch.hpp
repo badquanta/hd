@@ -17,7 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/evt/AbstractDispatch.hpp"
+#include "hd/evt/VoidDispatch.hpp"
 namespace hd::evt {
   class IntDispatch : public AbstractDispatch<int> {
+    public:
+      VoidDispatch Void;
+      virtual void Trigger (int) override;
   };
 }

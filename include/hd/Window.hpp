@@ -30,9 +30,10 @@ namespace hd {
     static SDL_WindowFlags NextFlags;
     virtual ~Window ();
     static Window::Ptr Create (SDL_Window *, SDL_GLContext);
-    evt::VoidDispatch onRender;
-    evt::WindowDispatch on;
+    evt::IntDispatch output;
+    evt::WindowDispatch input;
     evt::SDL_EventDispatch::Handle onHandle;
+    evt::IntDispatch::Handle outputHandle;
     /**
      * @brief
      *
@@ -161,7 +162,7 @@ namespace hd {
     static Ptr GetById (Uint32);
     static Ptr GetByPtr (SDL_Window *);
     static Ptr GetByGlContext (SDL_GLContext);
-    static void RenderAll ();
+
 
   private:
     Engine::Ptr engine;
