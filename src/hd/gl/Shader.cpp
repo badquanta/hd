@@ -93,8 +93,8 @@ namespace hd::gl {
   void
   Shader::Free ()
   {
-    hdDebugCall (NULL);
     if (ID != 0) {
+      hdDebugCall (NULL);
       glDeleteShader (ID);
       ID = 0;
     }

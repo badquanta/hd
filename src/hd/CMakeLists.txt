@@ -29,6 +29,7 @@ list(APPEND LIBHD_COMPONENTS
   gl/VAO.cpp
   gl/VBO.cpp
   gl/EBO.cpp
+  joy/Device.cpp
 )
 #add_executable(hddemo hd.cpp ${LIBHD_COMPONENTS})
 add_library(hd ${LIBHD_COMPONENTS} )

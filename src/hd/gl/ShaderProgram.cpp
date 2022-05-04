@@ -66,7 +66,7 @@ namespace hd::gl {
     }
   }
   void
-  ShaderProgram::Attach (Shader aShader)
+  ShaderProgram::Attach (Shader& aShader)
   {
     Attach (aShader.GetId ());
   }

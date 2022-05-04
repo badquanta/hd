@@ -28,15 +28,21 @@ namespace hd::gl {
   VAO::Bind ()
   {
     glBindVertexArray (ID);
+    GLenum err=glGetError();
+    if(err!=GL_NO_ERROR){
+      hdError ("Error binding VAO: %s", gluErrorString (err));
+    }
   }
   void
   VAO::Unbind ()
   {
+    hdDebugCall (NULL);
     glBindVertexArray (0);
   }
   void
   VAO::Delete ()
   {
+    hdDebugCall (NULL);
     glDeleteVertexArrays (1, &ID);
   }
 }

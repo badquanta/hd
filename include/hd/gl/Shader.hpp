@@ -4,7 +4,7 @@ namespace hd {
   namespace gl {
     class Shader {
     private:
-      GLuint ID;
+      GLuint ID=0;
 
     public:
       Shader ();

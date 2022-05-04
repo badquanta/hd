@@ -17,7 +17,7 @@ namespace hd {
       /** Destroys program **/
       ~ShaderProgram ();
       /** Attach a shader by `hd::gl::Shader` reference. **/
-      void Attach (Shader);
+      void Attach (Shader&);
       /** Attach a shader by ID **/
       void Attach (GLuint);
       /** Attempt to link.

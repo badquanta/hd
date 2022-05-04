@@ -49,7 +49,9 @@ main (int argc, char **argv)
   vao.Create ();
   vao.Bind ();
   hd::gl::VBO vbo (vertices, sizeof (vertices));
+  vbo.Bind ();
   hd::gl::EBO ebo (indices, sizeof (indices));
+  ebo.Bind ();
   glVertexAttribPointer (
       0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
   glEnableVertexAttribArray (0);
