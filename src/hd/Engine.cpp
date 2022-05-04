@@ -73,11 +73,11 @@ namespace hd {
    * is to let the user define all windows and not have to define and destroy
    * one for this reason.
    *
-   * @return Engine::Ptr a smart_ptr reference to the constructed singleton
+   * @return Engine::s_ptr a smart_ptr reference to the constructed singleton
    * engine instance.
    * @return NULL on failure.
    */
-  Engine::Ptr
+  Engine::s_ptr
   Engine::Initialize ()
   {
     hdDebugCall (NULL);
@@ -102,10 +102,10 @@ namespace hd {
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK,
                          SDL_GL_CONTEXT_PROFILE_CORE);
-    Ptr mounted = Ptr (new Engine ());
+    s_ptr mounted = s_ptr (new Engine ());
     instance = mounted;
     // Apparently in order to initializes GLEW we *MUST* have a window created
-    Window::Ptr splashWindow = Window::Create (320, 200, "Splash!");
+    Window::s_ptr splashWindow = Window::Create (320, 200, "Splash!");
     if (!splashWindow) {
       hdError ("Failed to create splash window.");
       mounted = NULL;
@@ -131,14 +131,14 @@ namespace hd {
    * @brief Access the Engine singleton;
    * @attention any reference attempts to initialize it.
    * @attention shuts down if there are no references.
-   * @return Engine::Ptr If the engine fails to initialize this will be `NULL`.
-   * @return Engine::Ptr if the engine has been initialized this will be a
+   * @return Engine::s_ptr If the engine fails to initialize this will be `NULL`.
+   * @return Engine::s_ptr if the engine has been initialized this will be a
    *smart_ptr reference to it.
    **/
-  Engine::Ptr
+  Engine::s_ptr
   Engine::Get ()
   {
-    Ptr mounted = instance.lock ();
+    s_ptr mounted = instance.lock ();
     if (mounted == NULL) {
       mounted = Initialize ();
     }

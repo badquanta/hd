@@ -29,13 +29,13 @@ namespace hd {
    */
   class Engine {
   public:
-    typedef std::shared_ptr<Engine> Ptr;
+    typedef std::shared_ptr<Engine> s_ptr;
     /**
      * @brief Initializes or simply returns an already initialized engine.
      *
-     * @return Ptr `std::shared_ptr<Engine>`, NULL if initialization error.
+     * @return s_ptr `std::shared_ptr<Engine>`, NULL if initialization error.
      */
-    static Ptr Get ();
+    static s_ptr Get ();
     static void PrintVersion (const SDL_version *,
                               const char *of = "SDL",
                               FILE *aFile = stdout);
@@ -75,7 +75,7 @@ namespace hd {
     static std::weak_ptr<Engine> instance;
     /** Pre-constructor initialization, called by Get() before construction.
      * **/
-    static Ptr Initialize ();
+    static s_ptr Initialize ();
     /** Clean up our workspace.**/
     static void Shutdown ();
     /** Perform a step of our work.**/

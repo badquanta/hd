@@ -5,7 +5,6 @@ namespace hd {
   Window::Window (SDL_Window *aWindow, SDL_GLContext aContext)
       : m_Window (aWindow), m_Context (aContext)
   {
-    engine = Engine::Get ();
     assert (aWindow);
     assert (aContext);
     onHandle = engine->input.Windows[Id ()].On (input.pipe);
@@ -49,10 +48,10 @@ namespace hd {
   std::map<Uint32, std::weak_ptr<Window> > Window::m_IdCache;
   /** SDL_GLContext pointer -> Window Smart pointer cache. **/
   std::map<SDL_GLContext, std::weak_ptr<Window> > Window::m_ContextCache;
-  Window::Ptr
+  Window::s_ptr
   Window::Create (SDL_Window *aWindow, SDL_GLContext aContext)
   {
-    Ptr created(new Window (aWindow, aContext));
+    s_ptr created(new Window (aWindow, aContext));
     m_PtrCache[aWindow] = created;
     m_IdCache[created->Id ()] = created;
     m_ContextCache[aContext] = created;
@@ -68,12 +67,12 @@ namespace hd {
    * @return smart pointer to and instance of this class managing a window.
    * @return NULL on failure.
    */
-  Window::Ptr
+  Window::s_ptr
   Window::Create (const char *aTitle, SDL_Rect *aRect,  Uint32 aFlags)
   {
     assert (aRect != NULL);
     assert (aTitle != NULL);
-    Engine::Ptr engine = Engine::Get ();
+    Engine::s_ptr engine = Engine::Get ();
     hdDebugCall ("{%d, %d, %d, %d}, \"%s\", 0x%x",
                  aRect->x,
                  aRect->y,
@@ -99,13 +98,13 @@ namespace hd {
     }
     return Create (created, created_context);
   }
-  Window::Ptr
+  Window::s_ptr
   Window::Create (int w, int h, const char *aTitle, Uint32 aFlags)
   {
     SDL_Rect aRect = { NextRect.x, NextRect.h, w, h };
     return Create ( aTitle, &aRect, aFlags);
   }
-  Window::Ptr
+  Window::s_ptr
   Window::GetById (Uint32 aId)
   {
     if (m_IdCache.find (aId) != m_IdCache.end ()) {
@@ -113,7 +112,7 @@ namespace hd {
     }
     return NULL;
   }
-  Window::Ptr
+  Window::s_ptr
   Window::GetByPtr (SDL_Window *aWindow)
   {
     if (m_PtrCache.find (aWindow) != m_PtrCache.end ()) {
@@ -121,7 +120,7 @@ namespace hd {
     }
     return NULL;
   }
-  Window::Ptr
+  Window::s_ptr
   Window::GetByGlContext (SDL_GLContext aContext)
   {
     if (m_ContextCache.find (aContext) != m_ContextCache.end ()) {
@@ -317,7 +316,7 @@ namespace hd {
     return true;
   }
   bool
-  Window::SetModalFor (Window::Ptr aWindow)
+  Window::SetModalFor (Window::s_ptr aWindow)
   {
     return SetModalFor (aWindow->m_Window);
   }

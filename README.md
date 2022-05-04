@@ -45,6 +45,7 @@ The `origin` repository resides on [github][PROJECT_GITHUB].
 
 In order to build one will need at a minimum the development libraries are available:
     - sdl, sdl_ttf, sdl_img, sdl_mixer, sdl_net (etc)
+    - boost::program_options 1.74
     - __@TODO__ document more / test that am not missing any others on a clean install.
 
 The repository contains some other dependencies as git submodules:

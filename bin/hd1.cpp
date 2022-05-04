@@ -18,14 +18,14 @@
 #include "hd/Engine.hpp"
 #include "hd/Window.hpp"
 
-hd::Window::Ptr window;
+hd::Window::s_ptr window;
 
 int
 main (int argc, char **argv)
 {
   hd::Engine::PrintVersions ();
-  //hd::Engine::Ptr engine = hd::Engine::Get ();
-  hd::Window::Ptr window = hd::Window::Create (800, 600, "HD1");
+  //hd::Engine::s_ptr engine = hd::Engine::Get ();
+  hd::Window::s_ptr window = hd::Window::Create (800, 600, "HD1");
   window->output.On ([&window] (int aTime) {
     window->MakeCurrent ();
     glClear (GL_COLOR_BUFFER_BIT);
@@ -33,7 +33,7 @@ main (int argc, char **argv)
   });
   window->input.Close.Void.On ([&window] () { window=NULL;});
 
-  hd::Window::Ptr win2 = hd::Window::Create (320, 200, "HD2");
+  hd::Window::s_ptr win2 = hd::Window::Create (320, 200, "HD2");
   win2->input.Close.Void.On ([&win2] () { win2 = NULL; });
   // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();

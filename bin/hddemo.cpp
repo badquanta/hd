@@ -55,7 +55,7 @@ GLint scaleLocation = -1;
 GLint tex0Uni = -1;
 hd::gl::Texture texture;
 
-hd::Window::Ptr window;
+hd::Window::s_ptr window;
 hd::gl::Camera camera;
 
 void
@@ -110,7 +110,7 @@ main (int argc, char **argv)
   });
   hd::Engine::Get ()->process.Void.Once ([] () {
     window->MakeCurrent ();
-    hd::Engine::Ptr engine = hd::Engine::Get ();
+    hd::Engine::s_ptr engine = hd::Engine::Get ();
     if (!shaderProgram.Create ("shaders/default.vert",
                                "shaders/default.frag")) {
       fprintf (stderr, "Failed to create Shader Program\n");

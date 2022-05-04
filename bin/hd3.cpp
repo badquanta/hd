@@ -21,13 +21,13 @@
 #include "hd/gl/ShaderProgram.hpp"
 #include "hd/gl/VAO.hpp"
 #include "hd/gl/VBO.hpp"
-hd::Window::Ptr window;
+hd::Window::s_ptr window;
 
 int
 main (int argc, char **argv)
 {
   hd::Engine::Configure (argc, argv);
-  hd::Window::Ptr window = hd::Window::Create (800, 600, "HD1");
+  hd::Window::s_ptr window = hd::Window::Create (800, 600, "HD1");
   // Vertices coordinates
   GLfloat vertices[] = {
     -0.5f, -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower left corner
@@ -71,7 +71,7 @@ main (int argc, char **argv)
     hd::Engine::Get ()->process.Once ([&window] (int) { window = NULL; });
   });
 
-  hd::Window::Ptr win2 = hd::Window::Create (320, 200, "HD2");
+  hd::Window::s_ptr win2 = hd::Window::Create (320, 200, "HD2");
   win2->input.Close.Void.On ([&win2] () {
     hd::Engine::Get ()->process.Once ([&win2] (int) { win2 = NULL; });
   });

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
-#include "hd/Engine.hpp"
+#include "hd/EngineComponent.hpp"
 #include "hd/Shared.hpp"
 #include "hd/evt/VoidDispatch.hpp"
 #include "hd/evt/WindowDispatch.hpp"
@@ -27,10 +27,10 @@ namespace hd {
    * @todo https://wiki.libsdl.org/SDL_SetWindowHitTest
    * @todo https://wiki.libsdl.org/SDL_IsScreenSaverEnabled
    **/
-  class Window {
+  class Window: public EngineComponent{
   public:
     /** Smart pointer reference. **/
-    typedef std::shared_ptr<Window> Ptr;
+    typedef std::shared_ptr<Window> s_ptr;
     /** `Create` uses this position and size if none are defined. **/
     static SDL_Rect NextRect;
     /** `Create` uses this title if none is defined. **/
@@ -49,10 +49,10 @@ namespace hd {
     evt::IntDispatch::Handle outputHandle;
   public: // Create window pointer utilities.
     /** Given an existing SDL_Windowand SDL_GLContext pointer construct
-     * a Window::Ptr
+     * a Window::s_ptr
      * @todo make this check the caches?
      ***/
-    static Window::Ptr Create (SDL_Window *, SDL_GLContext);
+    static Window::s_ptr Create (SDL_Window *, SDL_GLContext);
     /**
      * @brief
      *
@@ -61,13 +61,13 @@ namespace hd {
      * @param aTitle [const char*] used for the initial window title.
      * @param aFlags [Uint32] describing the window flags to use
      * @note Windows are always created with SDL_WINDOW_OPENGL flag set.
-     * @return Window::Ptr
+     * @return Window::s_ptr
      */
-    static Window::Ptr Create (const char *aTitle = Window::NextTitle,
+    static Window::s_ptr Create (const char *aTitle = Window::NextTitle,
                                SDL_Rect *aRect = &Window::NextRect,
 
                                Uint32 aFlags = Window::NextFlags);
-    static Window::Ptr Create (int aWidth,
+    static Window::s_ptr Create (int aWidth,
                                int aHeight,
                                const char *aTitle = Window::NextTitle,
                                Uint32 aFlags = Window::NextFlags);
@@ -133,7 +133,7 @@ namespace hd {
     void GetMinimumSize (int *, int *);
     /** @see https://wiki.libsdl.org/SDL_SetWindowModalFor **/
     bool SetModalFor (SDL_Window *);
-    bool SetModalFor (Window::Ptr);
+    bool SetModalFor (Window::s_ptr);
     /** @see https://wiki.libsdl.org/SDL_SetWindowOpacity **/
     bool SetOpacity (float);
     /** @see https://wiki.libsdl.org/SDL_GetWindowOpacity **/
@@ -178,13 +178,12 @@ namespace hd {
     SDL_Window *m_Window;
     const SDL_GLContext m_Context;
 
-    static Ptr GetById (Uint32);
-    static Ptr GetByPtr (SDL_Window *);
-    static Ptr GetByGlContext (SDL_GLContext);
+    static s_ptr GetById (Uint32);
+    static s_ptr GetByPtr (SDL_Window *);
+    static s_ptr GetByGlContext (SDL_GLContext);
 
 
   private:
-    Engine::Ptr engine;
     static std::map<SDL_Window *, std::weak_ptr<Window> > m_PtrCache;
     static std::map<Uint32, std::weak_ptr<Window> > m_IdCache;
     static std::map<SDL_GLContext, std::weak_ptr<Window> > m_ContextCache;
