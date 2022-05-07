@@ -21,7 +21,7 @@ namespace hd {
       EngineComponent ();
       ~EngineComponent ();
       const Engine::s_ptr engine;
-      evt::IntDispatch process;
+      evt::IntDispatch step;
 
   };
   class EngineOutputComponent: public EngineComponent {

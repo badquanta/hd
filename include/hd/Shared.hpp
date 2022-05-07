@@ -41,7 +41,5 @@ namespace hd
     static Texture makeTexture (SDL_Surface *, SDL_Renderer *);
     static Font loadFont (const char *, int);
     static Texture renderText (SDL_Renderer*, Font, std::string_view, SDL_Color);
-    static std::filesystem::path findRealPath (std::filesystem::path);
-    static std::list<std::filesystem::path> searchPaths;
   };
 } // namespace hd

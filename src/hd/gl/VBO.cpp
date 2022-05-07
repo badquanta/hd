@@ -3,13 +3,13 @@ namespace hd::gl {
   VBO::VBO () {}
   VBO::VBO (GLfloat *aVertices, GLsizeiptr aSize)
   {
-    hdDebugCall ("%p, %d", aVertices, aSize);
+    hdDebugCall ("%p, %p", aVertices, aSize);
     Create (aVertices, aSize);
   }
   void
   VBO::Create (GLfloat *aVertices, GLsizeiptr aSize)
   {
-    hdDebugCall ("%p, %d", aVertices, aSize);
+    hdDebugCall ("%p, %p", aVertices, aSize);
     glGenBuffers (1, &ID);
     //glBindBuffer (GL_ARRAY_BUFFER, ID);
     Bind();

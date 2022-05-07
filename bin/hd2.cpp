@@ -45,14 +45,14 @@ main (int argc, char **argv)
     window->Swap ();
   });
   window->input.Close.Void.On ([&window] () {
-    hd::Engine::Get()->process.Once( [&window](int){
+    hd::Engine::Get()->step.Once( [&window](int){
       window = NULL;
     });
   });
 
   hd::Window::s_ptr win2 = hd::Window::Create (320, 200, "HD2");
   win2->input.Close.Void.On (
-      [&win2] () { hd::Engine::Get ()->process.Once ([&win2] (int) {
+      [&win2] () { hd::Engine::Get ()->step.Once ([&win2] (int) {
         win2 = NULL;
       });
   });

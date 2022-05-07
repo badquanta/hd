@@ -21,6 +21,7 @@ namespace hd::evt {
     void
   JoyDispatch::Trigger (const SDL_Event &e)
   {
+    hdDebugCall(NULL);
     SDL_EventDispatch::Trigger (e);
     switch (e.type) {
     case SDL_JOYAXISMOTION:

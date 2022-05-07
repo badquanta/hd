@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Engine.hpp"
 #include "hd/Window.hpp"
 
 hd::Window::s_ptr window;
@@ -31,11 +30,8 @@ main (int argc, char **argv)
     glClear (GL_COLOR_BUFFER_BIT);
     window->Swap ();
   });
-  window->input.Close.Void.On ([&window] () { window=NULL;});
+  window->input.Close.Void.On ([&window] () { window->step.Void.Once([&window](){window=NULL;});});
 
-  hd::Window::s_ptr win2 = hd::Window::Create (320, 200, "HD2");
-  win2->input.Close.Void.On ([&win2] () { win2 = NULL; });
-  // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();
   return 0;
 }

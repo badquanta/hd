@@ -1,5 +1,5 @@
 #include "hd/gl/Shader.hpp"
-#include "hd/Shared.hpp"
+#include "hd/Engine.hpp"
 #include <fstream>
 #include <iostream>
 namespace hd::gl {
@@ -17,7 +17,7 @@ namespace hd::gl {
   {
     hdDebugCall("'%s'",aPath.generic_string().c_str());
     std::string content;
-    std::filesystem::path realPath = Shared::findRealPath (aPath);
+    std::filesystem::path realPath = Engine::FindPath (aPath);
     std::ifstream file (realPath, std::ios::in);
     if (!file.is_open ()) {
       fprintf (stderr,

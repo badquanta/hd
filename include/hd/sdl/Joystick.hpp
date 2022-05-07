@@ -5,6 +5,7 @@
  */
 
 #include "hd/EngineComponent.hpp"
+#include "hd/evt/JoyDispatch.hpp"
 #include <map>
 namespace hd::sdl {
   /**
@@ -14,6 +15,8 @@ namespace hd::sdl {
   class Joystick : public EngineComponent {
   public: // Class static components
     typedef std::shared_ptr<Joystick> s_ptr;
+    static bool EventState (int aState = SDL_QUERY);
+    static bool EventState (bool);
     /** SDL_JoystickFromInstanceID **/
     static s_ptr FromInstanceId (SDL_JoystickID);
     /**SDL_JoystickGetGUIDFromString**/
@@ -59,7 +62,9 @@ namespace hd::sdl {
     /**SDL_JoystickPowerLevel
      * SDL_JoystickCurrentPowerLevel **/
     SDL_JoystickPowerLevel CurrentPowerLevel ();
-
+  public: // Input Events
+    evt::JoyDispatch input;
+    evt::SDL_EventDispatch::Handle inputHandle;
   private: // static caches
     static std::map<int, std::weak_ptr<Joystick> > m_Opened;
     static std::map<SDL_Joystick *, std::weak_ptr<Joystick> > m_OpenedByPtr;

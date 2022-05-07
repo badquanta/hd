@@ -105,7 +105,7 @@ namespace hd::gl {
   GLint
   ShaderProgram::getUniformLocation (const GLchar *name)
   {
-    hdDebugCall ("%s", name);
+    //hdDebugCall ("%s", name);
     GLint result = glGetUniformLocation (ID, name);
     if (result == -1) {
       hdError ("Invalid uniform name '%s'.\n", name);

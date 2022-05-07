@@ -7,12 +7,12 @@ namespace hd {
   EngineComponent::EngineComponent () : engine (Engine::Get ())
   {
     m_ActiveEngineComponents++;
-    processHandle = engine->process.On (process.pipe);
+    processHandle = engine->step.On (step.pipe);
     hdDebug ("New component, total %d", m_ActiveEngineComponents);
   };
   EngineComponent::~EngineComponent () {
     hdDebugCall (NULL);
-    engine->process.Delete (processHandle);
+    engine->step.Delete (processHandle);
     m_ActiveEngineComponents--;
     hdDebug ("Delete component, total %d", m_ActiveEngineComponents);
   };

@@ -30,9 +30,19 @@ main (int argc, char **argv)
   hd::Window::s_ptr window = hd::Window::Create (800, 600, "HD1");
   // Vertices coordinates
   GLfloat vertices[] = {
-    -0.5f, -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower left corner
-    0.5f,  -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower right corner
-    0.0f,  0.5f * float (sqrt (3)) * 2 / 3, 0.0f  // Upper corner
+    //               COORDINATES                  /     COLORS           //
+    -0.5f,  -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
+    0.02f, // Lower left corner
+    0.5f,   -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
+    0.02f, // Lower right corner
+    0.0f,   0.5f * float (sqrt (3)) * 2 / 3,  0.0f, 1.0f, 0.6f,
+    0.32f, // Upper corner
+    -0.25f, 0.5f * float (sqrt (3)) * 1 / 6,  0.0f, 0.9f, 0.45f,
+    0.17f, // Inner left
+    0.25f,  0.5f * float (sqrt (3)) * 1 / 6,  0.0f, 0.9f, 0.45f,
+    0.17f, // Inner right
+    0.0f,   -0.5f * float (sqrt (3)) * 1 / 3, 0.0f, 0.8f, 0.3f,
+    0.02f // Inner down
   };
 
   // Indices for vertices order
@@ -43,7 +53,7 @@ main (int argc, char **argv)
   };
   window->MakeCurrent ();
   hd::gl::ShaderProgram shaderProgram;
-  shaderProgram.Create ("shaders/hd2.vert", "shaders/hd2.frag");
+  shaderProgram.Create ("shaders/hd5.vert", "shaders/hd5.frag");
   shaderProgram.Bind ();
   hd::gl::VAO vao;
   vao.Create ();
@@ -54,7 +64,21 @@ main (int argc, char **argv)
   ebo.Bind ();
   glVertexAttribPointer (
       0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
-  glEnableVertexAttribArray (0);
+  vao.LinkAttrib (vbo,
+                  shaderProgram,
+                  "aPos",
+                  3,
+                  GL_FLOAT,
+                  6 * sizeof (GLfloat),
+                  (void *)0);
+  vao.LinkAttrib (vbo,
+                  shaderProgram,
+                  "aColor",
+                  3,
+                  GL_FLOAT,
+                  6 * sizeof (GLfloat),
+                  (void *)(3 * sizeof (float)));
+  // glEnableVertexAttribArray (0);
   vao.Unbind ();
   vbo.Unbind ();
   ebo.Unbind ();
@@ -68,12 +92,12 @@ main (int argc, char **argv)
     window->Swap ();
   });
   window->input.Close.Void.On ([&window] () {
-    hd::Engine::Get ()->step.Once ([&window] (int) { window = NULL; });
+    window->engine->step.Once ([&window] (int) { window = NULL; });
   });
 
   hd::Window::s_ptr win2 = hd::Window::Create (320, 200, "HD2");
   win2->input.Close.Void.On ([&win2] () {
-    hd::Engine::Get ()->step.Once ([&win2] (int) { win2 = NULL; });
+    win2->engine->step.Once ([&win2] (int) { win2 = NULL; });
   });
   win2->output.On ([&win2] (int aTime) {
     win2->MakeCurrent ();
@@ -81,7 +105,11 @@ main (int argc, char **argv)
     glClear (GL_COLOR_BUFFER_BIT);
     win2->Swap ();
   });
+
+
   // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();
+
+
   return 0;
 }

@@ -1,6 +1,18 @@
 #include "hd/sdl/Joystick.hpp"
 
 namespace hd::sdl {
+  bool Joystick::EventState(int aState){
+    hdDebugCall ("%d", aState);
+    int state = SDL_JoystickEventState (aState);
+    if(state<0){
+      hdError("Unable to get/set Joystick event state because: %s",SDL_GetError());
+    }
+    return state == SDL_ENABLE;
+  }
+  bool Joystick::EventState(bool aState){
+    int state = (aState ? SDL_ENABLE : SDL_IGNORE);
+    return EventState (state);
+  }
   void Joystick::Update(){
     SDL_JoystickUpdate ();
   }
@@ -11,12 +23,7 @@ namespace hd::sdl {
    */
 SDL_JoystickPowerLevel Joystick::CurrentPowerLevel(){
   assert (m_Joystick);
-  SDL_JoystickPowerLevel result = SDL_JoystickCurrentPowerLevel (m_Joystick);
-  if(result == SDL_JOYSTICK_POWER_UNKNOWN){
-    hdError ("Unable to get the power level of joystick#%d because: %s",m_Index,
-             SDL_GetError ());
-  }
-  return result;
+  return SDL_JoystickCurrentPowerLevel (m_Joystick);
 }
   int
   Joystick::NumHats ()
@@ -30,9 +37,6 @@ SDL_JoystickPowerLevel Joystick::CurrentPowerLevel(){
     }
     return result;
   }
-
-
-
   int
   Joystick::NumButtons ()
   {
@@ -66,6 +70,7 @@ SDL_JoystickPowerLevel Joystick::CurrentPowerLevel(){
       hdError ("Unable to get number of axes for joystick#%d because: %s",
                m_Index,
                SDL_GetError ());
+
     }
     return result;
   }
@@ -222,17 +227,21 @@ SDL_JoystickPowerLevel Joystick::CurrentPowerLevel(){
     }
     return device;
   }
+   /** @see https://wiki.libsdl.org/SDL_JoystickClose **/
   Joystick::~Joystick ()
   {
     m_Opened.erase (m_Index);
     m_OpenedByPtr.erase (m_Joystick);
     SDL_JoystickClose (m_Joystick);
+    engine->input.Joysticks[InstanceId()].Delete(inputHandle);
     hdDebugCall (NULL);
   }
   Joystick::Joystick (int aIndex, SDL_Joystick *aDevice)
       : m_Index (aIndex), m_Joystick (aDevice)
   {
     hdDebugCall (NULL);
+
+    inputHandle = engine->input.Joysticks[InstanceId()].On (input.pipe);
   }
   /**
    * @brief

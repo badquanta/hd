@@ -30,4 +30,5 @@
 #include <SDL2/SDL2_framerate.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <filesystem>

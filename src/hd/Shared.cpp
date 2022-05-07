@@ -18,12 +18,7 @@
 #include "hd/Shared.hpp"
 #include "hd/Engine.hpp"
 namespace hd {
-  std::list<std::filesystem::path> Shared::searchPaths ({
-#if HD_DEBUG_BUILD == 1
-    HD_SOURCE_ASSETS,
-#endif
-        "./"
-  });
+
   Shared::Surface
   Shared::makeSurface (SDL_Surface *aSurface)
   {
@@ -49,7 +44,7 @@ namespace hd {
   Shared::Surface
   Shared::makeSurface (std::filesystem::path path)
   {
-    std::filesystem::path realPath = findRealPath (path);
+    std::filesystem::path realPath = Engine::FindPath (path);
     SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
     if (surface == NULL) {
       return nullptr;
@@ -60,7 +55,7 @@ namespace hd {
   Shared::Texture
   Shared::makeTexture (const char *aPath, SDL_Renderer *r)
   {
-    std::filesystem::path realPath = findRealPath (aPath);
+    std::filesystem::path realPath = Engine::FindPath (aPath);
     SDL_Surface *surface = IMG_Load (realPath.generic_string ().c_str ());
     if (surface == NULL) {
       Engine::PrintSdlError ();
@@ -89,36 +84,13 @@ namespace hd {
     }
     return Texture (tmp, [] (SDL_Texture *t) { SDL_DestroyTexture (t); });
   }
-  /** Locate the canonical path for the given path.
-   * If the path is already absolute; it will simply return the same path
-   *given. If it is not, it will attempt to find the actual file by appending
-   *searchPaths and checking if it exists; then returning the 'canonical' path.
-   *
-   * @return aPath IF `aPath` is already absolute OR it cannot find this path
-   *within `searchPaths`
-   **/
-  std::filesystem::path
-  Shared::findRealPath (std::filesystem::path aPath)
-  {
-    if (aPath.is_absolute ()) {
-      return aPath;
-    }
-    std::filesystem::path realPath = aPath;
-    for (auto const &base : searchPaths) {
-      std::filesystem::path thisPath = base / realPath;
-      printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str ());
-      if (std::filesystem::exists (thisPath)) {
-        return std::filesystem::canonical (thisPath);
-      }
-    }
-    return aPath;
-  }
+
 
   Shared::Font
   Shared::loadFont (const char *aPath, int aSize)
   {
     TTF_Font *font = TTF_OpenFont (
-        findRealPath (aPath).generic_string ().c_str (), aSize);
+        Engine::FindPath (aPath).generic_string ().c_str (), aSize);
     if (font != NULL) {
       return Font (font, [] (TTF_Font *f) { TTF_CloseFont (f); });
     } else {

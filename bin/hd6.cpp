@@ -19,6 +19,7 @@
 #include "hd/Window.hpp"
 #include "hd/gl/EBO.hpp"
 #include "hd/gl/ShaderProgram.hpp"
+#include "hd/gl/Texture.hpp"
 #include "hd/gl/VAO.hpp"
 #include "hd/gl/VBO.hpp"
 hd::Window::s_ptr window;
@@ -30,20 +31,21 @@ main (int argc, char **argv)
   hd::Window::s_ptr window = hd::Window::Create (800, 600, "HD1");
   // Vertices coordinates
   GLfloat vertices[] = {
-    -0.5f, -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower left corner
-    0.5f,  -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower right corner
-    0.0f,  0.5f * float (sqrt (3)) * 2 / 3, 0.0f  // Upper corner
+    //     COORDINATES/     COLORS      /   TexCoord  //
+    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Lower left corner
+    -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Upper left corner
+    0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Upper right corner
+    0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f  // Lower right corner
   };
 
   // Indices for vertices order
   GLuint indices[] = {
-    0, 3, 5, // Lower left triangle
-    3, 2, 4, // Lower right triangle
-    5, 4, 1  // Upper triangle
+    0, 2, 1, // Upper triangle
+    0, 3, 2  // Lower triangle
   };
   window->MakeCurrent ();
   hd::gl::ShaderProgram shaderProgram;
-  shaderProgram.Create ("shaders/hd2.vert", "shaders/hd2.frag");
+  shaderProgram.Create ("shaders/hd6.vert", "shaders/hd6.frag");
   shaderProgram.Bind ();
   hd::gl::VAO vao;
   vao.Create ();
@@ -54,34 +56,61 @@ main (int argc, char **argv)
   ebo.Bind ();
   glVertexAttribPointer (
       0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
+  vao.LinkAttrib (vbo,
+                  shaderProgram,
+                  "aPos",
+                  3,
+                  GL_FLOAT,
+                  8 * sizeof (GLfloat),
+                  (void *)0);
+  vao.LinkAttrib (vbo,
+                  shaderProgram,
+                  "aColor",
+                  3,
+                  GL_FLOAT,
+                  8 * sizeof (GLfloat),
+                  (void *)(3 * sizeof (float)));
+  vao.LinkAttrib (vbo,
+                  shaderProgram,
+                  "aTex",
+                  2,
+                  GL_FLOAT,
+                  8 * sizeof (GLfloat),
+                  (void *)(6 * sizeof (GLfloat)));
   glEnableVertexAttribArray (0);
   vao.Unbind ();
   vbo.Unbind ();
   ebo.Unbind ();
+  hd::gl::Texture text;
+  text.Create ("textures/pattern_16/diffus.tga", GL_TEXTURE_2D, GL_TEXTURE0);
+  text.Assign (shaderProgram, "tex0", 0);
   window->output.On ([&window, &shaderProgram, &vao, &vbo] (int aTime) {
     window->MakeCurrent ();
     glClearColor (.0f, .5f, .5f, 1.0f);
     glClear (GL_COLOR_BUFFER_BIT);
     shaderProgram.Bind ();
     vao.Bind ();
-    glDrawElements (GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+    glDrawElements (GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     window->Swap ();
   });
   window->input.Close.Void.On ([&window] () {
-    hd::Engine::Get ()->step.Once ([&window] (int) { window = NULL; });
+    window->engine->step.Once ([&window] (int) { window = NULL; });
   });
 
   hd::Window::s_ptr win2 = hd::Window::Create (320, 200, "HD2");
   win2->input.Close.Void.On ([&win2] () {
-    hd::Engine::Get ()->step.Once ([&win2] (int) { win2 = NULL; });
+    win2->engine->step.Once ([&win2] (int) { win2 = NULL; });
   });
-  win2->output.On ([&win2] (int aTime) {
+  win2->output.On ([&win2, &text] (int aTime) {
     win2->MakeCurrent ();
+    text.Bind ();
     glClearColor (.5f, .5f, .0f, 1.0f);
     glClear (GL_COLOR_BUFFER_BIT);
     win2->Swap ();
   });
+
   // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();
+
   return 0;
 }

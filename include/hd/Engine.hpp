@@ -47,10 +47,13 @@ namespace hd {
      *  @return "" if `Configure(argc, argv)` has not be called
      * **/
     static char *GetProgramName ();
+    static std::filesystem::path FindPath (std::filesystem::path);
+    static std::list<std::filesystem::path> searchPaths;
     /** Finish applying **/
     ~Engine ();
     /** Signal to the engine we wish to exit the main loop **/
-    void Quit ();
+    //void Quit ();
+    const std::function<void()> Quit = [this](){m_Quit = true;};
     void Start ();
     /** Print out what went wrong with SDL2.
      * \deprecated someone else should just do this. **/
@@ -58,7 +61,7 @@ namespace hd {
     /** `SDL_Event&` Callback list for events. **/
     evt::EngineDispatch input;
     /** Callback list for logical processing. **/
-    evt::IntDispatch process;
+    evt::IntDispatch step;
     /** Callback list for rendering. **/
     evt::IntDispatch output;
     /** @todo remove from Engine gl::Camera camera; **/

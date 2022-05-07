@@ -106,9 +106,9 @@ main (int argc, char **argv)
   window = hd::Window::Create (hd::Engine::GetProgramName ());
   window->input.On (camera.input.pipe);
   window->input.Close.Void.Once ([] () {
-    hd::Engine::Get ()->process.Void.Once ([] () { window = NULL; });
+    hd::Engine::Get ()->step.Void.Once ([] () { window = NULL; });
   });
-  hd::Engine::Get ()->process.Void.Once ([] () {
+  hd::Engine::Get ()->step.Void.Once ([] () {
     window->MakeCurrent ();
     hd::Engine::s_ptr engine = hd::Engine::Get ();
     if (!shaderProgram.Create ("shaders/default.vert",

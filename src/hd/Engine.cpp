@@ -38,7 +38,7 @@ namespace hd {
       int frameStartTicks = SDL_GetTicks ();
       HandleEvents ();
       // SDL_Renderer *renderer = SDL_GetRenderer (window);
-      process.Trigger (frameStartTicks);
+      step.Trigger (frameStartTicks);
       output.Trigger (frameStartTicks);
       // SDL_RenderPresent (renderer);
       SDL_Delay (10 /**SDL_framerateDelay (&fpsMan)**/);
@@ -46,7 +46,8 @@ namespace hd {
   }
   /**
    * @details process pending events until there are no more events.
-   * @todo make how many events are process configurable (count/duration of processing.)
+   * @todo make how many events are process configurable (count/duration of
+   *processing.)
    **/
   int
   Engine::HandleEvents ()
@@ -98,6 +99,21 @@ namespace hd {
       hdError ("SDL_TTF failed to initialize because: %s\n", TTF_GetError ());
       return NULL;
     }
+    int mixInitFlags
+        = MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG;
+    if (Mix_Init (mixInitFlags) != 0) {
+      hdError ("Failed to initialize SDL_mixer because: %s", Mix_GetError ());
+      TTF_Quit ();
+      IMG_Quit ();
+      SDL_Quit ();
+    }
+    if (Mix_OpenAudio (MIX_DEFAULT_FREQUENCY,
+                       MIX_DEFAULT_FORMAT,
+                       MIX_DEFAULT_CHANNELS,
+                       4096)
+        != 0) {
+      hdError ("Failed to open audio because: %s", Mix_GetError ());
+    };
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK,
@@ -131,7 +147,8 @@ namespace hd {
    * @brief Access the Engine singleton;
    * @attention any reference attempts to initialize it.
    * @attention shuts down if there are no references.
-   * @return Engine::s_ptr If the engine fails to initialize this will be `NULL`.
+   * @return Engine::s_ptr If the engine fails to initialize this will be
+   *`NULL`.
    * @return Engine::s_ptr if the engine has been initialized this will be a
    *smart_ptr reference to it.
    **/
@@ -165,6 +182,7 @@ namespace hd {
     PrintVersion (&sdlver, "SDL", aFile);
     PrintVersion (IMG_Linked_Version (), "SDL_image", aFile);
     PrintVersion (TTF_Linked_Version (), "SDL_TTF", aFile);
+    PrintVersion (Mix_Linked_Version (), "SDL_mixer", aFile);
   }
   /** Some boring details about how to construct an application. **/
   Engine::Engine () /* @todo :  remove camera (glm::vec3 (0.0f, 0.0f, 1.0f)) */
@@ -184,7 +202,7 @@ namespace hd {
     m_Argv = argv;
     hdDebugCall ("argc=%d, argv=%p", argc, argv);
     // Shared::searchPaths.clear ();
-    Shared::searchPaths.push_back (std::filesystem::canonical (
+    searchPaths.push_back (std::filesystem::canonical (
         std::filesystem::path (argv[0]).parent_path () / "../assets"));
   }
   char *
@@ -204,12 +222,12 @@ namespace hd {
   }
   /** **/
 
-  void
-  Engine::Quit ()
-  {
-    hdDebugCall (NULL);
-    m_Quit = true;
-  }
+  //void
+  //Engine::Quit ()
+  //{
+  //  hdDebugCall (NULL);
+  //  m_Quit = true;
+  //}
   /** **/
 
   void
@@ -228,10 +246,12 @@ namespace hd {
     if (instance.lock ()) {
       instance.lock ()->Quit ();
     }
+    Mix_Quit ();
     TTF_Quit ();
     IMG_Quit ();
     SDL_Quit ();
   }
+
   /** **/
   void
   Engine::PrintSdlError (const char *msg)
@@ -246,5 +266,42 @@ namespace hd {
 
     fprintf (stderr, "%s: %s\n", MSG, SDL_GetError ());
   }
-
+  /**
+   * @brief Searches a few extra places where the file could be.
+   * @details
+   *  Locate the canonical path for the given path.
+   *If the path is already absolute; it will simply return the same path
+   *given. If it is not, it will attempt to find the actual file by appending
+   *searchPaths and checking if it exists; then returning the 'canonical' path.
+   * @param aPath
+   * @return std::filesystem::path
+   * @return aPath IF `aPath` is already absolute OR it cannot find this path
+   *within `searchPaths`
+   **/
+  std::filesystem::path
+  Engine::FindPath (std::filesystem::path aPath)
+  {
+    if (aPath.is_absolute ()) {
+      return aPath;
+    }
+    std::filesystem::path realPath = aPath;
+    for (auto const &base : searchPaths) {
+      std::filesystem::path thisPath = base / realPath;
+      // printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str
+      // ());
+      if (std::filesystem::exists (thisPath)) {
+        return std::filesystem::canonical (thisPath);
+      }
+    }
+    return aPath;
+  }
+  /**
+   * @brief a list of paths to search for a file.
+   **/
+  std::list<std::filesystem::path> Engine::searchPaths ({
+#if HD_DEBUG_BUILD == 1
+    HD_SOURCE_ASSETS,
+#endif
+        "./"
+  });
 } // namespace hd

@@ -7,6 +7,10 @@ list(APPEND LIBHD_COMPONENTS
   Engine.cpp
   EngineComponent.cpp
   sdl/Joystick.cpp
+  sdl/GameController.cpp
+  sdl/MixerChunk.cpp
+  sdl/MixerChannel.cpp
+
   evt/AbstractDispatch.cpp
   evt/ControllerDeviceDispatch.cpp
   evt/ControllerDispatch.cpp
