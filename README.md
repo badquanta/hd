@@ -74,19 +74,19 @@ Use git to _recursively_ clone the repository. Then create a build directory, ge
 
 Aside from the ones already defined (or required) by cmake these are:
 
-- __HD_BUILD_BIN__ ___ON / OFF___
+- __HD_BUILD_BIN__ _ON / OFF_
 
     Enable building demonstration binaries.
 
-- __HD_BUILD_TESTS__ ___ON / OFF___
+- __HD_BUILD_TESTS__ _ON / OFF_
 
     Enable or disable building unit tests.
 
-- __HD_DEBUG_BUILD__ ___ON / OFF___
+- __HD_DEBUG_BUILD__ _ON / OFF_
 
     Enable debugging output; traces code execution: basically print line debugging.
 
-- __HD_COMPILE_COMMON_HPP__ ___ON / OFF___
+- __HD_COMPILE_COMMON_HPP__ _ON / OFF_
 
     Successive build times can be shortened by pre-compiling `hd/Common.hpp`.
 
@@ -94,11 +94,28 @@ Aside from the ones already defined (or required) by cmake these are:
 
 Utilized to generate debian and other installers. Simply execute `cpack` within the build directory.
 
-# Runtime
-
 <a name='credits'>
 
 # Credits
+
+## Assets
+
+The assets here are for testing & prototyping right now. If I did not tag a source properly, please create an [issue][NEW_ISSUE].
+
+- audio
+    - [horror ambient.ogg](https://opengameart.org/content/horror-ambient) by [Vladislav Krotov](https://opengameart.org/users/vinrax)
+    - [jrpg-pack-1-exploration](https://opengameart.org/content/jrpg-pack-1-exploration)
+by [Juhani Junkala](https://opengameart.org/users/subspaceaudio)
+    -
+- textures
+    - pattern_*
+Provided by Nobiax / yughues. """Absolutely free to use or to modify in any kind of work (personal, commercial or else)."""
+        - [@deviantart](nobiax.deviantart.com)
+        - [@OpenGameArt](https://opengameart.org/users/yughues)
+
+
+
+## Software
 
 A lot of open source software was utilized just to get a skeleton running:
 
@@ -121,17 +138,6 @@ A lot of open source software was utilized just to get a skeleton running:
 - tutorials
     - [Victor Gordan's OpenGL tutorials repository][TUT_VICTOR_REPO] & [youtube playlist][TUT_VICTOR_YOUTUBE].
 
-[PROJECT_GITHUB]: https://github.com/badquanta/hd
-[CMAKE_HOME]: https://cmake.org/
-[DOXYGEN_HOME]: https://www.doxygen.nl/
-[SDL_HOME]: #TODO
-[SDL_IMAGE_HOME]: https://www.libsdl.org/projects/SDL_image/
-[SDL_TTF_HOME]: https://github.com/libsdl-org/SDL_ttf
-[SDL_MIXER_HOME]: https://www.libsdl.org/projects/SDL_mixer/
-[SDL_NET_HOME]: https://www.libsdl.org/projects/SDL_net/
-[TUT_VICTOR_REPO]: https://github.com/VictorGordan/opengl-tutorials
-[TUT_VICTOR_YOUTUBE]: https://www.youtube.com/playlist?list=PLPaoO-vpZnumdcb4tZc4x5Q-v7CkrQ6M-
-
 # random useful links
 - https://en.cppreference.com/w/cpp/links/libs
 - https://www.boost.org/doc/libs/
@@ -148,3 +154,16 @@ However if I took the time to document it in the `README.md` it means it's eithe
     - building instructions
     - runtime & build dependencies
     - CREDITSs
+
+
+[PROJECT_GITHUB]: https://github.com/badquanta/hd
+[CMAKE_HOME]: https://cmake.org/
+[DOXYGEN_HOME]: https://www.doxygen.nl/
+[SDL_HOME]: #TODO
+[SDL_IMAGE_HOME]: https://www.libsdl.org/projects/SDL_image/
+[SDL_TTF_HOME]: https://github.com/libsdl-org/SDL_ttf
+[SDL_MIXER_HOME]: https://www.libsdl.org/projects/SDL_mixer/
+[SDL_NET_HOME]: https://www.libsdl.org/projects/SDL_net/
+[TUT_VICTOR_REPO]: https://github.com/VictorGordan/opengl-tutorials
+[TUT_VICTOR_YOUTUBE]: https://www.youtube.com/playlist?list=PLPaoO-vpZnumdcb4tZc4x5Q-v7CkrQ6M-
+[NEW_ISSUE]:https://github.com/badquanta/hd/issues/new
