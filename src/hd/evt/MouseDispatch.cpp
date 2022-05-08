@@ -31,8 +31,6 @@ namespace hd::evt {
     case SDL_MOUSEBUTTONUP:   // mouse button released
       if (Button.find (e.button.button) != Button.end ()) {
         Button[e.button.button].Trigger (e);
-      } else {
-        hdDebug ("No handlers for mouse button %d", e.button.button);
       }
       break;
     case SDL_MOUSEWHEEL: // mouse wheel motion

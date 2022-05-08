@@ -68,7 +68,7 @@ main (int argc, char **argv)
 
   window->engine->Delay (5000, [&horrorAmbient] (int) {
     auto channel = horrorAmbient->FadeIn (1000, 0);
-    window->engine->Delay (2000, [&channel] (int) {
+    window->engine->Delay (2000, [channel] (int) {
       hdLog ("Delayed callback.");
       channel.FadeOut (500);
     });

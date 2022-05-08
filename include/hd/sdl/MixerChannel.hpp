@@ -21,7 +21,7 @@ namespace hd::sdl {
 
           int channel;
           MixerChannel (int = -1);
-          int FadeOut (int ms);
+          int FadeOut (int ms) const;
           Mix_Fading FadingStatus ();
           bool IsFadingIn ();
           bool IsFadingOut ();
