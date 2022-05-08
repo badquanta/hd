@@ -24,9 +24,11 @@ namespace hd::evt {
     SDL_EventDispatch::Trigger (e);
     switch (e.type) {
     case SDL_MOUSEBUTTONDOWN: // mouse button pressed
+      //hdDebug ("Mouse Button Down");
       Down.Trigger (e);
       break;
     case SDL_MOUSEBUTTONUP: // mouse button released
+      //hdDebug ("Mouse Button Up");
       Up.Trigger (e);
       break;
     default:
