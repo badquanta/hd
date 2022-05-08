@@ -1,14 +1,5 @@
-function(hd_exec name)
-  add_executable(${name} ${name}.cpp)
-  target_link_libraries(${name} hd)
-endfunction()
-hd_exec(hddemo)
-hd_exec(hd1)
-hd_exec(hd2)
-hd_exec(hd3)
-hd_exec(hd4)
-hd_exec(hd5)
-hd_exec(hd6)
+
+
 hd_exec(joy-list)
 hd_exec(playAudio)
 #install(TARGETS hddemo RUNTIME DESTINATION bin )

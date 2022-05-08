@@ -1,0 +1,7 @@
+hd_exec(hddemo)
+hd_exec(hd1)
+hd_exec(hd2)
+hd_exec(hd3)
+hd_exec(hd4)
+hd_exec(hd5)
+hd_exec(hd6)

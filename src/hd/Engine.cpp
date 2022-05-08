@@ -26,8 +26,6 @@ namespace hd {
             Uint64 f = SDL_GetPerformanceFrequency ())
         : pc (p), pcFps (f)
     {
-      hdDebugCall (
-          "%lu, %lu (%.2f seconds)", pc, pcFps, (double)pc / (double)pcFps);
     }
 
     float
@@ -65,9 +63,12 @@ namespace hd {
     {
       return pc == o.pc;
     }
-    PcTime& operator+=(PcTime &o){
+    PcTime
+    operator+= (PcTime &o)
+    {
       pc += o.pc;
       pcFps = (pcFps + o.pcFps) / 2;
+      return *this;
     }
   };
 
@@ -75,9 +76,9 @@ namespace hd {
   PcDuration (PcTime &b, PcTime &e)
   {
 
-    //PcTime &begin = (b.pc < e.pc) ? b : e, &end = (b.pc < e.pc) ? e : b;
-    //return { begin.pc - end.pc, (begin.pcFps + end.pcFps) / 2 };
-    return (b < e) ? b - e : e - b;
+    // PcTime &begin = (b.pc < e.pc) ? b : e, &end = (b.pc < e.pc) ? e : b;
+    // return { begin.pc - end.pc, (begin.pcFps + end.pcFps) / 2 };
+    return (b < e) ? e - b : b - e;
   }
 
   /**
@@ -95,21 +96,26 @@ namespace hd {
   {
     hdDebugCall (NULL);
     Uint64 frameCounter = 0;
-    PcTime pcEpoch, totalFrame (0), totalHandle (0), totalStep (0),
-        totalOutput (0);
+    PcTime pcEpoch{}, totalFrame (0), totalHandle (0), totalStep (0),
+        totalOutput (0), totalSleep (0);
     while (!m_Quit) {
-      PcTime pcFrameStart;
+      PcTime pcFrameStart{};
       int frameTicks = SDL_GetTicks ();
-      // Uint64 frameStartTicks = SDL_GetPerformanceCounter ();
       HandleEvents ();
-      PcTime pcHandle;
-      // Uint64 frameHandleTicks = SDL_GetPerformanceCounter ();
-      //  SDL_Renderer *renderer = SDL_GetRenderer (window);
+      PcTime pcHandle{};
+      PcTime durHandle = PcDuration (pcFrameStart, pcHandle);
+      totalHandle += durHandle;
+
       step.Trigger (frameTicks);
-      PcTime pcStep;
+      PcTime pcStep{};
+      PcTime durStep = PcDuration (pcHandle, pcStep);
+      totalStep += durStep;
       // Uint64 frameStepTicks = SDL_GetPerformanceCounter ();
       output.Trigger (frameTicks);
-      PcTime pcOutput;
+      PcTime pcOutput{};
+      PcTime durOutput = PcDuration (pcStep, pcOutput);
+      totalOutput += durOutput;
+
       std::vector<int> eraseList = {};
       for (auto pair : atTicksNext) {
         if (pair.first <= frameTicks) {
@@ -125,63 +131,49 @@ namespace hd {
       for (int tickId : eraseList) {
         atTicksNext.erase (tickId);
       }
-      PcTime pcNextFrame;
-      PcTime durNextFrame = PcDuration(pcOutput)
-      // Uint64 frameOutputTicks = SDL_GetPerformanceCounter ();
-      //  SDL_RenderPresent (renderer);
-      PcTime durFrame = PcDuration (pcFrameStart, pcOutput);
-      // Uint64 thisFrameTicks = frameOutputTicks - frameStartTicks;
-      totalFrame += durFrame;
-      PcTime durHandle = PcDuration (pcFrameStart, pcHandle);
-      totalHandle += durHandle;
-      //Uint64 thisHandleTicks = frameHandleTicks - frameStartTicks;
-      //totalHandleTicks += thisHandleTicks;
-      PcTime durStep = PcDuration (pcHandle, pcStep);
-      totalStep += durStep;
-      //Uint64 thisStepTicks = frameStepTicks - frameHandleTicks;
-      //totalStepTicks += thisStepTicks;
-      PcTime durOutput = PcDuration (pcStep, pcOutput);
-      totalOutput += durOutput;
       // Uint64 thisOutputTicks = frameOutputTicks - frameStepTicks;
       // totalOutputTicks += thisOutputTicks;
-      PcTime pcFrameStats;
-      PcTime durStatistics = PcDuration (pcOutput, pcFrameStats);
-      frameCounter++;
-      if ((frameCounter % 60) == 0) {
-        hdLog ("ticks frame#%lu start: %lu handle: %lu step: %lu output: %lu",
-               frameCounter,
-               pcFrameStart.pc,
-               pcHandle.pc,
-               pcStep.pc,
-               pcOutput.pc);
-        hdLog ("dur .pc frame #%lu last frame total: %lu handle: %lu step: "
-               "%lu output: %lu",
-               frameCounter,
-               durFrame.pc,
-               durHandle.pc,
-               durStep.pc,
-               durOutput.pc);
-        hdLog ("total ticks frame#%lu: %lu handle: %lu step: %ld output: %lu",
-               frameCounter,
-               totalTicks,
-               totalHandle.pc,
-               totalStep.pc,
-               totalOutput.pc);
-        hdLog (
-            "frame#%lu fps: %.1f sleep: %.1f%% handle: %.1f%% step: %.1f%% "
-            "output: %.1f%%",
-            frameCounter,
 
-            ((float)frameCounter
-             / ((float)(frameOutputTicks / SDL_GetPerformanceFrequency ()))),
-            (((float)totalTicks / (float)epochStart - frameOutput.pc)
-             * 100.0f),
-            ((float)totalHandle.pc / (float)total.pc) * 100.0f,
-            ((float)totalStep.pc / (float)totalTicks) * 100.0f,
-            ((float)totalOutput.pc / (float)totalTicks) * 100.0f);
+      PcTime pcFrameEnd{};
+      PcTime durFrame = PcDuration (pcFrameStart, pcFrameEnd);
+      totalFrame += durFrame;
+      frameCounter++;
+      PcTime totalEpoch = PcDuration (pcEpoch, pcFrameEnd);
+      if ((frameCounter % 1000) == 0)
+      {
+        // hdLog ("frame#%lu ABSOLUTE start: %lx handle: %lx step: %lx output:
+        // %lx",
+        //        frameCounter,
+        //       pcFrameStart.pc,
+        //      pcHandle.pc,
+        //     pcStep.pc,
+        //    pcOutput.pc);
+        hdLog (
+            "frame#%lu DURATION frame: %lu handle: %lu step: %lu output: %lu",
+            frameCounter,
+            durFrame.pc,
+            durHandle.pc,
+            durStep.pc,
+            durOutput.pc);
+        hdLog ("frame#%lu: TOTALS epoch:%.3fs frame:%.3fs handle:%.3fs step:%.3fs output:%.3fs",
+               frameCounter,
+               totalEpoch.ToSeconds(),
+               totalFrame.ToSeconds (),
+               totalHandle.ToSeconds (),
+               totalStep.ToSeconds (),
+               totalOutput.ToSeconds ());
+        hdLog ("frame#%lu PERCENTS\tfps: %.1f sleep: %.1f%% handle: %.1f%% "
+               "step: %.1f%% "
+               "output: %.1f%%",
+               frameCounter,
+               ((float)frameCounter / pcFrameEnd.ToSeconds ())*100.0f,
+               100.0f-(((float)totalFrame.pc/(float)totalEpoch.pc )*100.0f),
+               ((float)totalHandle.pc / (float)totalFrame.pc) * 100.0f,
+               ((float)totalStep.pc / (float)totalFrame.pc) * 100.0f,
+               ((float)totalOutput.pc / (float)totalFrame.pc) * 100.0f);
       }
-      Uint64 frameStatistics = counter.markPerformance ();
-      SDL_Delay (50 /**SDL_framerateDelay (&fpsMan)**/);
+
+      SDL_Delay (10 /**SDL_framerateDelay (&fpsMan)**/);
     }
   }
   int

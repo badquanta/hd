@@ -36,7 +36,7 @@ namespace hd {
         input.Mouse.Motion.Delete (TrackingListenerHandle);
       };
       evt::SDL_EventDispatch::Handler TrackingListener = [this] (const SDL_Event&e) {
-        hdDebug ("Tracking Listener");
+        //hdDebug ("Tracking Listener");
         if (e.motion.state & SDL_BUTTON_LMASK) {
           glm::vec3 newOrientation
               = glm::rotate (Orientation,
