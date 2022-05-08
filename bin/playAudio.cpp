@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Window.hpp"
-#include "hd/sdl/MixerChunk.hpp"
 #include "hd/sdl/MixerChannel.hpp"
+#include "hd/sdl/MixerChunk.hpp"
 
 using hd::Engine;
 using hd::Window;
@@ -37,7 +37,7 @@ doWindowOutput ()
 void
 doWindowClosed ()
 {
-  if(window!=NULL){
+  if (window != NULL) {
     window->step.Void.Once ([] () { window = NULL; });
   }
 }
@@ -53,14 +53,27 @@ main (int argc, char **argv)
   window->output.Void.On (&doWindowOutput);
   window->input.Close.Void.On (&doWindowClosed);
 
-  MixerChunk::s_ptr horrorAmbient = MixerChunk::Load("audio/horror ambient.ogg");
-
-  if(!horrorAmbient){
-    hdError("Unable to load audio chunk.");
+  MixerChunk::s_ptr horrorAmbient
+      = MixerChunk::Load ("audio/horror ambient.ogg");
+  if (!horrorAmbient) {
+    hdError ("Unable to load audio chunk.");
     return 1;
   }
+  MixerChannel defaultChannel = -1, s_Channel;
 
-  horrorAmbient->FadeIn (1000);
+  window->input.Key.Keycode[SDLK_s].Up.Void.On (
+      [&] () { s_Channel = horrorAmbient->Play (-1); });
+  window->input.Key.Keycode[SDLK_m].Up.Void.On (
+      [&] () { defaultChannel.FadeOut (100); });
+
+  window->engine->Delay (5000, [&horrorAmbient] (int) {
+    auto channel = horrorAmbient->FadeIn (1000, 0);
+    window->engine->Delay (2000, [&channel] (int) {
+      hdLog ("Delayed callback.");
+      channel.FadeOut (500);
+    });
+  });
+  window->engine->Delay (16000, [&] (int) { horrorAmbient->Play (); });
 
   Engine::Get ()->Start ();
   return 0;

@@ -34,15 +34,86 @@ namespace hd {
   Engine::FrameLoop ()
   {
     hdDebugCall (NULL);
+    Uint64 epochStart = SDL_GetPerformanceCounter (), totalFrames = 0,
+           totalTicks = 0, totalHandleTicks = 0, totalStepTicks = 0,
+           totalOutputTicks = 0;
     while (!m_Quit) {
-      int frameStartTicks = SDL_GetTicks ();
+      int frameTicks = SDL_GetTicks ();
+      Uint64 frameStartTicks = SDL_GetPerformanceCounter ();
       HandleEvents ();
+      Uint64 frameHandleTicks = SDL_GetPerformanceCounter ();
       // SDL_Renderer *renderer = SDL_GetRenderer (window);
-      step.Trigger (frameStartTicks);
-      output.Trigger (frameStartTicks);
+      step.Trigger (frameTicks);
+      Uint64 frameStepTicks = SDL_GetPerformanceCounter ();
+      output.Trigger (frameTicks);
+      Uint64 frameOutputTicks = SDL_GetPerformanceCounter ();
       // SDL_RenderPresent (renderer);
-      SDL_Delay (10 /**SDL_framerateDelay (&fpsMan)**/);
+      Uint64 thisFrameTicks = frameOutputTicks - frameStartTicks;
+      totalTicks += thisFrameTicks;
+      Uint64 thisHandleTicks = frameHandleTicks - frameStartTicks;
+      totalHandleTicks += thisHandleTicks;
+      Uint64 thisStepTicks = frameStepTicks - frameHandleTicks;
+      totalStepTicks += thisStepTicks;
+      Uint64 thisOutputTicks = frameOutputTicks - frameStepTicks;
+      totalOutputTicks += thisOutputTicks;
+      totalFrames++;
+      std::vector<int> eraseList = {};
+      for (auto pair : atTicksNext) {
+        if (pair.first <= frameTicks) {
+          hdDebug ("Adding delayed callback to next step. %d <= %d",
+                   pair.first,
+                   frameTicks);
+          for (auto cb : pair.second) {
+            step.Once (cb);
+          }
+          eraseList.push_back (pair.first);
+        }
+      }
+      for (int tickId : eraseList) {
+        atTicksNext.erase (tickId);
+      }
+      if ((totalFrames % 60) == 0) {
+        hdLog ("ticks frame#%lu start: %lu handle: %lu step: %lu output: %lu",
+               totalFrames,
+               frameStartTicks,
+               frameHandleTicks,
+               frameStepTicks,
+               frameOutputTicks);
+        hdLog ("this ticks frame #%lu last frame total: %lu handle: %lu step: "
+               "%lu output: %lu",
+               totalFrames,
+               thisFrameTicks,
+               thisHandleTicks,
+               thisStepTicks,
+               thisOutputTicks);
+        hdLog ("total ticks frame#%lu: %lu handle: %lu step: %ld output: %lu",
+               totalFrames,
+               totalTicks,
+               totalHandleTicks,
+               totalStepTicks,
+               totalOutputTicks);
+        hdLog (
+            "frame#%lu fps: %.1f sleep: %.1f%% handle: %.1f%% step: %.1f%% "
+            "output: %.1f%%",
+            totalFrames,
+
+            ((float)totalFrames
+             / ((float)(frameOutputTicks / SDL_GetPerformanceFrequency ()))),
+            (100.0f - ((float)totalTicks / (float)epochStart-frameOutputTicks) * 100.0f),
+            ((float)totalHandleTicks / (float)totalTicks) * 100.0f,
+            ((float)totalStepTicks / (float)totalTicks) * 100.0f,
+            ((float)totalOutputTicks / (float)totalTicks) * 100.0f);
+      }
+      SDL_Delay (50 /**SDL_framerateDelay (&fpsMan)**/);
     }
+  }
+  int
+  Engine::Delay (int aMs, evt::IntDispatch::Handler aHandler)
+  {
+    int whenTicks = SDL_GetTicks () + aMs;
+    hdDebugCall ("%d @ %d", aMs, whenTicks);
+    atTicksNext[whenTicks].push_back (aHandler);
+    return whenTicks;
   }
   /**
    * @details process pending events until there are no more events.
@@ -188,7 +259,7 @@ namespace hd {
   Engine::Engine () /* @todo :  remove camera (glm::vec3 (0.0f, 0.0f, 1.0f)) */
   {
     hdDebugCall (NULL);
-    input.Quit.On ([this] (const SDL_Event &e) { m_Quit = true; });
+    input.Quit.Void.On (Quit);
   }
   int Engine::m_Argc = 0;
 
@@ -222,12 +293,12 @@ namespace hd {
   }
   /** **/
 
-  //void
-  //Engine::Quit ()
+  // void
+  // Engine::Quit ()
   //{
-  //  hdDebugCall (NULL);
-  //  m_Quit = true;
-  //}
+  //   hdDebugCall (NULL);
+  //   m_Quit = true;
+  // }
   /** **/
 
   void
@@ -279,13 +350,14 @@ namespace hd {
    *within `searchPaths`
    **/
   std::filesystem::path
-  Engine::FindPath (std::filesystem::path aPath)
+  Engine::FindPath (std::filesystem::path aPath,
+                    std::list<std::filesystem::path> &aSearchPaths)
   {
     if (aPath.is_absolute ()) {
       return aPath;
     }
     std::filesystem::path realPath = aPath;
-    for (auto const &base : searchPaths) {
+    for (auto const &base : aSearchPaths) {
       std::filesystem::path thisPath = base / realPath;
       // printf ("Checking for '%s'...\n", thisPath.generic_string ().c_str
       // ());
