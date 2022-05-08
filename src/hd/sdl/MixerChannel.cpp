@@ -1,14 +1,19 @@
 #include "hd/sdl/MixerChannel.hpp"
-
 namespace hd::sdl {
+
     /** **/
-    MixerChannel::MixerChannel(int aChannel):channel(aChannel){}
+    MixerChannel::MixerChannel(int aChannel):channel(aChannel){
+      hdDebugCall ("%d", channel);
+    }
     /** **/
     int MixerChannel::FadeOut(int aMs){
+      hdDebugCall ("%d, %d", channel, aMs);
+      assert (channel > -2);
       return Mix_FadeOutChannel (channel, aMs);
     }
     /** **/
     Mix_Fading MixerChannel::FadingStatus(){
+      assert (channel > -2);
       return Mix_FadingChannel (channel);
     }
     /** **/
@@ -29,7 +34,8 @@ namespace hd::sdl {
     }
     /** **/
     bool MixerChannel::IsPlaying(){
-      return (Mix_Playing (channel) == 1);
+      assert (channel > -2);
+      return (Mix_Playing (channel) > 0);
     }
     /** **/
     int MixerChannel::CountPaused(){

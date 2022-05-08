@@ -1,4 +1,4 @@
-#include "hd/evt/AbstractDispatch.hpp"
+#include "hd/evt/VoidDispatch.hpp"
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)

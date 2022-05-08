@@ -29,6 +29,7 @@ namespace hd {
    */
   class Engine {
   public:
+    /** Refer to the engine via smart pointers. **/
     typedef std::shared_ptr<Engine> s_ptr;
     /**
      * @brief Initializes or simply returns an already initialized engine.
@@ -36,9 +37,14 @@ namespace hd {
      * @return s_ptr `std::shared_ptr<Engine>`, NULL if initialization error.
      */
     static s_ptr Get ();
+    /** Print an SDL_version structure to aFile
+     * @param aFile `*FILE` defaults to `stdout`
+     * @param of `const char*` defaults to `"SDL"`.
+     **/
     static void PrintVersion (const SDL_version *,
                               const char *of = "SDL",
                               FILE *aFile = stdout);
+    /** Gather and print out all of the versions of libraries used by hd? **/
     static void PrintVersions (FILE *aFile = stdout);
     /** Sets up engine options from Command Line Environment **/
     static void Configure (int, char **);
@@ -47,8 +53,14 @@ namespace hd {
      *  @return "" if `Configure(argc, argv)` has not be called
      * **/
     static char *GetProgramName ();
-    static std::filesystem::path FindPath (std::filesystem::path);
+    /** These paths will be utilized automatically if no paths are
+     * specified when `FindPath` is called.**/
     static std::list<std::filesystem::path> searchPaths;
+    /** Test if `aPath` exists. If it does it simply returns the path given;
+     * however if it does not this function attempts to append the file to `aSearchPaths`.
+     **/
+    static std::filesystem::path FindPath (std::filesystem::path,std::list<std::filesystem::path>&aSearchPaths=searchPaths);
+
     /** Finish applying **/
     ~Engine ();
     /** Signal to the engine we wish to exit the main loop **/
@@ -64,9 +76,12 @@ namespace hd {
     evt::IntDispatch step;
     /** Callback list for rendering. **/
     evt::IntDispatch output;
-    /** @todo remove from Engine gl::Camera camera; **/
+    /** Register something to happen later. **/
+    int Delay (int aMs, evt::IntDispatch::Handler);
   private:
+    /** Keeps a copy of the argc & argv for interegation **/
     static int m_Argc;
+    /** @copydoc m_Argc **/
     static char **m_Argv;
     /**
      * @brief Construct a new Engine object
@@ -83,6 +98,10 @@ namespace hd {
     static void Shutdown ();
     /** Perform a step of our work.**/
     void FrameLoop ();
+    /** **/
+    std::map<int, std::list<evt::IntDispatch::Handler> > atTicksNext;
+
+
     /** Ensure we are responsive to changes to our environment. */
     int HandleEvents ();
     /** Should we keep on working? */

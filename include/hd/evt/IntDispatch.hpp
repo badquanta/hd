@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/evt/AbstractDispatch.hpp"
 #include "hd/evt/VoidDispatch.hpp"
 namespace hd::evt {
   class IntDispatch : public AbstractDispatch<int> {

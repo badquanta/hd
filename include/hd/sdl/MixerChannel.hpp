@@ -18,8 +18,9 @@ namespace hd::sdl {
      */
     class MixerChannel {
         public:
+
           int channel;
-          MixerChannel (int);
+          MixerChannel (int = -1);
           int FadeOut (int ms);
           Mix_Fading FadingStatus ();
           bool IsFadingIn ();
