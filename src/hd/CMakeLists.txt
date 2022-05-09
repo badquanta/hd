@@ -10,6 +10,7 @@ list(APPEND LIBHD_COMPONENTS
   sdl/GameController.cpp
   sdl/MixerChunk.cpp
   sdl/MixerChannel.cpp
+  sdl/Surface.cpp
 
   evt/AbstractDispatch.cpp
   evt/ControllerDeviceDispatch.cpp

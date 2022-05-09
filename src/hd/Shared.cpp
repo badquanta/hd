@@ -28,12 +28,12 @@ namespace hd {
   }
   Shared::Surface
   Shared::ConvertSurface(Shared::Surface aSurface, SDL_PixelFormatEnum aFormat){
-    if(aSurface == NULL) {
+    if (aSurface == NULL) {
       return NULL;
     }
     SDL_Surface *converted
         = SDL_ConvertSurfaceFormat (aSurface.get (), aFormat, 0);
-    if(converted == NULL){
+    if (converted == NULL) {
       fprintf (stderr,
                "Failed to convert pixel format of surface because: %s\n",
                SDL_GetError ());
