@@ -1,58 +1,22 @@
-/*
- * holodeck - maybe it will be a game or a game engine
- * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #pragma once
-#include "hd/EngineComponent.hpp"
-#include "hd/Shared.hpp"
-#include "hd/evt/VoidDispatch.hpp"
-#include "hd/evt/WindowDispatch.hpp"
-#include <memory>
-namespace hd {
+#include "hd/sdl/Surface.hpp"
+namespace hd::sdl {
+
   /** future
    * @todo https://wiki.libsdl.org/SDL_SetWindowHitTest
    * @todo https://wiki.libsdl.org/SDL_SetWindowHitTest
    * @todo https://wiki.libsdl.org/SDL_IsScreenSaverEnabled
    **/
-  class Window: public EngineComponent{
-  public:
-    /** Smart pointer reference. **/
-    typedef std::shared_ptr<Window> s_ptr;
-    /** `Create` uses this position and size if none are defined. **/
-    static SDL_Rect NextRect;
-    /** `Create` uses this title if none is defined. **/
-    static const char *NextTitle;
-    /** `Create()` uses these flags if none are defined. **/
-    static SDL_WindowFlags NextFlags;
-    /** Destroy a window and its associated OpenGL Context.**/
-    virtual ~Window ();
-  public: // events
-    /** Automatically (dis)connected to/from engine output event. **/
-    evt::IntDispatch output;
-    /** Automatically (dis)connected to/from engine input event. **/
-    evt::WindowDispatch input;
-  private: // handles used to disconnect on destruct.
-    evt::SDL_EventDispatch::Handle onHandle;
-    evt::IntDispatch::Handle outputHandle;
-  public: // Create window pointer utilities.
+  class Window : public EngineComponent<Window, SDL_Window> {
+    private:
+      /** Hide constructor **/
+      Window (SDL_Window *, SDL_GLContext, bool);
+    public: // Static constructor methods
     /** Given an existing SDL_Windowand SDL_GLContext pointer construct
-     * a Window::s_ptr
+     * a sdl::Window::s_ptr
      * @todo make this check the caches?
      ***/
-    static Window::s_ptr Create (SDL_Window *, SDL_GLContext);
+    static sdl::Window::s_ptr Create (SDL_Window *, SDL_GLContext,bool);
     /**
      * @brief
      *
@@ -61,22 +25,28 @@ namespace hd {
      * @param aTitle [const char*] used for the initial window title.
      * @param aFlags [Uint32] describing the window flags to use
      * @note Windows are always created with SDL_WINDOW_OPENGL flag set.
-     * @return Window::s_ptr
+     * @return sdl::Window::s_ptr
      */
-    static Window::s_ptr Create (const char *aTitle = Window::NextTitle,
-                               SDL_Rect *aRect = &Window::NextRect,
+    static sdl::Window::s_ptr Create (const char *aTitle = Window::NextTitle,
+                                      SDL_Rect *aRect = &Window::NextRect,
 
-                               Uint32 aFlags = Window::NextFlags);
-    static Window::s_ptr Create (int aWidth,
-                               int aHeight,
-                               const char *aTitle = Window::NextTitle,
-                               Uint32 aFlags = Window::NextFlags);
+                                      Uint32 aFlags = Window::NextFlags);
+    static sdl::Window::s_ptr Create (int aWidth,
+                                      int aHeight,
+                                      const char *aTitle = Window::NextTitle,
+                                      Uint32 aFlags = Window::NextFlags);
+    virtual void Free () override;
+
+    Surface::s_ptr GetSurface ();
+    bool UpdateSurface ();
+
   public: // Window state modifiers:
     void Swap ();
     /** @see https://wiki.libsdl.org/SDL_GL_SetSwapInterval **/
     bool SetSwapInterval (int);
     /** @see https://wiki.libsdl.org/SDL_GL_MakeCurrent **/
     bool MakeCurrent ();
+
   public: // Window attribute accessors
     /** Return the window Identifier integer. **/
     Uint32 Id ();
@@ -133,7 +103,7 @@ namespace hd {
     void GetMinimumSize (int *, int *);
     /** @see https://wiki.libsdl.org/SDL_SetWindowModalFor **/
     bool SetModalFor (SDL_Window *);
-    bool SetModalFor (Window::s_ptr);
+    bool SetModalFor (sdl::Window::s_ptr);
     /** @see https://wiki.libsdl.org/SDL_SetWindowOpacity **/
     bool SetOpacity (float);
     /** @see https://wiki.libsdl.org/SDL_GetWindowOpacity **/
@@ -182,11 +152,32 @@ namespace hd {
     static s_ptr GetByPtr (SDL_Window *);
     static s_ptr GetByGlContext (SDL_GLContext);
 
-
   private:
     static std::map<SDL_Window *, std::weak_ptr<Window> > m_PtrCache;
     static std::map<Uint32, std::weak_ptr<Window> > m_IdCache;
     static std::map<SDL_GLContext, std::weak_ptr<Window> > m_ContextCache;
-    Window (SDL_Window *, SDL_GLContext);
+
+
+  public:
+    /** `Create` uses this position and size if none are defined. **/
+    static SDL_Rect NextRect;
+    /** `Create` uses this title if none is defined. **/
+    static const char *NextTitle;
+    /** `Create()` uses these flags if none are defined. **/
+    static SDL_WindowFlags NextFlags;
+    /** Destroy a window and its associated OpenGL Context.**/
+    ~Window ();
+
+  public: // events
+    /** Automatically (dis)connected to/from engine output event. **/
+    evt::IntDispatch output;
+    /** Automatically (dis)connected to/from engine input event. **/
+    evt::WindowDispatch input;
+
+  private: // handles used to disconnect on destruct.
+    evt::SDL_EventDispatch::Handle onHandle;
+    evt::IntDispatch::Handle outputHandle;
+
+  public: // Create window pointer utilities.
   };
 }

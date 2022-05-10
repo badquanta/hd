@@ -1,6 +1,5 @@
 list(APPEND LIBHD_COMPONENTS
   Common.cpp
-  Window.cpp
   Scene.cpp
   Shared.cpp
   SplashScene.cpp
@@ -11,6 +10,7 @@ list(APPEND LIBHD_COMPONENTS
   sdl/MixerChunk.cpp
   sdl/MixerChannel.cpp
   sdl/Surface.cpp
+  sdl/Window.cpp
 
   evt/AbstractDispatch.cpp
   evt/ControllerDeviceDispatch.cpp

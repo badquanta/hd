@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Window.hpp"
+#include "hd/sdl/Window.hpp"
 
-hd::Window::s_ptr window;
+hd::sdl::Window::s_ptr window;
 
 int
 main (int argc, char **argv)
 {
   hd::Engine::PrintVersions ();
   //hd::Engine::s_ptr engine = hd::Engine::Get ();
-  hd::Window::s_ptr window = hd::Window::Create (800, 600, "HD1");
+  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create (800, 600, "HD1");
   window->output.On ([&window] (int aTime) {
     window->MakeCurrent ();
     glClear (GL_COLOR_BUFFER_BIT);

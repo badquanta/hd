@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Engine.hpp"
-#include "hd/Window.hpp"
+#include "hd/sdl/Window.hpp"
 #include "hd/gl/Camera.hpp"
 #include "hd/gl/EBO.hpp"
 #include "hd/gl/Texture.hpp"
@@ -55,7 +55,7 @@ GLint scaleLocation = -1;
 GLint tex0Uni = -1;
 hd::gl::Texture texture;
 
-hd::Window::s_ptr window;
+hd::sdl::Window::s_ptr window;
 hd::gl::Camera camera;
 
 void
@@ -103,7 +103,7 @@ main (int argc, char **argv)
   hd::Engine::PrintVersions ();
   // hd::Engine::Mount engine = hd::Engine::Get ();
   hd::Engine::Configure (argc, argv);
-  window = hd::Window::Create (hd::Engine::GetProgramName ());
+  window = hd::sdl::Window::Create (hd::Engine::GetProgramName ());
   window->input.On (camera.input.pipe);
   window->input.Close.Void.Once ([] () {
     hd::Engine::Get ()->step.Void.Once ([] () { window = NULL; });

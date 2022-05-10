@@ -12,9 +12,8 @@ namespace hd::sdl {
    * @brief Representation of an SDL component
    * @todo SDL_JoystickEventState
    */
-  class Joystick : public EngineComponent {
+  class Joystick : public EngineComponent<Joystick, void> {
   public: // Class static components
-    typedef std::shared_ptr<Joystick> s_ptr;
     static bool EventState (int aState = SDL_QUERY);
     static bool EventState (bool);
     /** SDL_JoystickFromInstanceID **/
@@ -34,6 +33,7 @@ namespace hd::sdl {
     /** @see SDL_NumJoysticks **/
     static int Count ();
   public: // Instance Methods
+    virtual void Free () override;
     /**SDL_JoystickGetAttached **/
     bool IsAttached ();
     /**SDL_JoystickGetAxis **/

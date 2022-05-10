@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Engine.hpp"
-#include "hd/Window.hpp"
+#include "hd/sdl/Window.hpp"
 
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 namespace hd {
@@ -261,7 +261,7 @@ namespace hd {
     s_ptr mounted = s_ptr (new Engine ());
     instance = mounted;
     // Apparently in order to initializes GLEW we *MUST* have a window created
-    Window::s_ptr splashWindow = Window::Create (320, 200, "Splash!");
+    sdl::Window::s_ptr splashWindow = sdl::Window::Create (320, 200, "Splash!");
     if (!splashWindow) {
       hdError ("Failed to create splash window.");
       mounted = NULL;

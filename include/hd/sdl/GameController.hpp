@@ -12,9 +12,8 @@ namespace hd::sdl {
    * @brief Representation of an SDL component
    * @todo SDL_ControllerEventState
    */
-  class GameController : public EngineComponent {
+  class GameController : public EngineComponent<GameController, void> {
   public: // Class static components
-    typedef std::shared_ptr<GameController> s_ptr;
     /** SDL_GameControllerNameForIndex **/
     static const char* Name (int);
     /** SDL_IsGameController **/
@@ -30,6 +29,7 @@ namespace hd::sdl {
     /** SDL_GameControllerEventState **/
     /** SDL_GameControllerFromInstanceID **/
   public: // instance methods
+    virtual void Free () override;
     /** SDL_GameControllerGetAttached **/
     bool IsAttached ();
     /** SDL_GameControllerGetAxis **/

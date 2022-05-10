@@ -93,6 +93,13 @@ namespace hd::sdl {
     }
     return controller;
   }
+  void GameController::Free(){
+    hdDebugCall (NULL);
+    if (m_Free) {
+      SDL_GameControllerClose (m_Controller);
+      m_Controller = NULL;
+    }
+  }
   /**
    * @brief Construct a new Game Controller:: Game Controller object
    * @private
@@ -100,7 +107,7 @@ namespace hd::sdl {
    * @param aController
    */
   GameController::GameController (int aIndex, SDL_GameController *aController)
-      : m_Index (aIndex), m_Controller (aController)
+      : m_Index (aIndex), m_Controller (aController), EngineComponent(NULL,false)
   {
     hdDebugCall (NULL);
   }

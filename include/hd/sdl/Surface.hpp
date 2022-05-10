@@ -11,20 +11,11 @@
 #pragma once
 #include "hd/EngineComponent.hpp"
 namespace hd::sdl {
-  template <typename target> class EnCom : public std::shared_ptr<target>{
-      private:
-        bool m_Free;
-      public:
-        EnCom (target *p, bool aFree = false):std::shared_ptr<target>(p),m_Free(aFree),engine(Engine::Get()){};
-        virtual ~EnCom(){if(m_Free){this->Free();}
-        };
-        const Engine::s_ptr engine;
-        virtual void Free (){};
-  };
-  class Surface : public EnCom<SDL_Surface> {
+
+  class Surface : public EngineComponent<Surface, SDL_Surface> {
   public:
-    Surface (SDL_Surface *, bool);
-    static Surface CreateRGBA (Uint32 flags,
+    static s_ptr Create(SDL_Surface*, bool);
+    static s_ptr CreateRGBA (Uint32 flags,
                                int width,
                                int height,
                                int depth,
@@ -32,7 +23,13 @@ namespace hd::sdl {
                                Uint32 Gmask,
                                Uint32 Bmask,
                                Uint32 Amask);
-    ~Surface ();
+    static s_ptr Load (std::filesystem::path);
+  public:// Instance Methods
     virtual void Free () override;
+    bool Blit (s_ptr, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
+    bool BlitScaled (s_ptr, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
+
+  protected: /** Hidden Constructor **/
+    Surface (SDL_Surface *, bool);
   };
 }

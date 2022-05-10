@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Window.hpp"
+#include "hd/sdl/Window.hpp"
 #include "hd/sdl/MixerChannel.hpp"
 #include "hd/sdl/MixerChunk.hpp"
 
 using hd::Engine;
-using hd::Window;
+using hd::sdl::Window;
 using hd::sdl::MixerChannel;
 using hd::sdl::MixerChunk;
 

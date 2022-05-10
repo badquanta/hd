@@ -16,18 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Engine.hpp"
-#include "hd/Window.hpp"
+#include "hd/sdl/Window.hpp"
 #include "hd/gl/EBO.hpp"
 #include "hd/gl/ShaderProgram.hpp"
 #include "hd/gl/VAO.hpp"
 #include "hd/gl/VBO.hpp"
-hd::Window::s_ptr window;
+hd::sdl::Window::s_ptr window;
 
 int
 main (int argc, char **argv)
 {
   hd::Engine::Configure (argc, argv);
-  hd::Window::s_ptr window = hd::Window::Create (800, 600, "HD1");
+  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create (800, 600, "HD1");
   // Vertices coordinates
   GLfloat vertices[] = {
     -0.5f, -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower left corner
@@ -71,7 +71,7 @@ main (int argc, char **argv)
     hd::Engine::Get ()->step.Once ([&window] (int) { window = NULL; });
   });
 
-  hd::Window::s_ptr win2 = hd::Window::Create (320, 200, "HD2");
+  hd::sdl::Window::s_ptr win2 = hd::sdl::Window::Create (320, 200, "HD2");
   win2->input.Close.Void.On ([&win2] () {
     hd::Engine::Get ()->step.Once ([&win2] (int) { win2 = NULL; });
   });

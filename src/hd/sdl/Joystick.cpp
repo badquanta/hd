@@ -232,15 +232,18 @@ SDL_JoystickPowerLevel Joystick::CurrentPowerLevel(){
   {
     m_Opened.erase (m_Index);
     m_OpenedByPtr.erase (m_Joystick);
-    SDL_JoystickClose (m_Joystick);
     engine->input.Joysticks[InstanceId()].Delete(inputHandle);
+    Free ();
+  }
+  void Joystick::Free(){
     hdDebugCall (NULL);
+    if (m_Free) {
+      SDL_JoystickClose (m_Joystick);
+    }
   }
   Joystick::Joystick (int aIndex, SDL_Joystick *aDevice)
-      : m_Index (aIndex), m_Joystick (aDevice)
+      : m_Index (aIndex), m_Joystick (aDevice) , EngineComponent (NULL, false)
   {
-    hdDebugCall (NULL);
-
     inputHandle = engine->input.Joysticks[InstanceId()].On (input.pipe);
   }
   /**

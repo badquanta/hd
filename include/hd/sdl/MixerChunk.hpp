@@ -13,22 +13,20 @@
 #include "hd/sdl/MixerChannel.hpp"
 
 namespace hd::sdl {
-    class MixerChunk : public EngineComponent {
-        public:
-          typedef std::shared_ptr<MixerChunk> s_ptr;
-          /** **/
-          static s_ptr Load (char *);
-        public: // instance methods
-            int SetVolume(int);
-            int GetVolume ();
-            /** @see Mix_PlayChannel **/
-            MixerChannel Play (int aLoops = 0, int aChannel = -1);
-            MixerChannel FadeIn (int aTicks, int aLoops = 0, int aChannel = -1);
+  class MixerChunk : public EngineComponent<MixerChunk, Mix_Chunk> {
+  public: // class static methods
+    /** **/
+    static s_ptr Load (char *);
 
-            ~MixerChunk ();
+  public: // instance methods
+    int SetVolume (int);
+    int GetVolume ();
+    /** @see Mix_PlayChannel **/
+    MixerChannel Play (int aLoops = 0, int aChannel = -1);
+    MixerChannel FadeIn (int aTicks, int aLoops = 0, int aChannel = -1);
+    virtual void Free () override;
 
-          private:
-            MixerChunk (Mix_Chunk *);
-            Mix_Chunk *m_Chunk;
-    };
+  protected:
+    MixerChunk (Mix_Chunk *, bool);
+  };
 }

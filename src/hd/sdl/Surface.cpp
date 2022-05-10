@@ -11,7 +11,17 @@
 #include "hd/sdl/Surface.hpp"
 
 namespace hd::sdl {
-  Surface
+  Surface::Surface (SDL_Surface *p, bool b) : EngineComponent (p, b) {}
+  Surface::s_ptr
+  Surface::Create (SDL_Surface *p, bool b)
+  {
+    if (p == NULL) {
+      return NULL;
+    }
+    return Surface::s_ptr (new Surface (p, b));
+  }
+
+  Surface::s_ptr
   Surface::CreateRGBA (Uint32 flags,
                        int width,
                        int height,
@@ -23,18 +33,55 @@ namespace hd::sdl {
   {
     SDL_Surface *created = SDL_CreateRGBSurface (
         flags, width, height, depth, Rmask, Gmask, Bmask, Amask);
-    if(!created){
+    if (!created) {
       hdError ("Unable to create surface because: %s", SDL_GetError ());
     }
-    return Surface(created, true);
+    return Create (created, true);
   }
-  Surface::Surface (SDL_Surface *p, bool b) : EnCom<SDL_Surface> (p, b){
 
+  Surface::s_ptr
+  Surface::Load (std::filesystem::path aPath)
+  {
+    SDL_Surface *loaded
+        = IMG_Load (Engine::FindPath (aPath).generic_string ().c_str ());
+    if (loaded == NULL) {
+      hdError ("Unable to load '%s' because %s.",
+               aPath.generic_string ().c_str (),
+               SDL_GetError ());
+      return nullptr;
+    }
+    return Create (loaded, true);
   }
 
   void
   Surface::Free ()
   {
-    SDL_FreeSurface (get ());
+    hdDebugCall (NULL);
+    if (m_Free) {
+      SDL_FreeSurface (m_Component);
+    }
+  }
+
+  bool
+  Surface::Blit (Surface::s_ptr aOther,
+                 SDL_Rect *aDstRect,
+                 const SDL_Rect *aSrcRect)
+  {
+    if (SDL_BlitSurface (m_Component, aSrcRect, aOther->m_Component, aDstRect)
+        == 0) {
+      return true;
+    } else {
+      hdError ("Unable to BlitSurface because: %s", SDL_GetError ());
+      return false;
+    }
+  }
+  bool
+  Surface::BlitScaled (Surface::s_ptr aOther,
+                       SDL_Rect *aDstRect,
+                       const SDL_Rect *aSrcRect)
+  {
+    return SDL_BlitSurface (
+               m_Component, aSrcRect, aOther->m_Component, aDstRect)
+           == 0;
   }
 }
