@@ -17,6 +17,7 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/sdl/Window.hpp"
+#include "hd/sdl/GLContext.hpp"
 
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 namespace hd {
@@ -261,14 +262,15 @@ namespace hd {
     s_ptr mounted = s_ptr (new Engine ());
     instance = mounted;
     // Apparently in order to initializes GLEW we *MUST* have a window created
-    sdl::Window::s_ptr splashWindow = sdl::Window::Create (320, 200, "Splash!");
+    sdl::Window splashWindow = sdl::Window::Create (320, 200, "Splash!");
     if (!splashWindow) {
       hdError ("Failed to create splash window.");
       mounted = NULL;
       return NULL;
     }
     // Ensure we have an OpenGL Context...
-    splashWindow->MakeCurrent ();
+    sdl::GLContext context = sdl::GLContext::Create (splashWindow);
+    splashWindow.MakeCurrent (context);
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit ();
     if (glewError != GLEW_OK) {

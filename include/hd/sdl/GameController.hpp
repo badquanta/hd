@@ -6,13 +6,14 @@
 
 #include "hd/EngineComponent.hpp"
 #include "hd/evt/ControllerDispatch.hpp"
+#include "hd/Wrap.hpp"
 #include <map>
 namespace hd::sdl {
   /**
    * @brief Representation of an SDL component
    * @todo SDL_ControllerEventState
    */
-  class GameController : public EngineComponent<GameController, void> {
+  class GameController : public EngineComponent, public WRAP_PTR<SDL_GameController> {
   public: // Class static components
     /** SDL_GameControllerNameForIndex **/
     static const char* Name (int);
@@ -29,7 +30,6 @@ namespace hd::sdl {
     /** SDL_GameControllerEventState **/
     /** SDL_GameControllerFromInstanceID **/
   public: // instance methods
-    virtual void Free () override;
     /** SDL_GameControllerGetAttached **/
     bool IsAttached ();
     /** SDL_GameControllerGetAxis **/
@@ -64,16 +64,13 @@ namespace hd::sdl {
     evt::SDL_EventDispatch::Handle inputHandle;
 
   private: // static caches
-    static std::map<int, std::weak_ptr<GameController> > m_Opened;
-    static std::map<SDL_GameController *, std::weak_ptr<GameController> >
+    static std::map<int, std::weak_ptr<SDL_GameController> > m_Opened;
+    static std::map<SDL_GameController *, std::weak_ptr<SDL_GameController> >
         m_OpenedByPtr;
 
   private: //
-    SDL_GameController *m_Controller;
     int m_Index;
 
-  private: // constructors
-    GameController (int, SDL_GameController *);
 
   public: // destructors
     /** SDL_GameControllerClose **/

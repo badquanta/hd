@@ -17,46 +17,41 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/sdl/Window.hpp"
+#include "hd/sdl/GLContext.hpp"
 #include "hd/gl/VAO.hpp"
 #include "hd/gl/ShaderProgram.hpp"
-hd::sdl::Window::s_ptr window;
+hd::sdl::Window window;
+hd::sdl::GLContext glCtx;
 
 int
 main (int argc, char **argv)
 {
   hd::Engine::Configure (argc, argv);
-  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create (800, 600, "HD1");
+  window = hd::sdl::Window::Create (800, 600, "HD1");
+  glCtx = hd::sdl::GLContext::Create (window);
   // Vertices coordinates
   GLfloat vertices[] = {
     -0.5f, -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower left corner
     0.5f,  -0.5f * float (sqrt (3)) / 3,    0.0f, // Lower right corner
     0.0f,  0.5f * float (sqrt (3)) * 2 / 3, 0.0f  // Upper corner
   };
-  window->MakeCurrent ();
+  window.MakeCurrent (glCtx);
   hd::gl::ShaderProgram shaderProgram;
   shaderProgram.Create ("shaders/hd2.vert","shaders/hd2.frag");
   shaderProgram.Bind ();
   hd::gl::VAO vao;
   vao.Create ();
 
-  window->output.On ([&window] (int aTime) {
-    window->MakeCurrent ();
+  window.engine->output.On ([&] (int aTime) {
+    window.MakeCurrent (glCtx);
     glClear (GL_COLOR_BUFFER_BIT);
-    window->Swap ();
+    window.Swap ();
   });
-  window->input.Close.Void.On ([&window] () {
-    hd::Engine::Get()->step.Once( [&window](int){
+  window.Event().Close.Void.On ([&] () {
+    hd::Engine::Get()->step.Once( [&](int){
       window = NULL;
     });
   });
-
-  hd::sdl::Window::s_ptr win2 = hd::sdl::Window::Create (320, 200, "HD2");
-  win2->input.Close.Void.On (
-      [&win2] () { hd::Engine::Get ()->step.Once ([&win2] (int) {
-        win2 = NULL;
-      });
-  });
-  // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();
   return 0;
 }

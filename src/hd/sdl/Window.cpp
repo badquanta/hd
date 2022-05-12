@@ -1,57 +1,17 @@
 #include "hd/sdl/Window.hpp"
 namespace hd::sdl {
-  /** Creates an SDL Window with an OpenGL context
-   * @note use `Create` instead of directly calling this constructor **/
-  Window::Window (SDL_Window *aWindow, SDL_GLContext aContext, bool aFree)
-      : EngineComponent (aWindow, aFree), m_Context (aContext)
-  {
-    assert (aWindow);
-    assert (aContext);
-    onHandle = engine->input.Windows[Id ()].On (input.pipe);
-    outputHandle = engine->output.On (output.pipe);
-    hdDebugCall ("id=%d winPtr=%p glCtxPr = %p, ", Id (), aWindow, aContext);
-  }
 
-  /** Destroys the underlying SDL_Window reference **/
-  Window::~Window ()
-  {
-    hdDebugCall ("id#%d", Id ());
-    engine->input.Windows[Id ()].Delete (onHandle);
-    engine->output.Delete (outputHandle);
-    m_IdCache.erase (Id ());
-    m_ContextCache.erase (m_Context);
-    m_PtrCache.erase (m_Component);
-    if(m_Free){
-      Free ();
-    }
-  }
-  void
-  Window::Free ()
-  {
-    hdDebugCall (NULL);
-    if (m_Component) {
-      hdDebug ("Destroying Window ID%d", Id ());
-      SDL_DestroyWindow (m_Component);
-      m_Component = NULL;
-    } else {
-      hdDebug ("NULL");
-    }
-    if (m_Context != NULL) {
-      hdDebug ("Deleting GL Context");
-      SDL_GL_DeleteContext (m_Context);
-    }
-  }
-  Surface::s_ptr
+  Surface
   Window::GetSurface ()
   {
-    SDL_Surface *aSurface = SDL_GetWindowSurface (m_Component);
+    SDL_Surface *aSurface = SDL_GetWindowSurface (*this);
     return Surface::Create (aSurface, false);
   }
   bool
   Window::UpdateSurface ()
   {
-    assert (m_Component);
-    return SDL_UpdateWindowSurface (m_Component) == 0;
+    assert (*this);
+    return SDL_UpdateWindowSurface (*this) == 0;
   }
   /** Defines the shape of the next window if no shape is specified. **/
   SDL_Rect Window::NextRect
@@ -64,18 +24,19 @@ namespace hd::sdl {
   SDL_WindowFlags Window::NextFlags
       = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
   /** SDL_Window* -> Smart Pointer cache. **/
-  std::map<SDL_Window *, std::weak_ptr<Window> > Window::m_PtrCache;
+  //std::map<SDL_Window *, std::weak_ptr<SDL_Window> > Window::m_PtrCache;
   /** Uint32 (SDL_WindowID) -> Smart pointer cache. **/
-  std::map<Uint32, std::weak_ptr<Window> > Window::m_IdCache;
+  //std::map<Uint32, std::weak_ptr<SDL_Window> > Window::m_IdCache;
   /** SDL_GLContext pointer -> Window Smart pointer cache. **/
-  std::map<SDL_GLContext, std::weak_ptr<Window> > Window::m_ContextCache;
-  sdl::Window::s_ptr
+  //std::map<SDL_GLContext, std::weak_ptr<SDL_Window> > Window::m_ContextCache;
+  sdl::Window
   Window::Create (SDL_Window *aWindow, SDL_GLContext aContext, bool aFree)
   {
-    s_ptr created (new Window (aWindow, aContext, aFree));
-    m_PtrCache[aWindow] = created;
-    m_IdCache[created->Id ()] = created;
-    m_ContextCache[aContext] = created;
+    s_ptr created(aWindow, aFree ? SDL_DestroyWindow : [](SDL_Window*p){});
+    Window window = created;
+    //@todo remove m_PtrCache[aWindow] = created;
+    //m_IdCache[window.Id ()] = created;
+    //m_ContextCache[aContext] = created;
     return created;
   }
   /**
@@ -88,7 +49,7 @@ namespace hd::sdl {
    * @return smart pointer to and instance of this class managing a window.
    * @return NULL on failure.
    */
-  sdl::Window::s_ptr
+  sdl::Window
   Window::Create (const char *aTitle, SDL_Rect *aRect, Uint32 aFlags)
   {
     assert (aRect != NULL);
@@ -109,51 +70,28 @@ namespace hd::sdl {
                                             SDL_WINDOW_OPENGL | aFlags);
     if (created == NULL) {
       hdError ("Unable to create SDL Window because:\n %s", SDL_GetError ());
-      return NULL;
     }
-    SDL_GLContext created_context = SDL_GL_CreateContext (created);
+    SDL_GLContext created_context =  (created);
     if (created_context == NULL) {
       hdError ("Unable to create SDL GL Context because:\n %s",
                SDL_GetError ());
       SDL_DestroyWindow (created);
     }
-    return Create (created, created_context, true);
+    return s_ptr (created, SDL_DestroyWindow);
   }
-  sdl::Window::s_ptr
+  sdl::Window
   Window::Create (int w, int h, const char *aTitle, Uint32 aFlags)
   {
     SDL_Rect aRect = { NextRect.x, NextRect.h, w, h };
     return Create (aTitle, &aRect, aFlags);
   }
-  sdl::Window::s_ptr
-  Window::GetById (Uint32 aId)
-  {
-    if (m_IdCache.find (aId) != m_IdCache.end ()) {
-      return m_IdCache.at (aId).lock ();
-    }
-    return NULL;
+  evt::WindowDispatch&Window::Event(){
+    return engine->input.Windows[Id ()];
   }
-  sdl::Window::s_ptr
-  Window::GetByPtr (SDL_Window *aWindow)
-  {
-    if (m_PtrCache.find (aWindow) != m_PtrCache.end ()) {
-      return m_PtrCache.at (aWindow).lock ();
-    }
-    return NULL;
-  }
-  sdl::Window::s_ptr
-  Window::GetByGlContext (SDL_GLContext aContext)
-  {
-    if (m_ContextCache.find (aContext) != m_ContextCache.end ()) {
-      return m_ContextCache.at (aContext).lock ();
-    }
-    return NULL;
-  }
-
   Uint32
   Window::Id ()
   {
-    Uint32 id = SDL_GetWindowID (m_Component);
+    Uint32 id = SDL_GetWindowID (*this);
     if (id == 0) {
       hdError ("Failed to get Window Id %s", SDL_GetError ());
     }
@@ -163,7 +101,7 @@ namespace hd::sdl {
   void
   Window::Swap ()
   {
-    SDL_GL_SwapWindow (m_Component);
+    SDL_GL_SwapWindow (*this);
   }
 
   bool
@@ -173,9 +111,9 @@ namespace hd::sdl {
   }
 
   bool
-  Window::MakeCurrent ()
+  Window::MakeCurrent (SDL_GLContext aContext)
   {
-    if (SDL_GL_MakeCurrent (m_Component, m_Context) != 0) {
+    if (SDL_GL_MakeCurrent (*this, aContext) != 0) {
       hdError ("Unable to make Window/GLContext current: %s", SDL_GetError ());
       return false;
     }
@@ -184,58 +122,58 @@ namespace hd::sdl {
   void
   Window::GetDrawableSize (int *w, int *h)
   {
-    SDL_GL_GetDrawableSize (m_Component, w, h);
+    SDL_GL_GetDrawableSize (*this, w, h);
   }
   void
   Window::Hide ()
   {
-    SDL_HideWindow (m_Component);
+    SDL_HideWindow (*this);
   }
   void
   Window::Show ()
   {
-    SDL_ShowWindow (m_Component);
+    SDL_ShowWindow (*this);
   }
   void
   Window::Raise ()
   {
-    SDL_RaiseWindow (m_Component);
+    SDL_RaiseWindow (*this);
   }
   void
   Window::Maximize ()
   {
-    SDL_MaximizeWindow (m_Component);
+    SDL_MaximizeWindow (*this);
   }
   void
   Window::Minimize ()
   {
-    SDL_MinimizeWindow (m_Component);
+    SDL_MinimizeWindow (*this);
   }
   void
   Window::Restore ()
   {
-    SDL_RestoreWindow (m_Component);
+    SDL_RestoreWindow (*this);
   }
   void
   Window::SetBordered (bool aBool)
   {
     SDL_bool setting = (aBool ? SDL_TRUE : SDL_FALSE);
-    SDL_SetWindowBordered (m_Component, setting);
+    SDL_SetWindowBordered (*this, setting);
   }
   void *
   Window::SetData (const char *aName, void *aData)
   {
-    return SDL_SetWindowData (m_Component, aName, aData);
+    return SDL_SetWindowData (*this, aName, aData);
   }
   void *
   Window::GetData (const char *aName)
   {
-    return SDL_GetWindowData (m_Component, aName);
+    return SDL_GetWindowData (*this, aName);
   }
   bool
   Window::SetFullscreen (Uint32 aFlags)
   {
-    if (SDL_SetWindowFullscreen (m_Component, aFlags) != 0) {
+    if (SDL_SetWindowFullscreen (*this, aFlags) != 0) {
       hdError ("Unable to set window fullscreen because: %s", SDL_GetError ());
       return false;
     }
@@ -245,14 +183,14 @@ namespace hd::sdl {
   Window::SetGrab (bool aGrab)
   {
     SDL_bool setting = (aGrab ? SDL_TRUE : SDL_FALSE);
-    SDL_SetWindowGrab (m_Component, setting);
+    SDL_SetWindowGrab (*this, setting);
   }
   void
   Window::SetKeyboardGrab (bool aGrab)
   {
 #if SDL_VERSION_ATLEAST(2, 0, 16)
     SDL_bool setting = (aGrab ? SDL_TRUE : SDL_FALSE);
-    SDL_SetWindowKeyboardGrab (m_Component, setting);
+    SDL_SetWindowKeyboardGrab (*this, setting);
 #else
     hdError ("SDL Version is less than 2.0.16");
 #endif
@@ -261,20 +199,20 @@ namespace hd::sdl {
   void
   Window::SetTitle (std::string aTitle)
   {
-    SDL_SetWindowTitle (m_Component, aTitle.c_str ());
+    SDL_SetWindowTitle (*this, aTitle.c_str ());
   }
 
   std::string
   Window::GetTitle ()
   {
-    const char *title = SDL_GetWindowTitle (m_Component);
+    const char *title = SDL_GetWindowTitle (*this);
     return std::string (title);
   }
 
   bool
   Window::GetWmInfo (SDL_SysWMinfo *aInfo)
   {
-    if (SDL_GetWindowWMInfo (m_Component, aInfo) != SDL_TRUE) {
+    if (SDL_GetWindowWMInfo (*this, aInfo) != SDL_TRUE) {
       hdError ("Unable to get System Window Manager Info: %s",
                SDL_GetError ());
       return false;
@@ -285,66 +223,61 @@ namespace hd::sdl {
   void
   Window::SetIcon (SDL_Surface *aSurface)
   {
-    SDL_SetWindowIcon (m_Component, aSurface);
+    SDL_SetWindowIcon (*this, aSurface);
   }
   void
-  Window::SetIcon (Shared::Surface aSurface)
+  Window::SetIcon (sdl::Surface::s_ptr aSurface)
   {
-    SetIcon (aSurface.get ());
+    SetIcon (aSurface);
   }
   void
   Window::SetIcon (std::filesystem::path aPath)
   {
-    SetIcon (Shared::makeSurface (aPath));
+    SetIcon (sdl::Surface::Load (aPath).ptr);
   }
   void
   Window::SetSize (int w, int h)
   {
-    SDL_SetWindowSize (m_Component, w, h);
+    SDL_SetWindowSize (*this, w, h);
   }
   void
   Window::GetSize (int *w, int *h)
   {
-    SDL_GetWindowSize (m_Component, w, h);
+    SDL_GetWindowSize (*this, w, h);
   }
   void
   Window::SetMaximumSize (int w, int h)
   {
-    SDL_SetWindowMaximumSize (m_Component, w, h);
+    SDL_SetWindowMaximumSize (*this, w, h);
   }
   void
   Window::GetMaximumSize (int *w, int *h)
   {
-    SDL_GetWindowMaximumSize (m_Component, w, h);
+    SDL_GetWindowMaximumSize (*this, w, h);
   }
   void
   Window::SetMinimumSize (int w, int h)
   {
-    SDL_SetWindowMinimumSize (m_Component, w, h);
+    SDL_SetWindowMinimumSize (*this, w, h);
   }
   void
   Window::GetMinimumSize (int *w, int *h)
   {
-    SDL_GetWindowMinimumSize (m_Component, w, h);
+    SDL_GetWindowMinimumSize (*this, w, h);
   }
   bool
   Window::SetModalFor (SDL_Window *aWindow)
   {
-    if (SDL_SetWindowModalFor (aWindow, m_Component) != 0) {
+    if (SDL_SetWindowModalFor (aWindow, *this) != 0) {
       hdError ("Unable to set Window as Modal: %s", SDL_GetError ());
       return false;
     }
     return true;
   }
   bool
-  Window::SetModalFor (sdl::Window::s_ptr aWindow)
-  {
-    return SetModalFor (aWindow->m_Component);
-  }
-  bool
   Window::SetOpacity (float aOpacity)
   {
-    if (SDL_SetWindowOpacity (m_Component, aOpacity) != 0) {
+    if (SDL_SetWindowOpacity (*this, aOpacity) != 0) {
       hdError ("Unable to set Window Opacity: %s", SDL_GetError ());
       return false;
     }
@@ -354,7 +287,7 @@ namespace hd::sdl {
   Window::GetOpacity ()
   {
     float value;
-    if (SDL_GetWindowOpacity (m_Component, &value) != 0) {
+    if (SDL_GetWindowOpacity (*this, &value) != 0) {
       hdError ("Unable to get Window Opacity: %s", SDL_GetError ());
     }
     return value;
@@ -362,23 +295,23 @@ namespace hd::sdl {
   void
   Window::SetPosition (int x, int y)
   {
-    SDL_SetWindowPosition (m_Component, x, y);
+    SDL_SetWindowPosition (*this, x, y);
   }
   void
   Window::GetPosition (int *x, int *y)
   {
-    SDL_GetWindowPosition (m_Component, x, y);
+    SDL_GetWindowPosition (*this, x, y);
   }
   void
   Window::SetResizable (bool aBool)
   {
     SDL_bool setting = aBool ? SDL_TRUE : SDL_FALSE;
-    SDL_SetWindowResizable (m_Component, setting);
+    SDL_SetWindowResizable (*this, setting);
   }
   Uint32
   Window::GetFlags ()
   {
-    return SDL_GetWindowFlags (m_Component);
+    return SDL_GetWindowFlags (*this);
   }
 
 #define CheckFor(aFlag) (GetFlags () & aFlag) != 0

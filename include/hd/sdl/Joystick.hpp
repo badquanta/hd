@@ -6,14 +6,17 @@
 
 #include "hd/EngineComponent.hpp"
 #include "hd/evt/JoyDispatch.hpp"
+#include "hd/Wrap.hpp"
 #include <map>
 namespace hd::sdl {
   /**
    * @brief Representation of an SDL component
    * @todo SDL_JoystickEventState
    */
-  class Joystick : public EngineComponent<Joystick, void> {
+  class Joystick : public WRAP_PTR<SDL_Joystick> {
   public: // Class static components
+    using WRAP_PTR::WRAP_PTR;
+    using WRAP_PTR::operator=;
     static bool EventState (int aState = SDL_QUERY);
     static bool EventState (bool);
     /** SDL_JoystickFromInstanceID **/
@@ -33,7 +36,7 @@ namespace hd::sdl {
     /** @see SDL_NumJoysticks **/
     static int Count ();
   public: // Instance Methods
-    virtual void Free () override;
+
     /**SDL_JoystickGetAttached **/
     bool IsAttached ();
     /**SDL_JoystickGetAxis **/
@@ -66,10 +69,9 @@ namespace hd::sdl {
     evt::JoyDispatch input;
     evt::SDL_EventDispatch::Handle inputHandle;
   private: // static caches
-    static std::map<int, std::weak_ptr<Joystick> > m_Opened;
-    static std::map<SDL_Joystick *, std::weak_ptr<Joystick> > m_OpenedByPtr;
+    static std::map<int, std::weak_ptr<SDL_Joystick> > m_Opened;
+    static std::map<SDL_Joystick *, std::weak_ptr<SDL_Joystick> > m_OpenedByPtr;
   private: //
-    SDL_Joystick *m_Joystick;
     int m_Index;
   private: // constructors
     Joystick (int, SDL_Joystick *);

@@ -17,6 +17,7 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/sdl/Window.hpp"
+#include "hd/sdl/GLContext.hpp"
 #include "hd/gl/Camera.hpp"
 #include "hd/gl/EBO.hpp"
 #include "hd/gl/Texture.hpp"
@@ -55,13 +56,14 @@ GLint scaleLocation = -1;
 GLint tex0Uni = -1;
 hd::gl::Texture texture;
 
-hd::sdl::Window::s_ptr window;
+hd::sdl::Window window;
+hd::sdl::GLContext glCtx;
 hd::gl::Camera camera;
 
 void
 drawFrame (int ticks)
 {
-  window->MakeCurrent ();
+  window.MakeCurrent (glCtx);
   glClearColor (0.f, 0.f, 0.f, 1.f);
   glEnable (GL_DEPTH_TEST);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -75,7 +77,7 @@ drawFrame (int ticks)
   // GLint projLoc = shaderProgram.getUniformLocation ("proj");
   // glUniformMatrix4fv (projLoc, 1, GL_FALSE, glm::value_ptr (proj));
   int w, h;
-  window->GetDrawableSize (&w, &h);
+  window.GetDrawableSize (&w, &h);
   // hdDebug ("Drawable size: %dx%d", w, h);
   glViewport (0, 0, w, h);
   camera.Matrix (w, h, 45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
@@ -94,7 +96,7 @@ drawFrame (int ticks)
                   NULL);
   // glDisableVertexAttribArray (aPos);
   shaderProgram.Unbind ();
-  window->Swap ();
+  window.Swap ();
 }
 
 int
@@ -104,12 +106,13 @@ main (int argc, char **argv)
   // hd::Engine::Mount engine = hd::Engine::Get ();
   hd::Engine::Configure (argc, argv);
   window = hd::sdl::Window::Create (hd::Engine::GetProgramName ());
-  window->input.On (camera.input.pipe);
-  window->input.Close.Void.Once ([] () {
+  glCtx = hd::sdl::GLContext::Create (window);
+  window.Event ().On (camera.input.pipe);
+  window.Event().Close.Void.Once ([] () {
     hd::Engine::Get ()->step.Void.Once ([] () { window = NULL; });
   });
-  hd::Engine::Get ()->step.Void.Once ([] () {
-    window->MakeCurrent ();
+  window.engine->step.Void.Once ([] () {
+    window.MakeCurrent (glCtx);
     hd::Engine::s_ptr engine = hd::Engine::Get ();
     if (!shaderProgram.Create ("shaders/default.vert",
                                "shaders/default.frag")) {
@@ -159,7 +162,7 @@ main (int argc, char **argv)
         "textures/pattern_16/diffus.tga", GL_TEXTURE_2D, GL_TEXTURE0);
     texture.Assign (shaderProgram, "tex0", 0);
   });
-  window->output.On (&drawFrame);
+  window.engine->output.On (&drawFrame);
   hd::Engine::Get ()->Start ();
   return 0;
 }

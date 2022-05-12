@@ -15,30 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/sdl/Window.hpp"
+#include "hd/sdl/GLContext.hpp"
 #include "hd/sdl/MixerChannel.hpp"
 #include "hd/sdl/MixerChunk.hpp"
-
+#include "hd/sdl/Window.hpp"
+#include <cassert>
 using hd::Engine;
-using hd::sdl::Window;
+using hd::sdl::GLContext;
 using hd::sdl::MixerChannel;
 using hd::sdl::MixerChunk;
+using hd::sdl::Window;
 
-Window::s_ptr window;
+hd::sdl::Window window;
+GLContext glContext;
+hd::Engine::s_ptr engine;
 
 void
 doWindowOutput ()
 {
   assert (window); // should only be called while the window isn't null.
-  window->MakeCurrent ();
+  window.MakeCurrent (glContext);
   glClear (GL_COLOR_BUFFER_BIT);
-  window->Swap ();
+  window.Swap ();
 }
 void
 doWindowClosed ()
 {
-  if (window != NULL) {
-    window->step.Void.Once ([] () { window = NULL; });
+  if (window) {
+    engine->step.Void.Once ([] () { window.m_IDENTITY = NULL; });
   }
 }
 
@@ -50,10 +54,12 @@ main (int argc, char **argv)
 
   // Engine::s_ptr engine = Engine::Get ();
   window = Window::Create (800, 600, "play some audio");
-  window->output.Void.On (&doWindowOutput);
-  window->input.Close.Void.On (&doWindowClosed);
 
-  MixerChunk::s_ptr horrorAmbient
+  glContext = GLContext::Create (window.ptr.get ());
+  engine->output.Void.On (&doWindowOutput);
+  window.Event().Close.Void.On (&doWindowClosed);
+
+  MixerChunk horrorAmbient
       = MixerChunk::Load ("audio/horror ambient.ogg");
   if (!horrorAmbient) {
     hdError ("Unable to load audio chunk.");
@@ -61,19 +67,19 @@ main (int argc, char **argv)
   }
   MixerChannel defaultChannel = -1, s_Channel;
 
-  window->input.Key.Keycode[SDLK_s].Up.Void.On (
-      [&] () { s_Channel = horrorAmbient->Play (-1); });
-  window->input.Key.Keycode[SDLK_m].Up.Void.On (
+  window.Event().Key.Keycode[SDLK_s].Up.Void.On (
+      [&] () { s_Channel = horrorAmbient.Play (-1); });
+  window.Event().Key.Keycode[SDLK_m].Up.Void.On (
       [&] () { defaultChannel.FadeOut (100); });
 
-  window->engine->Delay (5000, [&horrorAmbient] (int) {
-    auto channel = horrorAmbient->FadeIn (1000, 0);
-    window->engine->Delay (2000, [channel] (int) {
+  window.engine->Delay (5000, [&horrorAmbient] (int) {
+    auto channel = horrorAmbient.FadeIn (1000, 0);
+    window.engine->Delay (2000, [channel] (int) {
       hdLog ("Delayed callback.");
       channel.FadeOut (500);
     });
   });
-  window->engine->Delay (16000, [&] (int) { horrorAmbient->Play (); });
+  window.engine->Delay (16000, [&] (int) { horrorAmbient.Play (); });
 
   Engine::Get ()->Start ();
   return 0;

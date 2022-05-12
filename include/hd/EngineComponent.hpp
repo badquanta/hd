@@ -11,29 +11,8 @@
 #include "hd/Engine.hpp"
 #include "hd/evt/IntDispatch.hpp"
 namespace hd {
-  template <typename WRAPPER, typename TARGET > class EngineComponent {
-      protected:
-        bool m_Free;
-        TARGET *m_Component;
-        evt::IntDispatch::Handle processHandle;
+  class EngineComponent {
       public:
-        TARGET *GetComponent (){
-          return m_Component;
-        };
-        typedef std::shared_ptr<WRAPPER> s_ptr;
-        evt::IntDispatch step;
-        EngineComponent (TARGET *p, bool aFree)
-            : m_Component (p), m_Free (aFree), engine (Engine::Get ()){
-              processHandle = engine->step.On (step.pipe);
-            };
-        ~EngineComponent(){
-
-          if(m_Free){this->Free();}
-          engine->step.Delete (processHandle);
-        };
-        const Engine::s_ptr engine;
-        virtual void Free () {
-          hdDebugCall (NULL);
-        };
+        Engine::s_ptr engine = Engine::Get();
   };
 }

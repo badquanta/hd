@@ -17,18 +17,20 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/sdl/Window.hpp"
+#include "hd/sdl/GLContext.hpp"
 #include "hd/gl/EBO.hpp"
 #include "hd/gl/ShaderProgram.hpp"
 #include "hd/gl/Texture.hpp"
 #include "hd/gl/VAO.hpp"
 #include "hd/gl/VBO.hpp"
-hd::sdl::Window::s_ptr window;
+hd::sdl::Window window;
 
 int
 main (int argc, char **argv)
 {
   hd::Engine::Configure (argc, argv);
-  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create (800, 600, "HD1");
+  window = hd::sdl::Window::Create (800, 600, "HD1");
+  hd::sdl::GLContext glCtx = hd::sdl::GLContext::Create (window);
   // Vertices coordinates
   GLfloat vertices[] = {
     //     COORDINATES/     COLORS      /   TexCoord  //
@@ -43,7 +45,7 @@ main (int argc, char **argv)
     0, 2, 1, // Upper triangle
     0, 3, 2  // Lower triangle
   };
-  window->MakeCurrent ();
+  window.MakeCurrent (glCtx);
   hd::gl::ShaderProgram shaderProgram;
   shaderProgram.Create ("shaders/hd6.vert", "shaders/hd6.frag");
   shaderProgram.Bind ();
@@ -84,30 +86,19 @@ main (int argc, char **argv)
   hd::gl::Texture text;
   text.Create ("textures/pattern_16/diffus.tga", GL_TEXTURE_2D, GL_TEXTURE0);
   text.Assign (shaderProgram, "tex0", 0);
-  window->output.On ([&window, &shaderProgram, &vao, &vbo] (int aTime) {
-    window->MakeCurrent ();
+  window.engine->output.On ([&] (int aTime) {
+    window.MakeCurrent (glCtx);
     glClearColor (.0f, .5f, .5f, 1.0f);
     glClear (GL_COLOR_BUFFER_BIT);
     shaderProgram.Bind ();
     vao.Bind ();
     glDrawElements (GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    window->Swap ();
+    window.Swap ();
   });
-  window->input.Close.Void.On ([&window] () {
-    window->engine->step.Once ([&window] (int) { window = NULL; });
+  window.Event().Close.Void.On ([&] () {
+    window.engine->step.Once ([&] (int) { window = NULL; });
   });
 
-  hd::sdl::Window::s_ptr win2 = hd::sdl::Window::Create (320, 200, "HD2");
-  win2->input.Close.Void.On ([&win2] () {
-    win2->engine->step.Once ([&win2] (int) { win2 = NULL; });
-  });
-  win2->output.On ([&win2, &text] (int aTime) {
-    win2->MakeCurrent ();
-    text.Bind ();
-    glClearColor (.5f, .5f, .0f, 1.0f);
-    glClear (GL_COLOR_BUFFER_BIT);
-    win2->Swap ();
-  });
 
   // engine->configure (argc, argv);
   hd::Engine::Get ()->Start ();

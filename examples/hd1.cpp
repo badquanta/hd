@@ -15,22 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "hd/sdl/GLContext.hpp"
 #include "hd/sdl/Window.hpp"
-
-hd::sdl::Window::s_ptr window;
-
+hd::sdl::Window window;
+hd::sdl::GLContext glCtx;
 int
 main (int argc, char **argv)
 {
   hd::Engine::PrintVersions ();
-  //hd::Engine::s_ptr engine = hd::Engine::Get ();
-  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create (800, 600, "HD1");
-  window->output.On ([&window] (int aTime) {
-    window->MakeCurrent ();
+  // hd::Engine::s_ptr engine = hd::Engine::Get ();
+  window = hd::sdl::Window::Create (800, 600, "HD1");
+  glCtx = hd::sdl::GLContext::Create (window);
+
+  window.engine->output.On ([&] (int aTime) {
+    window.MakeCurrent (glCtx);
     glClear (GL_COLOR_BUFFER_BIT);
-    window->Swap ();
+    window.Swap ();
   });
-  window->input.Close.Void.On ([&window] () { window->step.Void.Once([&window](){window=NULL;});});
+  window.Event ().Close.Void.On (
+      [&] () { window.engine->step.Void.Once ([&] () { window = NULL; }); });
 
   hd::Engine::Get ()->Start ();
   return 0;

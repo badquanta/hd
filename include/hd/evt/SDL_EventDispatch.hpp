@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/evt/VoidDispatch.hpp"
-#include <SDL2/SDL_events.h>
+#include "hd/Common.hpp"
 namespace hd::evt {
   class SDL_EventDispatch : public AbstractDispatch<const SDL_Event &> {
   public:

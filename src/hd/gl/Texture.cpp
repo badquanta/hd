@@ -1,16 +1,16 @@
 #include "hd/gl/Texture.hpp"
-#include "hd/Shared.hpp"
+#include "hd/sdl/Surface.hpp"
 namespace hd::gl {
   bool Texture::Create(std::filesystem::path aPath, GLenum aType, GLenum aSlot){
     type = aType;
-    Shared::Surface image = Shared::makeSurface (aPath);
-    if(image == NULL){
+    sdl::Surface image = sdl::Surface::Load (aPath);
+    if(image.ptr == NULL){
       fprintf (stderr,
                "Unable to load image from path: '%s'\n",
                aPath.generic_string ().c_str ());
       return false;
     }
-    Shared::Surface converted = Shared::ConvertSurface(image);
+    sdl::Surface::s_ptr converted = image.Convert ();
     glGenTextures (1, &ID);
     glActiveTexture (aSlot);
     glBindTexture (type, ID);
@@ -29,7 +29,7 @@ namespace hd::gl {
                   converted->pixels);
     glGenerateMipmap (type);
     glBindTexture (type, 0);
-    image = NULL;
+    image.m_IDENTITY = NULL;
     converted = NULL;
     return true;
   }

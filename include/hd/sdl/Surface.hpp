@@ -10,12 +10,15 @@
  */
 #pragma once
 #include "hd/EngineComponent.hpp"
+#include "hd/Wrap.hpp"
+#include "hd/Common.hpp"
 namespace hd::sdl {
 
-  class Surface : public EngineComponent<Surface, SDL_Surface> {
+  class Surface : public EngineComponent, public WRAP_PTR<SDL_Surface> {
   public:
-    static s_ptr Create(SDL_Surface*, bool);
-    static s_ptr CreateRGBA (Uint32 flags,
+    using WRAP_PTR::WRAP_PTR;
+    static Surface::s_ptr Create(SDL_Surface*, bool);
+    static Surface CreateRGBA (Uint32 flags,
                                int width,
                                int height,
                                int depth,
@@ -23,13 +26,15 @@ namespace hd::sdl {
                                Uint32 Gmask,
                                Uint32 Bmask,
                                Uint32 Amask);
-    static s_ptr Load (std::filesystem::path);
-  public:// Instance Methods
-    virtual void Free () override;
-    bool Blit (s_ptr, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
-    bool BlitScaled (s_ptr, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
+    static Surface Load (std::filesystem::path);
+    static Surface Convert (SDL_Surface *aSurface,
+                                     SDL_PixelFormatEnum aFormat=SDL_PIXELFORMAT_RGBA32);
 
-  protected: /** Hidden Constructor **/
-    Surface (SDL_Surface *, bool);
+  public: // Instance Methods
+    bool Blit (SDL_Surface*, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
+    bool BlitScaled (SDL_Surface*, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
+    bool FillRect (const SDL_Rect *, Uint32);
+    Uint32 MapRGBA (Uint8, Uint8, Uint8, Uint8=255);
+    Surface Convert (SDL_PixelFormatEnum aFormat=SDL_PIXELFORMAT_RGBA32);
   };
 }

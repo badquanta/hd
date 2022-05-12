@@ -9,25 +9,26 @@ using std::cout;
 using std::string;
 using std::vector;
 namespace po = boost::program_options;
-Joystick::s_ptr js;
+Joystick js;
 void
 watch (int anIndex)
 {
   Joystick::EventState (true);
-  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create();
+  Engine::s_ptr engine = Engine::Get ();
+  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create ();
   SDL_EventState(SDL_JOYAXISMOTION, SDL_ENABLE);
   js = Joystick::Open (anIndex);
-  js->engine->input.On([](const SDL_Event&e){
+  engine->input.On([](const SDL_Event&e){
     printf("SDL EVENT %d\n",e.type);
   });
-  js->input.On ([] (const SDL_Event&e) {
+  engine->input.On ([] (const SDL_Event&e) {
     printf ("Joystick input type %x.\n",e.type);
     });
-  js->engine->step.On([](int){
+  engine->step.On([](int){
     //hdDebug("Process Update...");
     Joystick::Update();
   });
-  js->engine->Start ();
+  engine->Start ();
 }
 void
 printList ()
@@ -42,13 +43,13 @@ printList ()
             joystickIndex,
             guid.c_str (),
             name.c_str ());
-    Joystick::s_ptr joystick = Joystick::Open (joystickIndex);
-    int numAxes = joystick->NumAxes ();
-    int numBalls = joystick->NumBalls ();
-    int numButtons = joystick->NumButtons ();
-    int numHats = joystick->NumHats ();
+    Joystick joystick = Joystick::Open (joystickIndex);
+    int numAxes = joystick.NumAxes ();
+    int numBalls = joystick.NumBalls ();
+    int numButtons = joystick.NumButtons ();
+    int numHats = joystick.NumHats ();
     std::string powerLevel;
-    switch (joystick->CurrentPowerLevel ()) {
+    switch (joystick.CurrentPowerLevel ()) {
     SDL_JOYSTICK_POWER_FULL:
       powerLevel = "full";
       break;

@@ -1,8 +1,6 @@
 list(APPEND LIBHD_COMPONENTS
   Common.cpp
-  Scene.cpp
-  Shared.cpp
-  SplashScene.cpp
+  Wrap.cpp
   Engine.cpp
   EngineComponent.cpp
   sdl/Joystick.cpp
@@ -10,7 +8,10 @@ list(APPEND LIBHD_COMPONENTS
   sdl/MixerChunk.cpp
   sdl/MixerChannel.cpp
   sdl/Surface.cpp
+  sdl/GLContext.cpp
   sdl/Window.cpp
+  sdl/Font.cpp
+  sdl/Texture.cpp
 
   evt/AbstractDispatch.cpp
   evt/ControllerDeviceDispatch.cpp

@@ -7,16 +7,15 @@ namespace hd::sdl {
    * @todo https://wiki.libsdl.org/SDL_SetWindowHitTest
    * @todo https://wiki.libsdl.org/SDL_IsScreenSaverEnabled
    **/
-  class Window : public EngineComponent<Window, SDL_Window> {
-    private:
-      /** Hide constructor **/
-      Window (SDL_Window *, SDL_GLContext, bool);
-    public: // Static constructor methods
+  class Window : public WRAP_PTR<SDL_Window> , public EngineComponent {
+  public: // Static constructor methods
+    using WRAP_PTR::WRAP_PTR;
+    using WRAP_PTR::operator=;
     /** Given an existing SDL_Windowand SDL_GLContext pointer construct
      * a sdl::Window::s_ptr
      * @todo make this check the caches?
      ***/
-    static sdl::Window::s_ptr Create (SDL_Window *, SDL_GLContext,bool);
+    static sdl::Window Create (SDL_Window *, SDL_GLContext, bool);
     /**
      * @brief
      *
@@ -27,25 +26,25 @@ namespace hd::sdl {
      * @note Windows are always created with SDL_WINDOW_OPENGL flag set.
      * @return sdl::Window::s_ptr
      */
-    static sdl::Window::s_ptr Create (const char *aTitle = Window::NextTitle,
+    static sdl::Window Create (const char *aTitle = Window::NextTitle,
                                       SDL_Rect *aRect = &Window::NextRect,
 
                                       Uint32 aFlags = Window::NextFlags);
-    static sdl::Window::s_ptr Create (int aWidth,
+    static sdl::Window Create (int aWidth,
                                       int aHeight,
                                       const char *aTitle = Window::NextTitle,
                                       Uint32 aFlags = Window::NextFlags);
-    virtual void Free () override;
 
-    Surface::s_ptr GetSurface ();
+  public: // instance methods:
+    evt::WindowDispatch &Event ();
+    /** Return the SDL Surface associated with this window. **/
+    Surface GetSurface ();
     bool UpdateSurface ();
-
-  public: // Window state modifiers:
     void Swap ();
     /** @see https://wiki.libsdl.org/SDL_GL_SetSwapInterval **/
     bool SetSwapInterval (int);
     /** @see https://wiki.libsdl.org/SDL_GL_MakeCurrent **/
-    bool MakeCurrent ();
+    bool MakeCurrent (SDL_GLContext);
 
   public: // Window attribute accessors
     /** Return the window Identifier integer. **/
@@ -86,7 +85,7 @@ namespace hd::sdl {
     std::string GetTitle ();
     /** @see https://wiki.libsdl.org/SDL_SetWindowIcon **/
     void SetIcon (SDL_Surface *);
-    void SetIcon (Shared::Surface);
+    void SetIcon (sdl::Surface::s_ptr);
     void SetIcon (std::filesystem::path);
     /** maybe future @todo https://wiki.libsdl.org/SDL_SetWindowInputFocus **/
     /** @see https://wiki.libsdl.org/SDL_SetWindowSize **/
@@ -103,7 +102,6 @@ namespace hd::sdl {
     void GetMinimumSize (int *, int *);
     /** @see https://wiki.libsdl.org/SDL_SetWindowModalFor **/
     bool SetModalFor (SDL_Window *);
-    bool SetModalFor (sdl::Window::s_ptr);
     /** @see https://wiki.libsdl.org/SDL_SetWindowOpacity **/
     bool SetOpacity (float);
     /** @see https://wiki.libsdl.org/SDL_GetWindowOpacity **/
@@ -145,19 +143,6 @@ namespace hd::sdl {
     bool IsTooltip ();
     bool IsPopupMenu ();
 
-    SDL_Window *m_Window;
-    const SDL_GLContext m_Context;
-
-    static s_ptr GetById (Uint32);
-    static s_ptr GetByPtr (SDL_Window *);
-    static s_ptr GetByGlContext (SDL_GLContext);
-
-  private:
-    static std::map<SDL_Window *, std::weak_ptr<Window> > m_PtrCache;
-    static std::map<Uint32, std::weak_ptr<Window> > m_IdCache;
-    static std::map<SDL_GLContext, std::weak_ptr<Window> > m_ContextCache;
-
-
   public:
     /** `Create` uses this position and size if none are defined. **/
     static SDL_Rect NextRect;
@@ -166,18 +151,5 @@ namespace hd::sdl {
     /** `Create()` uses these flags if none are defined. **/
     static SDL_WindowFlags NextFlags;
     /** Destroy a window and its associated OpenGL Context.**/
-    ~Window ();
-
-  public: // events
-    /** Automatically (dis)connected to/from engine output event. **/
-    evt::IntDispatch output;
-    /** Automatically (dis)connected to/from engine input event. **/
-    evt::WindowDispatch input;
-
-  private: // handles used to disconnect on destruct.
-    evt::SDL_EventDispatch::Handle onHandle;
-    evt::IntDispatch::Handle outputHandle;
-
-  public: // Create window pointer utilities.
   };
 }

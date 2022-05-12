@@ -10,13 +10,16 @@
  */
 #pragma once
 #include "hd/EngineComponent.hpp"
+#include "hd/Wrap.hpp"
 #include "hd/sdl/MixerChannel.hpp"
 
 namespace hd::sdl {
-  class MixerChunk : public EngineComponent<MixerChunk, Mix_Chunk> {
+  class MixerChunk : public EngineComponent,
+  public WRAP_PTR<Mix_Chunk> {
   public: // class static methods
+    using WRAP_PTR::WRAP_PTR;
     /** **/
-    static s_ptr Load (char *);
+    static MixerChunk Load (char *);
 
   public: // instance methods
     int SetVolume (int);
@@ -24,9 +27,8 @@ namespace hd::sdl {
     /** @see Mix_PlayChannel **/
     MixerChannel Play (int aLoops = 0, int aChannel = -1);
     MixerChannel FadeIn (int aTicks, int aLoops = 0, int aChannel = -1);
-    virtual void Free () override;
 
   protected:
-    MixerChunk (Mix_Chunk *, bool);
+
   };
 }

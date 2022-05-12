@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/Shared.hpp"
+#include "hd/Common.hpp"
 #include "hd/evt/EngineDispatch.hpp"
 #include "hd/evt/IntDispatch.hpp"
 #include <memory>
+#include <list>
+#include <filesystem>
 /**
  * @brief holodeck?
  */

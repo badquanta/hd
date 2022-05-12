@@ -6,24 +6,31 @@ using hd::sdl::Window;
 int
 main (int argc, char **argv)
 {
-  Surface::s_ptr pic = Surface::Load ("textures/pattern_16/preview.jpg");
-  Window::s_ptr win = Window::Create ("Picture Window");
-  win->input.Close.Void.On ([&win] () {
-    win->Hide ();
-    win->engine->Delay (0, [&win] (int) { win = NULL; });
+  hd::sdl::Surface pic = Surface::Load ("textures/pattern_16/preview.jpg");
+  hd::sdl::Window win = Window::Create ("Picture Window");
+  win.Event().Close.Void.On ([&] () {
+    win.Hide ();
+    win.engine->Delay (0, [&win] (int) { win.m_IDENTITY = NULL; });
   });
   const SDL_Rect src
-      = { 0, 0, pic->GetComponent ()->w, pic->GetComponent ()->h };
+      = { 0, 0, pic.ptr->w, pic.ptr->h };
   SDL_Rect dst = { 50, 75, 100, 100 };
-  win->output.Void.On ([=] () {
-    Surface::s_ptr winSurf = win->GetSurface ();
-
-    pic->BlitScaled (winSurf, &dst, &src);
-    win->UpdateSurface ();
+  win.engine->output.Void.On ([&] () {
+    Surface winSurf = win.GetSurface ();
+    SDL_Rect background{0};
+    win.GetSize (&background.w,&background.h);
+    winSurf.FillRect (&background, winSurf.MapRGBA(128, 64, 32));
+    pic.BlitScaled (winSurf, &dst, &src);
+    win.UpdateSurface ();
   });
-  win->input.Mouse.Wheel.On ([&] (const SDL_Event &e) {
-
+  win.Event().Mouse.Wheel.On ([&] (const SDL_Event &e) {
+    const SDL_MouseWheelEvent &w = e.wheel;
+    printf ("Mouse wheel x=%d y=%d direction:%d\n",w.x,w.y, w.direction);
   });
-  win->engine->Start ();
+
+  win.Event ().Key.Keycode[SDLK_f].Void.On (
+      [] () { printf ("SFS's keycode.\n"); });
+
+  win.engine->Start ();
   printf ("Image viewer.\n");
 }

@@ -17,6 +17,7 @@
  */
 #include "hd/Engine.hpp"
 #include "hd/sdl/Window.hpp"
+#include "hd/sdl/GLContext.hpp"
 #include "hd/gl/EBO.hpp"
 #include "hd/gl/ShaderProgram.hpp"
 #include "hd/gl/VAO.hpp"
@@ -27,7 +28,8 @@ int
 main (int argc, char **argv)
 {
   hd::Engine::Configure (argc, argv);
-  hd::sdl::Window::s_ptr window = hd::sdl::Window::Create (800, 600, "HD1");
+  hd::sdl::Window window = hd::sdl::Window::Create (800, 600, "HD1");
+  hd::sdl::GLContext glContext = hd::sdl::GLContext::Create (window);
   // Vertices coordinates
   GLfloat vertices[] = {
     //               COORDINATES                  /     COLORS           //
@@ -51,7 +53,7 @@ main (int argc, char **argv)
     3, 2, 4, // Lower right triangle
     5, 4, 1  // Upper triangle
   };
-  window->MakeCurrent ();
+  window.MakeCurrent (glContext);
   hd::gl::ShaderProgram shaderProgram;
   shaderProgram.Create ("shaders/hd5.vert", "shaders/hd5.frag");
   shaderProgram.Bind ();
@@ -82,28 +84,28 @@ main (int argc, char **argv)
   vao.Unbind ();
   vbo.Unbind ();
   ebo.Unbind ();
-  window->output.On ([&window, &shaderProgram, &vao, &vbo] (int aTime) {
-    window->MakeCurrent ();
+  window.engine->output.On ([&] (int aTime) {
+    window.MakeCurrent (glContext);
     glClearColor (.0f, .5f, .5f, 1.0f);
     glClear (GL_COLOR_BUFFER_BIT);
     shaderProgram.Bind ();
     vao.Bind ();
     glDrawElements (GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
-    window->Swap ();
+    window.Swap ();
   });
-  window->input.Close.Void.On ([&window] () {
-    window->engine->step.Once ([&window] (int) { window = NULL; });
+  window.Event().Close.Void.On ([&window] () {
+    window.engine->step.Once ([&window] (int) { window = NULL; });
   });
 
-  hd::sdl::Window::s_ptr win2 = hd::sdl::Window::Create (320, 200, "HD2");
-  win2->input.Close.Void.On ([&win2] () {
-    win2->engine->step.Once ([&win2] (int) { win2 = NULL; });
-  });
-  win2->output.On ([&win2] (int aTime) {
-    win2->MakeCurrent ();
+  hd::sdl::Window win2 = hd::sdl::Window::Create (320, 200, "HD2");
+  hd::sdl::GLContext win2gl = hd::sdl::GLContext::Create (win2);
+  win2.Event ().Close.Void.On (
+      [&win2] () { win2.engine->step.Once ([&win2] (int) { win2 = NULL; }); });
+  win2.engine->output.On ([&] (int aTime) {
+    win2.MakeCurrent (win2gl);
     glClearColor (.5f, .5f, .0f, 1.0f);
     glClear (GL_COLOR_BUFFER_BIT);
-    win2->Swap ();
+    win2.Swap ();
   });
 
 

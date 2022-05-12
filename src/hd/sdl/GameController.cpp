@@ -16,7 +16,7 @@ namespace hd::sdl {
   }
 
   bool GameController::GetButtonPressed(SDL_GameControllerButton aBtn){
-    return (SDL_GameControllerGetButton (m_Controller, aBtn) == 1);
+    return (SDL_GameControllerGetButton (*this, aBtn) == 1);
   }
 
   bool GameController::GetButtonReleased(SDL_GameControllerButton aBtn){
@@ -26,8 +26,8 @@ namespace hd::sdl {
   SDL_GameControllerButtonBind
   GameController::GetBindForButton (SDL_GameControllerButton aButton)
   {
-    assert (m_Controller);
-    return SDL_GameControllerGetBindForButton (m_Controller, aButton);
+    assert (*this);
+    return SDL_GameControllerGetBindForButton (*this, aButton);
   }
   /**
    * @brief Get the Bind For Axis object
@@ -38,8 +38,8 @@ namespace hd::sdl {
   SDL_GameControllerButtonBind
   GameController::GetBindForAxis (SDL_GameControllerAxis aAxis)
   {
-    assert (m_Controller);
-    return SDL_GameControllerGetBindForAxis (m_Controller, aAxis);
+    assert (*this);
+    return SDL_GameControllerGetBindForAxis (*this, aAxis);
   }
   /**
    * @brief
@@ -50,8 +50,8 @@ namespace hd::sdl {
   Sint16
   GameController::GetAxis (SDL_GameControllerAxis aAxis)
   {
-    assert (m_Controller);
-    return SDL_GameControllerGetAxis (m_Controller, aAxis);
+    assert (*this);
+    return SDL_GameControllerGetAxis (*this, aAxis);
   }
   /**
    * @brief
@@ -62,8 +62,8 @@ namespace hd::sdl {
   bool
   GameController::IsAttached ()
   {
-    assert (m_Controller);
-    return SDL_GameControllerGetAttached (m_Controller);
+    assert (*this);
+    return SDL_GameControllerGetAttached (*this);
   }
   /**
    * @brief calls SDL_GameControllerOpen and wraps the returned pointer into a shared_ptr GameController.
@@ -87,29 +87,11 @@ namespace hd::sdl {
                  SDL_GetError ());
         return NULL;
       }
-      controller = s_ptr (new GameController (aIndex, opened));
+      controller = s_ptr (opened, SDL_GameControllerClose);
       m_Opened[aIndex] = controller;
       m_OpenedByPtr[opened] = controller;
     }
     return controller;
-  }
-  void GameController::Free(){
-    hdDebugCall (NULL);
-    if (m_Free) {
-      SDL_GameControllerClose (m_Controller);
-      m_Controller = NULL;
-    }
-  }
-  /**
-   * @brief Construct a new Game Controller:: Game Controller object
-   * @private
-   * @param aIndex
-   * @param aController
-   */
-  GameController::GameController (int aIndex, SDL_GameController *aController)
-      : m_Index (aIndex), m_Controller (aController), EngineComponent(NULL,false)
-  {
-    hdDebugCall (NULL);
   }
   /**
    * @brief Destroy the Game Controller:: Game Controller object
@@ -118,6 +100,6 @@ namespace hd::sdl {
   GameController::~GameController ()
   {
     m_Opened.erase (m_Index);
-    m_OpenedByPtr.erase (m_Controller);
+    m_OpenedByPtr.erase (*this);
   }
 }
