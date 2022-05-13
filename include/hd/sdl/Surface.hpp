@@ -11,7 +11,6 @@
 #pragma once
 #include "hd/EngineComponent.hpp"
 #include "hd/Wrap.hpp"
-#include "hd/Common.hpp"
 namespace hd::sdl {
 
   class Surface : public EngineComponent, public WRAP_PTR<SDL_Surface> {

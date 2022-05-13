@@ -5,9 +5,8 @@
  */
 
 #include "hd/EngineComponent.hpp"
-#include "hd/evt/ControllerDispatch.hpp"
+#include "hd/sdl/ControllerDispatch.hpp"
 #include "hd/Wrap.hpp"
-#include <map>
 namespace hd::sdl {
   /**
    * @brief Representation of an SDL component
@@ -60,8 +59,8 @@ namespace hd::sdl {
      */
 
   public: // Input Events
-    evt::ControllerDispatch input;
-    evt::SDL_EventDispatch::Handle inputHandle;
+    sdl::ControllerDispatch input;
+    sdl::EventDispatch::Handle inputHandle;
 
   private: // static caches
     static std::map<int, std::weak_ptr<SDL_GameController> > m_Opened;

@@ -1,5 +1,29 @@
+/**
+ * @file Camera.hpp
+ * @author Jón Davíð Sawyer (badquanta@gmail.com)
+ * @brief Simple implementation of OpenGL Camera.
+ * @version 0.1
+ * @date 2022-05-13
+ *
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
 #pragma once
-#include "hd/evt/WindowDispatch.hpp"
+#include "hd/sdl/WindowDispatch.hpp"
 #include "hd/gl/ShaderProgram.hpp"
 
 namespace hd {
@@ -22,20 +46,20 @@ namespace hd {
        *
        */
       void Matrix (int, int, float, float, float, ShaderProgram &, const char *);
-      evt::WindowDispatch input;
+      sdl::WindowDispatch input;
 
       // Event Handlers
-      evt::VoidDispatch::Handler StartTrackingMouse = [this] () {
+      VoidDispatch::Handler StartTrackingMouse = [this] () {
         hdDebug ("Start Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_TRUE);
         TrackingListenerHandle = input.Mouse.Motion.On(TrackingListener);
       };
-      evt::VoidDispatch::Handler StopTrackingMouse = [this] () {
+      VoidDispatch::Handler StopTrackingMouse = [this] () {
         hdDebug ("Stop Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_FALSE);
         input.Mouse.Motion.Delete (TrackingListenerHandle);
       };
-      evt::SDL_EventDispatch::Handler TrackingListener = [this] (const SDL_Event&e) {
+      sdl::EventDispatch::Handler TrackingListener = [this] (const SDL_Event&e) {
         //hdDebug ("Tracking Listener");
         if (e.motion.state & SDL_BUTTON_LMASK) {
           glm::vec3 newOrientation
@@ -52,36 +76,36 @@ namespace hd {
                              Up);
         }
       };
-      evt::SDL_EventDispatch::Handle TrackingListenerHandle;
-      evt::VoidDispatch::Handler MoveForward = [this] () {
+      sdl::EventDispatch::Handle TrackingListenerHandle;
+      VoidDispatch::Handler MoveForward = [this] () {
         hdDebug ("Move Forward");
         Position += speed * Orientation;
       };
-      evt::VoidDispatch::Handler MoveBackward = [this] () {
+      VoidDispatch::Handler MoveBackward = [this] () {
         hdDebug ("Move Backward");
         Position += speed * -Orientation;
       };
-      evt::VoidDispatch::Handler StrafeLeft = [this] () {
+      VoidDispatch::Handler StrafeLeft = [this] () {
         hdDebug ("Strafe Left");
         Position += speed * -glm::normalize (glm::cross (Orientation, Up));
       };
-      evt::VoidDispatch::Handler StrafeRight = [this] () {
+      VoidDispatch::Handler StrafeRight = [this] () {
         hdDebug ("Strafe Right");
         Position += speed * glm::normalize (glm::cross (Orientation, Up));
       };
-      evt::VoidDispatch::Handler MoveUp = [this] () {
+      VoidDispatch::Handler MoveUp = [this] () {
         hdDebug ("Move Up");
         Position += speed * Up;
       };
-      evt::VoidDispatch::Handler MoveDown = [this] () {
+      VoidDispatch::Handler MoveDown = [this] () {
         hdDebug ("Move Down");
         Position += speed * -Up;
       };
-      evt::VoidDispatch::Handler WalkSpeed = [this] () {
+      VoidDispatch::Handler WalkSpeed = [this] () {
         hdDebug ("Walk Speed");
         speed = 0.1f;
       };
-      evt::VoidDispatch::Handler RunSpeed = [this] () {
+      VoidDispatch::Handler RunSpeed = [this] () {
         hdDebug ("Run Speed");
         speed = 0.4f;
       };

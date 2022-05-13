@@ -36,7 +36,7 @@ namespace hd::sdl {
                                       Uint32 aFlags = Window::NextFlags);
 
   public: // instance methods:
-    evt::WindowDispatch &Event ();
+    sdl::WindowDispatch &Event ();
     /** Return the SDL Surface associated with this window. **/
     Surface GetSurface ();
     bool UpdateSurface ();

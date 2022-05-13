@@ -140,7 +140,7 @@ namespace hd {
       totalFrame += durFrame;
       frameCounter++;
       PcTime totalEpoch = PcDuration (pcEpoch, pcFrameEnd);
-      if ((frameCounter % 1000) == 0)
+      if ((frameCounter % 60) == 0)
       {
         // hdLog ("frame#%lu ABSOLUTE start: %lx handle: %lx step: %lx output:
         // %lx",
@@ -167,7 +167,7 @@ namespace hd {
                "step: %.1f%% "
                "output: %.1f%%",
                frameCounter,
-               ((float)frameCounter / pcFrameEnd.ToSeconds ())*100.0f,
+               ((float)frameCounter / totalEpoch.ToSeconds ()),
                100.0f-(((float)totalFrame.pc/(float)totalEpoch.pc )*100.0f),
                ((float)totalHandle.pc / (float)totalFrame.pc) * 100.0f,
                ((float)totalStep.pc / (float)totalFrame.pc) * 100.0f,
@@ -178,7 +178,7 @@ namespace hd {
     }
   }
   int
-  Engine::Delay (int aMs, evt::IntDispatch::Handler aHandler)
+  Engine::Delay (int aMs, sdl::IntDispatch::Handler aHandler)
   {
     int whenTicks = SDL_GetTicks () + aMs;
     hdDebugCall ("%d @ %d", aMs, whenTicks);
@@ -279,9 +279,9 @@ namespace hd {
       mounted = NULL;
       return NULL;
     }
-    if (SDL_GL_SetSwapInterval (1) < 0) {
+    /**if (SDL_GL_SetSwapInterval (1) < 0) {
       hdError ("Warning: Unable to set VSync because: %s", SDL_GetError ());
-    }
+    }**/
     return mounted;
   }
 

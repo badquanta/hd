@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Common.hpp"
-#include "hd/evt/EngineDispatch.hpp"
-#include "hd/evt/IntDispatch.hpp"
+#include "hd/sdl/EngineDispatch.hpp"
+#include "hd/IntDispatch.hpp"
 #include <memory>
 #include <list>
 #include <filesystem>
@@ -73,13 +73,13 @@ namespace hd {
      * \deprecated someone else should just do this. **/
     static void PrintSdlError (const char *msg = NULL);
     /** `SDL_Event&` Callback list for events. **/
-    evt::EngineDispatch input;
+    sdl::EngineDispatch input;
     /** Callback list for logical processing. **/
-    evt::IntDispatch step;
+    sdl::IntDispatch step;
     /** Callback list for rendering. **/
-    evt::IntDispatch output;
+    sdl::IntDispatch output;
     /** Register something to happen later. **/
-    int Delay (int aMs, evt::IntDispatch::Handler);
+    int Delay (int aMs, sdl::IntDispatch::Handler);
   private:
     /** Keeps a copy of the argc & argv for interegation **/
     static int m_Argc;
@@ -101,7 +101,7 @@ namespace hd {
     /** Perform a step of our work.**/
     void FrameLoop ();
     /** **/
-    std::map<int, std::list<evt::IntDispatch::Handler> > atTicksNext;
+    std::map<int, std::list<sdl::IntDispatch::Handler> > atTicksNext;
 
 
     /** Ensure we are responsive to changes to our environment. */

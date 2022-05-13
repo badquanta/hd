@@ -5,7 +5,7 @@
  */
 
 #include "hd/EngineComponent.hpp"
-#include "hd/evt/JoyDispatch.hpp"
+#include "hd/sdl/JoyDispatch.hpp"
 #include "hd/Wrap.hpp"
 #include <map>
 namespace hd::sdl {
@@ -66,8 +66,8 @@ namespace hd::sdl {
      * SDL_JoystickCurrentPowerLevel **/
     SDL_JoystickPowerLevel CurrentPowerLevel ();
   public: // Input Events
-    evt::JoyDispatch input;
-    evt::SDL_EventDispatch::Handle inputHandle;
+    sdl::JoyDispatch input;
+    sdl::EventDispatch::Handle inputHandle;
   private: // static caches
     static std::map<int, std::weak_ptr<SDL_Joystick> > m_Opened;
     static std::map<SDL_Joystick *, std::weak_ptr<SDL_Joystick> > m_OpenedByPtr;

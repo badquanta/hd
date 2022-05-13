@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <hd/evt/EngineDispatch.hpp>
+#include <hd/sdl/EngineDispatch.hpp>
 // Demonstrate some basic assertions.
 TEST (keycode, getsCalled)
 {
   testing::MockFunction<void (const SDL_Event &e)> test;
-  hd::evt::EngineDispatch list;
+  hd::sdl::EngineDispatch list;
   list.Windows[123].Key.Keycode[SDLK_0].On(test.AsStdFunction());
 
   SDL_Event e;

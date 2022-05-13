@@ -93,6 +93,7 @@ if(DOXYGEN_FOUND)
   set(DOXYGEN_STRIP_CODE_COMMENTS NO)
 
   #t
+  set(DOXYGEN_TEMPLATE_RELATIONS YES)
 
   #u
   set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
@@ -116,7 +117,7 @@ if(DOXYGEN_FOUND)
 
 
 
-  set(DOXYGEN_TEMPLATE_RELATIONS NO)
+
   doxygen_add_docs(
     doxygen ${PROJECT_SOURCE_DIR}/README.md ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/include COMMENT "Generate documentation.")

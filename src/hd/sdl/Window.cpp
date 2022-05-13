@@ -85,7 +85,7 @@ namespace hd::sdl {
     SDL_Rect aRect = { NextRect.x, NextRect.h, w, h };
     return Create (aTitle, &aRect, aFlags);
   }
-  evt::WindowDispatch&Window::Event(){
+  sdl::WindowDispatch&Window::Event(){
     return engine->input.Windows[Id ()];
   }
   Uint32

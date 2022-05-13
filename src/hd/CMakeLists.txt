@@ -3,6 +3,10 @@ list(APPEND LIBHD_COMPONENTS
   Wrap.cpp
   Engine.cpp
   EngineComponent.cpp
+  AbstractDispatch.cpp
+  VoidDispatch.cpp
+  IntDispatch.cpp
+
   sdl/Joystick.cpp
   sdl/GameController.cpp
   sdl/MixerChunk.cpp
@@ -13,23 +17,21 @@ list(APPEND LIBHD_COMPONENTS
   sdl/Font.cpp
   sdl/Texture.cpp
 
-  evt/AbstractDispatch.cpp
-  evt/ControllerDeviceDispatch.cpp
-  evt/ControllerDispatch.cpp
-  evt/DropDispatch.cpp
-  evt/EngineDispatch.cpp
-  evt/IntDispatch.cpp
-  evt/JoyDeviceDispatch.cpp
-  evt/JoyDispatch.cpp
-  evt/KeyboardDispatch.cpp
-  evt/KeyDispatch.cpp
-  evt/MouseButtonDispatch.cpp
-  evt/MouseDispatch.cpp
-  evt/SDL_EventDispatch.cpp
-  evt/TextDispatch.cpp
-  evt/VoidDispatch.cpp
-  evt/WindowDispatch.cpp
-  evt/WindowIdDispatch.cpp
+  sdl/ControllerDeviceDispatch.cpp
+  sdl/ControllerDispatch.cpp
+  sdl/DropDispatch.cpp
+  sdl/EngineDispatch.cpp
+  sdl/JoyDeviceDispatch.cpp
+  sdl/JoyDispatch.cpp
+  sdl/KeyboardDispatch.cpp
+  sdl/KeyDispatch.cpp
+  sdl/MouseButtonDispatch.cpp
+  sdl/MouseDispatch.cpp
+  sdl/EventDispatch.cpp
+  sdl/TextDispatch.cpp
+  sdl/WindowDispatch.cpp
+  sdl/WindowIdDispatch.cpp
+  sdl/events.cpp
 
   gl/Camera.cpp
   gl/Texture.cpp

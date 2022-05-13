@@ -1,4 +1,4 @@
-#pragma once
+#include "hd/sdl/MouseButtonDispatch.hpp"
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
@@ -16,23 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtx/rotate_vector.hpp"
-#include "glm/gtx/vector_angle.hpp"
-#include "hd/Config.hpp"
-#include "hd/Log.hpp"
-#include <GL/glew.h>
-#include <GL/glu.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL2_framerate.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_syswm.h>
-#include <SDL2/SDL_ttf.h>
-#include <filesystem>
-#include <functional>
-#include <list>
-#include <map>
-#include <memory>
+/** **/
+namespace hd::sdl {
+    void
+  MouseButtonDispatch::Trigger (const SDL_Event &e)
+  {
+    EventDispatch::Trigger (e);
+    switch (e.type) {
+    case SDL_MOUSEBUTTONDOWN: // mouse button pressed
+      //hdDebug ("Mouse Button Down");
+      Down.Trigger (e);
+      break;
+    case SDL_MOUSEBUTTONUP: // mouse button released
+      //hdDebug ("Mouse Button Up");
+      Up.Trigger (e);
+      break;
+    default:
+      fprintf (stderr, "Unknown MouseButtonDispatch %d\n", e.type);
+    }
+  }
+
+}

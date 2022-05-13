@@ -28,21 +28,21 @@ using hd::sdl::Window;
 
 hd::sdl::Window window;
 GLContext glContext;
-hd::Engine::s_ptr engine;
 
 void
 doWindowOutput ()
 {
-  assert (window); // should only be called while the window isn't null.
+  //assert (window); // should only be called while the window isn't null.
+  if(window){
   window.MakeCurrent (glContext);
   glClear (GL_COLOR_BUFFER_BIT);
-  window.Swap ();
+  window.Swap ();}
 }
 void
 doWindowClosed ()
 {
   if (window) {
-    engine->step.Void.Once ([] () { window.m_IDENTITY = NULL; });
+    window.engine->step.Void.Once ([] () { window.m_IDENTITY = NULL; });
   }
 }
 
@@ -54,9 +54,8 @@ main (int argc, char **argv)
 
   // Engine::s_ptr engine = Engine::Get ();
   window = Window::Create (800, 600, "play some audio");
-
-  glContext = GLContext::Create (window.ptr.get ());
-  engine->output.Void.On (&doWindowOutput);
+  glContext = GLContext::Create (window);
+  window.engine->output.Void.On (&doWindowOutput);
   window.Event().Close.Void.On (&doWindowClosed);
 
   MixerChunk horrorAmbient

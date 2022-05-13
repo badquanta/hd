@@ -1,16 +1,29 @@
 /**
  * @file Wrap.hpp
  * @author Jón Davíð Sawyer (badquanta@gmail.com)
- * @brief Template that wraps a simple class around a identity signature.
+ * @brief Wrap the identity around a type, also provide a smart_ptr variant.
  * @version 0.1
- * @date 2022-05-10
+ * @date 2022-05-13
  *
- * @copyright GNU-GPL 3.0
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  */
 #pragma once
-#include <functional>
-#include <memory>
+#include "hd/Common.hpp"
 namespace hd {
   /** Wrap up the identity of an object around the value of a type. **/
   template <typename WRAP_TYPE> class WRAP_IDENTITY {
