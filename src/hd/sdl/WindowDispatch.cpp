@@ -1,4 +1,7 @@
 #include "hd/sdl/WindowDispatch.hpp"
+#include "hd/Log.hpp"
+#include "hd/Error.hpp"
+#include <SDL2/SDL_version.h>
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
@@ -98,7 +101,7 @@ namespace hd::sdl {
         break;
 #endif
       default:
-        SDL_Log ("Window %d got unknown event %x",
+        hdLog ("Window %d got unknown event %x",
                  e.window.windowID,
                  e.window.event);
         break;

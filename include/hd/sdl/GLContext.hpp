@@ -9,8 +9,9 @@
  *
  */
 #pragma once
-#include "hd/Common.hpp"
+
 #include "hd/Wrap.hpp"
+#include "SDL2/SDL_video.h"
 namespace hd::sdl {
     class GLContext: public WRAP_PTR<void> {
         public:

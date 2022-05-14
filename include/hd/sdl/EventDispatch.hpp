@@ -16,7 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "hd/VoidDispatch.hpp"
+#include "hd/Dispatch.hpp"
+#include <SDL2/SDL_events.h>
 namespace hd::sdl {
   class EventDispatch : public AbstractDispatch<const SDL_Event &> {
   public:

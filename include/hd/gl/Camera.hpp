@@ -5,7 +5,8 @@
  * @version 0.1
  * @date 2022-05-13
  *
- * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer
+ * (badquanta@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +24,14 @@
  *
  */
 #pragma once
-#include "hd/sdl/WindowDispatch.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/rotate_vector.hpp"
+#include "glm/gtx/vector_angle.hpp"
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 #include "hd/gl/ShaderProgram.hpp"
-
+#include "hd/sdl/WindowDispatch.hpp"
+#include <glm/vec3.hpp>
 namespace hd {
   namespace gl {
     class Camera {
@@ -40,27 +46,29 @@ namespace hd {
       float sensitivity = 0.10f;
 
     public:
-      Camera (glm::vec3 p = {0.0f,0.0f,1.0f});
+      Camera (glm::vec3 p = { 0.0f, 0.0f, 1.0f });
       /**
        * @brief Redefine the camera.
        *
        */
-      void Matrix (int, int, float, float, float, ShaderProgram &, const char *);
+      void
+      Matrix (int, int, float, float, float, ShaderProgram &, const char *);
       sdl::WindowDispatch input;
 
       // Event Handlers
       VoidDispatch::Handler StartTrackingMouse = [this] () {
         hdDebug ("Start Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_TRUE);
-        TrackingListenerHandle = input.Mouse.Motion.On(TrackingListener);
+        TrackingListenerHandle = input.Mouse.Motion.On (TrackingListener);
       };
       VoidDispatch::Handler StopTrackingMouse = [this] () {
         hdDebug ("Stop Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_FALSE);
         input.Mouse.Motion.Delete (TrackingListenerHandle);
       };
-      sdl::EventDispatch::Handler TrackingListener = [this] (const SDL_Event&e) {
-        //hdDebug ("Tracking Listener");
+      sdl::EventDispatch::Handler TrackingListener = [this] (
+                                                         const SDL_Event &e) {
+        // hdDebug ("Tracking Listener");
         if (e.motion.state & SDL_BUTTON_LMASK) {
           glm::vec3 newOrientation
               = glm::rotate (Orientation,

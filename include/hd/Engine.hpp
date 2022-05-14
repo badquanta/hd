@@ -1,7 +1,12 @@
-#pragma once
-/*
- * holodeck - maybe it will be a game or a game engine
- * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
+/**
+ * @file Engine.hpp
+ * @author Jón Davíð Sawyer (badquanta@gmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2022-05-14
+ *
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer
+ * (badquanta@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +20,21 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
  */
-#include "hd/Common.hpp"
+#pragma once
+#include "hd/Log.hpp"
 #include "hd/sdl/EngineDispatch.hpp"
-#include "hd/IntDispatch.hpp"
-#include <memory>
-#include <list>
+#include <GL/glew.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_version.h>
 #include <filesystem>
+#include <list>
+#include <memory>
 /**
  * @brief holodeck?
  */
@@ -59,25 +72,29 @@ namespace hd {
      * specified when `FindPath` is called.**/
     static std::list<std::filesystem::path> searchPaths;
     /** Test if `aPath` exists. If it does it simply returns the path given;
-     * however if it does not this function attempts to append the file to `aSearchPaths`.
+     * however if it does not this function attempts to append the file to
+     *`aSearchPaths`.
      **/
-    static std::filesystem::path FindPath (std::filesystem::path,std::list<std::filesystem::path>&aSearchPaths=searchPaths);
+    static std::filesystem::path
+    FindPath (std::filesystem::path,
+              std::list<std::filesystem::path> &aSearchPaths = searchPaths);
 
     /** Finish applying **/
     ~Engine ();
     /** Signal to the engine we wish to exit the main loop **/
-    //void Quit ();
-    const std::function<void()> Quit = [this](){m_Quit = true;};
+    // void Quit ();
+    const std::function<void ()> Quit = [this] () { m_Quit = true; };
     void Start ();
     /** Print out what went wrong with SDL2.
      * \deprecated someone else should just do this. **/
     static void PrintSdlError (const char *msg = NULL);
     /** Callback list for logical processing. **/
-    sdl::IntDispatch step;
+    IntDispatch step;
     /** Callback list for rendering. **/
-    sdl::IntDispatch output;
+    IntDispatch output;
     /** Register something to happen later. **/
-    int Delay (int aMs, sdl::IntDispatch::Handler);
+    int Delay (int aMs, IntDispatch::Handler);
+
   private:
     /** Keeps a copy of the argc & argv for interegation **/
     static int m_Argc;
@@ -99,8 +116,7 @@ namespace hd {
     /** Perform a step of our work.**/
     void FrameLoop ();
     /** **/
-    std::map<int, std::list<sdl::IntDispatch::Handler> > atTicksNext;
-
+    std::map<int, std::list<IntDispatch::Handler> > atTicksNext;
 
     /** Ensure we are responsive to changes to our environment. */
     int HandleEvents ();

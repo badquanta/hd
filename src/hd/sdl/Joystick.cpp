@@ -1,5 +1,6 @@
 #include "hd/sdl/Joystick.hpp"
-
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 namespace hd::sdl {
   bool
   Joystick::EventState (int aState)
@@ -243,7 +244,8 @@ namespace hd::sdl {
   }
   /** **/
   Joystick::Joystick (int aIndex, SDL_Joystick *aDevice)
-      : m_Index (aIndex), WRAP_PTR<SDL_Joystick>(s_ptr(aDevice,SDL_JoystickClose))
+      : m_Index (aIndex), WRAP_PTR<SDL_Joystick> (
+                              s_ptr (aDevice, SDL_JoystickClose))
   {
   }
   /**
@@ -282,5 +284,6 @@ namespace hd::sdl {
   }
 
   std::map<int, std::weak_ptr<SDL_Joystick> > Joystick::m_Opened;
-  std::map<SDL_Joystick *, std::weak_ptr<SDL_Joystick> > Joystick::m_OpenedByPtr;
+  std::map<SDL_Joystick *, std::weak_ptr<SDL_Joystick> >
+      Joystick::m_OpenedByPtr;
 }

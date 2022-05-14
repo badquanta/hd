@@ -1,12 +1,11 @@
 /**
- * @file Shader.hpp
+ * @file Error.hpp
  * @author Jón Davíð Sawyer (badquanta@gmail.com)
  * @brief
  * @version 0.1
  * @date 2022-05-14
  *
- * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer
- * (badquanta@gmail.com)
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,25 +23,14 @@
  *
  */
 #pragma once
-#include <GL/glew.h>
-#include <filesystem>
-namespace hd {
-  namespace gl {
-    class Shader {
-    private:
-      GLuint ID = 0;
+#include <cassert>
+#define hdError(MESSAGE, ...)                                                 \
+  fprintf (stderr, "%s:%d\t+++\tERROR\t+++\n\t", __FILE__, __LINE__);         \
+  fprintf (stderr, MESSAGE, ##__VA_ARGS__);                                   \
+  fprintf (stderr, "\n---\tERROR\r---\n")
 
-    public:
-      Shader ();
-      Shader (GLenum);
-      ~Shader ();
-      void setSource (const GLchar *);
-      bool loadSource (std::filesystem::path);
-      bool compile ();
-      void printLog (FILE *);
-      GLuint GetId ();
-      void create (GLenum type);
-      void Free ();
-    };
+#define hdErrorIf(CONDITION, ERROR_MESSAGE, ...)                              \
+  if (CONDITION) {                                                            \
+    hdError (ERROR_MESSAGE, ##__VA_ARGS__);                                   \
+    assert (!CONDITION);                                                      \
   }
-}

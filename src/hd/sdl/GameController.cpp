@@ -9,6 +9,7 @@
  *
  */
 #include "hd/sdl/GameController.hpp"
+#include "hd/Error.hpp"
 
 namespace hd::sdl {
   bool GameController::IsGameController(int aIndex){

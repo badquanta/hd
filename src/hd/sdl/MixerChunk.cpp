@@ -1,5 +1,6 @@
 #include "hd/sdl/MixerChunk.hpp"
-
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 namespace hd::sdl {
   MixerChannel MixerChunk::FadeIn(int aTicks, int aLoops, int aChannel){
     hdDebugCall ("%d, %d, %d", aChannel, aLoops, aTicks);

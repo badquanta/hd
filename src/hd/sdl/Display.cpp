@@ -24,23 +24,27 @@
  *
  */
 #include "hd/sdl/Display.hpp"
+#include "hd/Error.hpp"
+
 namespace hd::sdl {
   int
   Display::Count ()
   {
     return SDL_GetNumVideoDisplays ();
   }
+  /**
+   * @brief
+   * @exception aId if aId is not between 0 & Count()-1
+   * @param aId
+   * @return Display
+   */
   Display
   Display::Get (int aId)
   {
-    if ((0 <= aId) && (aId < Display::Count ())) { // All Good
-
-    } else { // Oh shit
-      hdError ("Can't get a display %d that doesn't exist. Num displays = %d ",
+    hdErrorIf (!(0 >= aId) || (aId >= Count ()),
+               "Invalid display id %d out of %d possible:",
                aId,
                Count ());
-      assert (!(aId < Display::Count ()));
-    }
     return aId;
   }
   /**

@@ -14,6 +14,10 @@
 #include "hd/sdl/MixerChannel.hpp"
 
 namespace hd::sdl {
+  /**
+   * @brief Represents a chunk of audio to play.
+   * @example playAudio.cpp
+   */
   class MixerChunk : public EngineComponent,
   public WRAP_PTR<Mix_Chunk> {
   public: // class static methods

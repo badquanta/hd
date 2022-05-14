@@ -1,5 +1,6 @@
 #include "hd/gl/ShaderProgram.hpp"
-
+#include "hd/Error.hpp"
+#include "hd/Debug.hpp"
 namespace hd::gl {
   ShaderProgram::ShaderProgram ()
   {

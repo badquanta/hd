@@ -1,4 +1,5 @@
 #include "hd/gl/Camera.hpp"
+#include "glm/gtc/type_ptr.hpp"
 namespace hd::gl {
 
   Camera::Camera (glm::vec3 p) : Position (p)

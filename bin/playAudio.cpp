@@ -20,6 +20,7 @@
 #include "hd/sdl/MixerChunk.hpp"
 #include "hd/sdl/Window.hpp"
 #include <cassert>
+#include <hd/Error.hpp>
 using hd::Engine;
 using hd::sdl::GLContext;
 using hd::sdl::MixerChannel;
@@ -32,11 +33,12 @@ GLContext glContext;
 void
 doWindowOutput ()
 {
-  //assert (window); // should only be called while the window isn't null.
-  if(window){
-  window.MakeCurrent (glContext);
-  glClear (GL_COLOR_BUFFER_BIT);
-  window.Swap ();}
+  // assert (window); // should only be called while the window isn't null.
+  if (window) {
+    window.MakeCurrent (glContext);
+    glClear (GL_COLOR_BUFFER_BIT);
+    window.Swap ();
+  }
 }
 void
 doWindowClosed ()
@@ -56,19 +58,18 @@ main (int argc, char **argv)
   window = Window::Create (800, 600, "play some audio");
   glContext = GLContext::Create (window);
   window.engine->output.Void.On (&doWindowOutput);
-  window.Event().Close.Void.On (&doWindowClosed);
+  window.Event ().Close.Void.On (&doWindowClosed);
 
-  MixerChunk horrorAmbient
-      = MixerChunk::Load ("audio/horror ambient.ogg");
+  MixerChunk horrorAmbient = MixerChunk::Load ("audio/horror ambient.ogg");
   if (!horrorAmbient) {
     hdError ("Unable to load audio chunk.");
     return 1;
   }
   MixerChannel defaultChannel = -1, s_Channel;
 
-  window.Event().Key.Keycode[SDLK_s].Up.Void.On (
+  window.Event ().Key.Keycode[SDLK_s].Up.Void.On (
       [&] () { s_Channel = horrorAmbient.Play (-1); });
-  window.Event().Key.Keycode[SDLK_m].Up.Void.On (
+  window.Event ().Key.Keycode[SDLK_m].Up.Void.On (
       [&] () { defaultChannel.FadeOut (100); });
 
   window.engine->Delay (5000, [&horrorAmbient] (int) {

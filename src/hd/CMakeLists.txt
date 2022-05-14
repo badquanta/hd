@@ -1,11 +1,9 @@
 list(APPEND LIBHD_COMPONENTS
-  Common.cpp
+#  Common.cpp
   Wrap.cpp
   Engine.cpp
   EngineComponent.cpp
-  AbstractDispatch.cpp
-  VoidDispatch.cpp
-  IntDispatch.cpp
+  Dispatch.cpp
 
   sdl/Joystick.cpp
   sdl/GameController.cpp
@@ -55,5 +53,5 @@ target_include_directories(hd
   "${PROJECT_SOURCE_DIR}/ext/glm")
 
 if(HD_COMPILE_COMMON_HPP)
-target_precompile_headers(hd PRIVATE ../../include/hd/Common.hpp)
+#target_precompile_headers(hd PRIVATE ../../include/hd/Common.hpp)
 endif()

@@ -1,4 +1,6 @@
 #include "hd/sdl/MixerChannel.hpp"
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 namespace hd::sdl {
 
   /** **/

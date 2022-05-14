@@ -1,4 +1,6 @@
 #include "hd/sdl/DropDispatch.hpp"
+
+#include "hd/Error.hpp"
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)

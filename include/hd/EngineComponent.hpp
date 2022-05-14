@@ -9,7 +9,6 @@
  */
 #pragma once
 #include "hd/Engine.hpp"
-#include "hd/IntDispatch.hpp"
 namespace hd {
   class EngineComponent {
       public:

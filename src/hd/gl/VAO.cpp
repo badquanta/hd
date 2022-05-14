@@ -1,4 +1,6 @@
 #include "hd/gl/VAO.hpp"
+#include "hd/Error.hpp"
+#include "hd/Debug.hpp"
 namespace hd::gl {
   VAO::VAO () {hdDebugCall (NULL);}
   void

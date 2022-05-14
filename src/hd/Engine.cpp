@@ -19,7 +19,8 @@
 #include "hd/sdl/GLContext.hpp"
 #include "hd/sdl/Window.hpp"
 #include "hd/sdl/events.hpp"
-
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 namespace hd {
   struct PcTime {
@@ -180,7 +181,7 @@ namespace hd {
     }
   }
   int
-  Engine::Delay (int aMs, sdl::IntDispatch::Handler aHandler)
+  Engine::Delay (int aMs, IntDispatch::Handler aHandler)
   {
     int whenTicks = SDL_GetTicks () + aMs;
     hdDebugCall ("%d @ %d", aMs, whenTicks);
@@ -328,14 +329,21 @@ namespace hd {
     PrintVersion (TTF_Linked_Version (), "SDL_TTF", aFile);
     PrintVersion (Mix_Linked_Version (), "SDL_mixer", aFile);
   }
-  /** Some boring details about how to construct an application. **/
-  Engine::Engine () /* @todo :  remove camera (glm::vec3 (0.0f, 0.0f, 1.0f)) */
+  /** Engine construction connects Quit function to SDL Quit Event **/
+  Engine::Engine ()
   {
     hdDebugCall (NULL);
     sdl::events.Quit.Void.On (Quit);
   }
+  /**
+   * @brief perminate store of the last int value passed to `Configure`
+   *
+   */
   int Engine::m_Argc = 0;
-
+  /**
+   * @brief perminate store of teh last char** value passed to `Configure`
+   *
+   */
   char **Engine::m_Argv = NULL;
   // Engine::Engine (int argc, char **argv) { configure (argc, argv); }
   /** Setup some basic options based on the command line **/

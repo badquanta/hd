@@ -1,4 +1,31 @@
+/**
+ * @file Window.cpp
+ * @author Jón Davíð Sawyer (badquanta@gmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2022-05-14
+ *
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer
+ * (badquanta@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
 #include "hd/sdl/Window.hpp"
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 #include "hd/sdl/events.hpp"
 namespace hd::sdl {
 
@@ -236,7 +263,7 @@ namespace hd::sdl {
   }
 
   bool
-  Window::GetWmInfo (SDL_SysWMinfo *aInfo)const
+  Window::GetWmInfo (SDL_SysWMinfo *aInfo) const
   {
     if (SDL_GetWindowWMInfo (*this, aInfo) != SDL_TRUE) {
       hdError ("Unable to get System Window Manager Info: %s",
@@ -343,107 +370,107 @@ namespace hd::sdl {
 #define CheckFor(aFlag) (GetFlags () & aFlag) != 0
 
   bool
-  Window::IsFullscreen ()const
+  Window::IsFullscreen () const
   {
     return CheckFor (SDL_WINDOW_FULLSCREEN);
   }
   bool
-  Window::IsFullscreenDesktop ()const
+  Window::IsFullscreenDesktop () const
   {
     return CheckFor (SDL_WINDOW_FULLSCREEN_DESKTOP);
   }
   bool
-  Window::IsOpenGl ()const
+  Window::IsOpenGl () const
   {
     return CheckFor (SDL_WINDOW_OPENGL);
   }
   bool
-  Window::IsShown ()const
+  Window::IsShown () const
   {
     return CheckFor (SDL_WINDOW_SHOWN);
   }
   bool
-  Window::IsHidden ()const
+  Window::IsHidden () const
   {
     return CheckFor (SDL_WINDOW_HIDDEN);
   }
   bool
-  Window::IsBorderless ()const
+  Window::IsBorderless () const
   {
     return CheckFor (SDL_WINDOW_BORDERLESS);
   }
   bool
-  Window::HasBorder ()const
+  Window::HasBorder () const
   {
     return !IsBorderless ();
   }
   bool
-  Window::IsResizable ()const
+  Window::IsResizable () const
   {
     return CheckFor (SDL_WINDOW_RESIZABLE);
   }
   bool
-  Window::IsMinimized ()const
+  Window::IsMinimized () const
   {
     return CheckFor (SDL_WINDOW_MINIMIZED);
   }
   bool
-  Window::IsMaximized ()const
+  Window::IsMaximized () const
   {
     return CheckFor (SDL_WINDOW_MAXIMIZED);
   }
   bool
-  Window::HasInputGrab ()const
+  Window::HasInputGrab () const
   {
     return CheckFor (SDL_WINDOW_INPUT_GRABBED);
   }
   bool
-  Window::HasInputFocus ()const
+  Window::HasInputFocus () const
   {
     return CheckFor (SDL_WINDOW_INPUT_FOCUS);
   }
   bool
-  Window::HasMouseFocus ()const
+  Window::HasMouseFocus () const
   {
     return CheckFor (SDL_WINDOW_MOUSE_FOCUS);
   }
   bool
-  Window::IsForeign ()const
+  Window::IsForeign () const
   {
     return CheckFor (SDL_WINDOW_FOREIGN);
   }
   bool
-  Window::IsHighDPI ()const
+  Window::IsHighDPI () const
   {
     return CheckFor (SDL_WINDOW_ALLOW_HIGHDPI);
   }
   bool
-  Window::IsMouseCaptured ()const
+  Window::IsMouseCaptured () const
   {
     return CheckFor (SDL_WINDOW_MOUSE_CAPTURE);
   }
   bool
-  Window::IsAlwaysOnTop ()const
+  Window::IsAlwaysOnTop () const
   {
     return CheckFor (SDL_WINDOW_ALWAYS_ON_TOP);
   }
   bool
-  Window::IsSkipTaskbar ()const
+  Window::IsSkipTaskbar () const
   {
     return CheckFor (SDL_WINDOW_SKIP_TASKBAR);
   }
   bool
-  Window::IsUtility ()const
+  Window::IsUtility () const
   {
     return CheckFor (SDL_WINDOW_UTILITY);
   }
   bool
-  Window::IsTooltip ()const
+  Window::IsTooltip () const
   {
     return CheckFor (SDL_WINDOW_TOOLTIP);
   }
   bool
-  Window::IsPopupMenu ()const
+  Window::IsPopupMenu () const
   {
     return CheckFor (SDL_WINDOW_POPUP_MENU);
   }

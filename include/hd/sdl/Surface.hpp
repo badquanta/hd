@@ -16,15 +16,17 @@ namespace hd::sdl {
   class Surface : public EngineComponent, public WRAP_PTR<SDL_Surface> {
   public:
     using WRAP_PTR::WRAP_PTR;
-    static Surface::s_ptr Create(SDL_Surface*, bool);
-    static Surface CreateRGBA (Uint32 flags,
-                               int width,
+
+    static Surface::s_ptr Create (SDL_Surface *, bool);
+    static Surface CreateRGBA (int width,
                                int height,
-                               int depth,
-                               Uint32 Rmask,
-                               Uint32 Gmask,
-                               Uint32 Bmask,
-                               Uint32 Amask);
+                               int depth = 32,
+                               Uint32 Rmask = 0,
+                               Uint32 Gmask = 0,
+                               Uint32 Bmask = 0,
+                               Uint32 Amask = 0);
+    static Surface CreateFormat (int aWidth, int aHeight, int aDepth, Uint32 aFormat);
+    static Surface Create (int aWidth, int aHeight);
     static Surface Load (std::filesystem::path);
     static Surface Convert (SDL_Surface *aSurface,
                                      SDL_PixelFormatEnum aFormat=SDL_PIXELFORMAT_RGBA32);

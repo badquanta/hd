@@ -1,4 +1,6 @@
 #include "hd/sdl/JoyDeviceDispatch.hpp"
+#include "hd/Error.hpp"
+#include "hd/Debug.hpp"
 /*
  * holodeck - maybe it will be a game or a game engine
  * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)

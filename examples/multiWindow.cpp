@@ -26,6 +26,7 @@
 #include "hd/sdl/Font.hpp"
 #include "hd/sdl/GLContext.hpp"
 #include "hd/sdl/Window.hpp"
+#include "hd/Error.hpp"
 using namespace hd;
 /** Keep track of the windows this opens. **/
 std::map<int, sdl::Window> openWindows;

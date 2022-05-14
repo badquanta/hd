@@ -1,4 +1,6 @@
 #include "hd/gl/EBO.hpp"
+#include "hd/Error.hpp"
+#include "hd/Debug.hpp"
 namespace hd::gl {
   EBO::EBO () {}
   EBO::EBO (GLuint *data, GLsizeiptr size) { Create (data, size); }

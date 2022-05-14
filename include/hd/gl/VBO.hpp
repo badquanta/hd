@@ -1,5 +1,5 @@
 #pragma once
-#include "hd/Common.hpp"
+#include <GL/glew.h>
 namespace hd {
   namespace gl {
     class VBO {
@@ -8,7 +8,7 @@ namespace hd {
 
     public:
       VBO ();
-      VBO (GLfloat*,GLsizeiptr);
+      VBO (GLfloat *, GLsizeiptr);
       void Create (GLfloat *, GLsizeiptr);
       void Bind ();
       void Unbind ();

@@ -1,4 +1,6 @@
 #include "hd/gl/VBO.hpp"
+#include "hd/Error.hpp"
+#include "hd/Debug.hpp"
 namespace hd::gl {
   VBO::VBO () {}
   VBO::VBO (GLfloat *aVertices, GLsizeiptr aSize)

@@ -23,7 +23,7 @@
  *
  */
 #pragma once
-#include "hd/Common.hpp"
+#include <memory>
 namespace hd {
   /** Wrap up the identity of an object around the value of a type. **/
   template <typename WRAP_TYPE> class WRAP_IDENTITY {

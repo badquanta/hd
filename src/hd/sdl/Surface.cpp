@@ -9,7 +9,8 @@
  *
  */
 #include "hd/sdl/Surface.hpp"
-
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 namespace hd::sdl {
 
   Surface::s_ptr
@@ -27,8 +28,7 @@ namespace hd::sdl {
   }
 
   Surface
-  Surface::CreateRGBA (Uint32 aFlags,
-                       int aWidth,
+  Surface::CreateRGBA (int aWidth,
                        int aHeight,
                        int aDepth,
                        Uint32 aRedMask,
@@ -36,7 +36,10 @@ namespace hd::sdl {
                        Uint32 aBlueMask,
                        Uint32 aAlphaMask)
   {
-    SDL_Surface *created = SDL_CreateRGBSurface (aFlags,
+    /** flags is 0 because it is unused. @see
+     *https://wiki.libsdl.org/SDL_CreateRGBSurface#function_parameters
+     **/
+    SDL_Surface *created = SDL_CreateRGBSurface (0,
                                                  aWidth,
                                                  aHeight,
                                                  aDepth,
@@ -44,10 +47,24 @@ namespace hd::sdl {
                                                  aGreenMask,
                                                  aBlueMask,
                                                  aAlphaMask);
-    if (!created) {
-      hdError ("Unable to create surface because: %s", SDL_GetError ());
-    }
+    hdErrorIf (
+        !created, "Unable to create surface because: %s", SDL_GetError ());
     return s_ptr (created, SDL_FreeSurface);
+  }
+
+  Surface
+  Surface::CreateFormat (int aWidth, int aHeight, int aDepth, Uint32 aFormat)
+  {
+    SDL_Surface *created
+        = SDL_CreateRGBSurfaceWithFormat (0, aWidth, aHeight, aDepth, aFormat);
+    hdErrorIf (
+        !created, "unable to create surface because %s", SDL_GetError ());
+    return s_ptr (created, SDL_FreeSurface);
+  }
+  Surface
+  Surface::Create (int aWidth, int aHeight)
+  {
+    return CreateFormat (aWidth, aHeight, 32, SDL_PIXELFORMAT_RGBA32);
   }
 
   Surface
@@ -78,7 +95,7 @@ namespace hd::sdl {
   }
 
   Surface
-  Surface::Convert (SDL_PixelFormatEnum aFormat)const
+  Surface::Convert (SDL_PixelFormatEnum aFormat) const
   {
     return Convert (*this, aFormat);
   }
@@ -86,7 +103,7 @@ namespace hd::sdl {
   bool
   Surface::Blit (SDL_Surface *aOther,
                  SDL_Rect *aDstRect,
-                 const SDL_Rect *aSrcRect)const
+                 const SDL_Rect *aSrcRect) const
   {
     if (SDL_BlitSurface (*this, aSrcRect, aOther, aDstRect) == 0) {
       return true;
@@ -98,23 +115,23 @@ namespace hd::sdl {
   bool
   Surface::BlitScaled (SDL_Surface *aOther,
                        SDL_Rect *aDstRect,
-                       const SDL_Rect *aSrcRect)const
+                       const SDL_Rect *aSrcRect) const
   {
     return SDL_BlitSurface (*this, aSrcRect, aOther, aDstRect) == 0;
   }
   bool
-  Surface::FillRect (const SDL_Rect *aRect, Uint32 aColor)const
+  Surface::FillRect (const SDL_Rect *aRect, Uint32 aColor) const
   {
     return SDL_FillRect (*this, aRect, aColor) == 0;
   }
   bool
-  Surface::FillRect (SDL_Rect aRect, Uint32 aColor)const
+  Surface::FillRect (SDL_Rect aRect, Uint32 aColor) const
   {
     return FillRect (&aRect, aColor);
   }
 
   Uint32
-  Surface::MapRGBA (Uint8 r, Uint8 g, Uint8 b, Uint8 a)const
+  Surface::MapRGBA (Uint8 r, Uint8 g, Uint8 b, Uint8 a) const
   {
     SDL_PixelFormat *format = ptr->format;
     return SDL_MapRGBA (format, r, g, b, a);

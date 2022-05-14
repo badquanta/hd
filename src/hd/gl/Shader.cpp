@@ -2,6 +2,8 @@
 #include "hd/Engine.hpp"
 #include <fstream>
 #include <iostream>
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 namespace hd::gl {
   Shader::Shader () { hdDebugCall(NULL); ID = 0; }
   Shader::Shader (GLenum type) { hdDebugCall(NULL); create (type); }

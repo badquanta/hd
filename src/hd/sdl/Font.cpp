@@ -10,6 +10,7 @@
  */
 #include "hd/sdl/Font.hpp"
 
+#include "hd/Error.hpp"
 namespace hd::sdl {
   /**
    * @brief
