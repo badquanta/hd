@@ -30,11 +30,11 @@ namespace hd::sdl {
                                      SDL_PixelFormatEnum aFormat=SDL_PIXELFORMAT_RGBA32);
 
   public: // Instance Methods
-    bool Blit (SDL_Surface*, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
-    bool BlitScaled (SDL_Surface*, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL);
-    bool FillRect (const SDL_Rect *, Uint32);
-    bool FillRect (SDL_Rect, Uint32);
-    Uint32 MapRGBA (Uint8, Uint8, Uint8, Uint8 = 255);
-    Surface Convert (SDL_PixelFormatEnum aFormat=SDL_PIXELFORMAT_RGBA32);
+    bool Blit (SDL_Surface*, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL)const;
+    bool BlitScaled (SDL_Surface*, SDL_Rect *aDstRect= NULL, const SDL_Rect *aSrcRect= NULL)const;
+    bool FillRect (const SDL_Rect *, Uint32)const;
+    bool FillRect (SDL_Rect, Uint32)const;
+    Uint32 MapRGBA (Uint8, Uint8, Uint8, Uint8 = 255)const;
+    Surface Convert (SDL_PixelFormatEnum aFormat=SDL_PIXELFORMAT_RGBA32)const;
   };
 }

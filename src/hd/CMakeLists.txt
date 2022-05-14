@@ -16,6 +16,7 @@ list(APPEND LIBHD_COMPONENTS
   sdl/Window.cpp
   sdl/Font.cpp
   sdl/Texture.cpp
+  sdl/Display.cpp
 
   sdl/ControllerDeviceDispatch.cpp
   sdl/ControllerDispatch.cpp

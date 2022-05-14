@@ -20,7 +20,7 @@ namespace hd::sdl {
         hdDebug ("FREEING %p", p);
         SDL_FreeSurface (p);
       } else {
-        //hdDebugCall ("Not freeing %p", p);
+        // hdDebugCall ("Not freeing %p", p);
       }
     });
     return pointer;
@@ -36,12 +36,18 @@ namespace hd::sdl {
                        Uint32 aBlueMask,
                        Uint32 aAlphaMask)
   {
-    SDL_Surface *created = SDL_CreateRGBSurface (
-        aFlags, aWidth, aHeight, aDepth, aRedMask, aGreenMask, aBlueMask, aAlphaMask);
+    SDL_Surface *created = SDL_CreateRGBSurface (aFlags,
+                                                 aWidth,
+                                                 aHeight,
+                                                 aDepth,
+                                                 aRedMask,
+                                                 aGreenMask,
+                                                 aBlueMask,
+                                                 aAlphaMask);
     if (!created) {
       hdError ("Unable to create surface because: %s", SDL_GetError ());
     }
-    return s_ptr(created, SDL_FreeSurface);
+    return s_ptr (created, SDL_FreeSurface);
   }
 
   Surface
@@ -57,28 +63,32 @@ namespace hd::sdl {
     return Create (loaded, true);
   }
 
-  Surface Surface::Convert(SDL_Surface* aSurface, SDL_PixelFormatEnum aFormat){
-    if (aSurface== NULL) {
-      return Surface(NULL);
+  Surface
+  Surface::Convert (SDL_Surface *aSurface, SDL_PixelFormatEnum aFormat)
+  {
+    if (aSurface == NULL) {
+      return Surface (NULL);
     }
-    SDL_Surface *converted
-        = SDL_ConvertSurfaceFormat (aSurface, aFormat, 0);
+    SDL_Surface *converted = SDL_ConvertSurfaceFormat (aSurface, aFormat, 0);
     if (converted == NULL) {
-      hdError("Failed to convert pixel format of surface because: %s",SDL_GetError ());
+      hdError ("Failed to convert pixel format of surface because: %s",
+               SDL_GetError ());
     }
     return Create (converted, true);
   }
 
-  Surface Surface::Convert(SDL_PixelFormatEnum aFormat){
+  Surface
+  Surface::Convert (SDL_PixelFormatEnum aFormat)const
+  {
     return Convert (*this, aFormat);
   }
 
   bool
-  Surface::Blit (SDL_Surface* aOther, SDL_Rect *aDstRect, const SDL_Rect *aSrcRect)
+  Surface::Blit (SDL_Surface *aOther,
+                 SDL_Rect *aDstRect,
+                 const SDL_Rect *aSrcRect)const
   {
-    if (SDL_BlitSurface (
-            *this, aSrcRect, aOther, aDstRect)
-        == 0) {
+    if (SDL_BlitSurface (*this, aSrcRect, aOther, aDstRect) == 0) {
       return true;
     } else {
       hdError ("Unable to BlitSurface because: %s", SDL_GetError ());
@@ -86,26 +96,25 @@ namespace hd::sdl {
     }
   }
   bool
-  Surface::BlitScaled (SDL_Surface* aOther,
+  Surface::BlitScaled (SDL_Surface *aOther,
                        SDL_Rect *aDstRect,
-                       const SDL_Rect *aSrcRect)
+                       const SDL_Rect *aSrcRect)const
   {
-    return SDL_BlitSurface (
-               *this, aSrcRect, aOther, aDstRect)
-           == 0;
+    return SDL_BlitSurface (*this, aSrcRect, aOther, aDstRect) == 0;
   }
   bool
-  Surface::FillRect (const SDL_Rect *aRect, Uint32 aColor)
+  Surface::FillRect (const SDL_Rect *aRect, Uint32 aColor)const
   {
     return SDL_FillRect (*this, aRect, aColor) == 0;
   }
   bool
-  Surface::FillRect (SDL_Rect aRect, Uint32 aColor){
+  Surface::FillRect (SDL_Rect aRect, Uint32 aColor)const
+  {
     return FillRect (&aRect, aColor);
   }
 
   Uint32
-  Surface::MapRGBA (Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+  Surface::MapRGBA (Uint8 r, Uint8 g, Uint8 b, Uint8 a)const
   {
     SDL_PixelFormat *format = ptr->format;
     return SDL_MapRGBA (format, r, g, b, a);
