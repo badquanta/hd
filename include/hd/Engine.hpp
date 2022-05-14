@@ -72,8 +72,6 @@ namespace hd {
     /** Print out what went wrong with SDL2.
      * \deprecated someone else should just do this. **/
     static void PrintSdlError (const char *msg = NULL);
-    /** `SDL_Event&` Callback list for events. **/
-    sdl::EngineDispatch input;
     /** Callback list for logical processing. **/
     sdl::IntDispatch step;
     /** Callback list for rendering. **/

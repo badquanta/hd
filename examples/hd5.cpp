@@ -22,14 +22,17 @@
 #include "hd/gl/ShaderProgram.hpp"
 #include "hd/gl/VAO.hpp"
 #include "hd/gl/VBO.hpp"
-hd::sdl::Window::s_ptr window;
+
+
 
 int
 main (int argc, char **argv)
 {
-  hd::Engine::Configure (argc, argv);
-  hd::sdl::Window window = hd::sdl::Window::Create (800, 600, "HD1");
-  hd::sdl::GLContext glContext = hd::sdl::GLContext::Create (window);
+  using namespace hd;
+  Engine::Configure (argc, argv);
+  sdl::Window::NextFlags |= SDL_WINDOW_OPENGL;
+  sdl::Window window = sdl::Window::Create (800, 600, "HD1");
+  sdl::GLContext glContext = sdl::GLContext::Create (window);
   // Vertices coordinates
   GLfloat vertices[] = {
     //               COORDINATES                  /     COLORS           //
@@ -54,15 +57,15 @@ main (int argc, char **argv)
     5, 4, 1  // Upper triangle
   };
   window.MakeCurrent (glContext);
-  hd::gl::ShaderProgram shaderProgram;
+  gl::ShaderProgram shaderProgram;
   shaderProgram.Create ("shaders/hd5.vert", "shaders/hd5.frag");
   shaderProgram.Bind ();
-  hd::gl::VAO vao;
+  gl::VAO vao;
   vao.Create ();
   vao.Bind ();
-  hd::gl::VBO vbo (vertices, sizeof (vertices));
+  gl::VBO vbo (vertices, sizeof (vertices));
   vbo.Bind ();
-  hd::gl::EBO ebo (indices, sizeof (indices));
+  gl::EBO ebo (indices, sizeof (indices));
   ebo.Bind ();
   glVertexAttribPointer (
       0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (GLfloat), (void *)0);
@@ -97,8 +100,8 @@ main (int argc, char **argv)
     window.engine->step.Once ([&window] (int) { window = NULL; });
   });
 
-  hd::sdl::Window win2 = hd::sdl::Window::Create (320, 200, "HD2");
-  hd::sdl::GLContext win2gl = hd::sdl::GLContext::Create (win2);
+  sdl::Window win2 = sdl::Window::Create (320, 200, "HD2");
+  sdl::GLContext win2gl = sdl::GLContext::Create (win2);
   win2.Event ().Close.Void.On (
       [&win2] () { win2.engine->step.Once ([&win2] (int) { win2 = NULL; }); });
   win2.engine->output.On ([&] (int aTime) {
@@ -110,7 +113,7 @@ main (int argc, char **argv)
 
 
   // engine->configure (argc, argv);
-  hd::Engine::Get ()->Start ();
+  Engine::Get ()->Start ();
 
 
   return 0;

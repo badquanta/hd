@@ -1,6 +1,7 @@
 #include "boost/program_options.hpp"
 #include "hd/sdl/Joystick.hpp"
 #include "hd/sdl/Window.hpp"
+#include "hd/sdl/events.hpp"
 #include <iostream>
 #include <vector>
 using hd::Engine;
@@ -18,10 +19,10 @@ watch (int anIndex)
   hd::sdl::Window::s_ptr window = hd::sdl::Window::Create ();
   SDL_EventState(SDL_JOYAXISMOTION, SDL_ENABLE);
   js = Joystick::Open (anIndex);
-  engine->input.On([](const SDL_Event&e){
+  hd::sdl::events.On([](const SDL_Event&e){
     printf("SDL EVENT %d\n",e.type);
   });
-  engine->input.On ([] (const SDL_Event&e) {
+  hd::sdl::events.On ([] (const SDL_Event&e) {
     printf ("Joystick input type %x.\n",e.type);
     });
   engine->step.On([](int){

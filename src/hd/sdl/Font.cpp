@@ -10,7 +10,6 @@
  */
 #include "hd/sdl/Font.hpp"
 
-
 namespace hd::sdl {
   /**
    * @brief
@@ -299,5 +298,34 @@ namespace hd::sdl {
   Font::RenderBlendedGlyph (Uint16 aText, SDL_Color aFg)
   {
     return Surface::Create (TTF_RenderGlyph_Blended (*this, aText, aFg), true);
+  }
+
+  Surface
+  Font::RenderBlendedTextWrapped (std::string aText,
+                                  SDL_Color aFg,
+                                  Uint32 aWrapAt)
+  {
+    return Surface::Create (
+        TTF_RenderText_Blended_Wrapped (*this, aText.c_str (), aFg, aWrapAt),
+        true);
+  }
+  Surface
+  Font::RenderBlendedUTF8Wrapped (std::string aText,
+                                  SDL_Color aFg,
+                                  Uint32 aWrapAt)
+  {
+    return Surface::Create (
+        TTF_RenderUTF8_Blended_Wrapped (*this, aText.c_str (), aFg, aWrapAt),
+        true);
+  }
+
+  Surface
+  Font::RenderBlendedUTF16Wrapped (std::u16string aText,
+                                   SDL_Color aFg,
+                                   Uint32 aWrapAt)
+  {
+    return Surface::Create (TTF_RenderUNICODE_Blended_Wrapped (
+                                *this, (Uint16 *)aText.c_str (), aFg, aWrapAt),
+                            true);
   }
 }

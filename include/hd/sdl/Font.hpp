@@ -10,6 +10,7 @@
  */
 #include "hd/sdl/Surface.hpp"
 namespace hd::sdl {
+  /** @see https://www.libsdl.org/projects/docs/SDL_ttf/SDL_ttf.html **/
   class Font : public WRAP_PTR<TTF_Font> {
   public:
     using WRAP_PTR::WRAP_PTR;
@@ -49,5 +50,9 @@ namespace hd::sdl {
     Surface RenderBlendedUTF8 (std::string, SDL_Color);
     Surface RenderBlendedUTF16 (std::u16string, SDL_Color);
     Surface RenderBlendedGlyph (Uint16, SDL_Color);
+
+    Surface RenderBlendedTextWrapped (std::string, SDL_Color,Uint32);
+    Surface RenderBlendedUTF8Wrapped (std::string, SDL_Color,Uint32);
+    Surface RenderBlendedUTF16Wrapped (std::u16string, SDL_Color,Uint32);
   };
 }

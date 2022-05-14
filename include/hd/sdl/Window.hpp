@@ -12,10 +12,10 @@ namespace hd::sdl {
     using WRAP_PTR::WRAP_PTR;
     using WRAP_PTR::operator=;
     /** Given an existing SDL_Windowand SDL_GLContext pointer construct
-     * a sdl::Window::s_ptr
+     * a Window::s_ptr
      * @todo make this check the caches?
      ***/
-    static sdl::Window Create (SDL_Window *, SDL_GLContext, bool);
+    static Window Create (SDL_Window *, SDL_GLContext, bool);
     /**
      * @brief
      *
@@ -24,19 +24,21 @@ namespace hd::sdl {
      * @param aTitle [const char*] used for the initial window title.
      * @param aFlags [Uint32] describing the window flags to use
      * @note Windows are always created with SDL_WINDOW_OPENGL flag set.
-     * @return sdl::Window::s_ptr
+     * @return Window::s_ptr
      */
-    static sdl::Window Create (const char *aTitle = Window::NextTitle,
+    static Window Create (const char *aTitle = Window::NextTitle,
                                       SDL_Rect *aRect = &Window::NextRect,
 
                                       Uint32 aFlags = Window::NextFlags);
-    static sdl::Window Create (int aWidth,
+    static Window Create (int aWidth,
                                       int aHeight,
                                       const char *aTitle = Window::NextTitle,
                                       Uint32 aFlags = Window::NextFlags);
+    static Window Create (Uint32 aFlags);
 
   public: // instance methods:
-    sdl::WindowDispatch &Event ();
+    /** @note @see `hd::sdl::events.Windows` **/
+    WindowDispatch &Event ();
     /** Return the SDL Surface associated with this window. **/
     Surface GetSurface ();
     bool UpdateSurface ();
@@ -85,7 +87,7 @@ namespace hd::sdl {
     std::string GetTitle ();
     /** @see https://wiki.libsdl.org/SDL_SetWindowIcon **/
     void SetIcon (SDL_Surface *);
-    void SetIcon (sdl::Surface::s_ptr);
+    void SetIcon (Surface::s_ptr);
     void SetIcon (std::filesystem::path);
     /** maybe future @todo https://wiki.libsdl.org/SDL_SetWindowInputFocus **/
     /** @see https://wiki.libsdl.org/SDL_SetWindowSize **/
@@ -149,7 +151,7 @@ namespace hd::sdl {
     /** `Create` uses this title if none is defined. **/
     static const char *NextTitle;
     /** `Create()` uses these flags if none are defined. **/
-    static SDL_WindowFlags NextFlags;
+    static int NextFlags;
     /** Destroy a window and its associated OpenGL Context.**/
   };
 }

@@ -99,6 +99,11 @@ namespace hd::sdl {
   {
     return SDL_FillRect (*this, aRect, aColor) == 0;
   }
+  bool
+  Surface::FillRect (SDL_Rect aRect, Uint32 aColor){
+    return FillRect (&aRect, aColor);
+  }
+
   Uint32
   Surface::MapRGBA (Uint8 r, Uint8 g, Uint8 b, Uint8 a)
   {

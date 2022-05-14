@@ -23,7 +23,7 @@
  *
  */
 #pragma once
-#include "hd/sdl/EventDispatch.hpp"
-namespace {
-  EventDispatch events;
+#include "hd/sdl/EngineDispatch.hpp"
+namespace hd::sdl {
+  extern EngineDispatch events;
 }

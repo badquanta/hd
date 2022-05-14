@@ -27,6 +27,7 @@ int
 main (int argc, char **argv)
 {
   hd::Engine::Configure (argc, argv);
+  hd::sdl::Window::NextFlags |= SDL_WINDOW_OPENGL;
   hd::sdl::Window window = hd::sdl::Window::Create (800, 600, "HD1");
   hd::sdl::GLContext glCtx = hd::sdl::GLContext::Create (window);
   // Vertices coordinates

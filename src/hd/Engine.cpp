@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Engine.hpp"
-#include "hd/sdl/Window.hpp"
 #include "hd/sdl/GLContext.hpp"
+#include "hd/sdl/Window.hpp"
+#include "hd/sdl/events.hpp"
 
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 namespace hd {
@@ -140,8 +141,7 @@ namespace hd {
       totalFrame += durFrame;
       frameCounter++;
       PcTime totalEpoch = PcDuration (pcEpoch, pcFrameEnd);
-      if ((frameCounter % 60) == 0)
-      {
+      if ((frameCounter % 60) == 0) {
         // hdLog ("frame#%lu ABSOLUTE start: %lx handle: %lx step: %lx output:
         // %lx",
         //        frameCounter,
@@ -156,9 +156,10 @@ namespace hd {
             durHandle.pc,
             durStep.pc,
             durOutput.pc);
-        hdLog ("frame#%lu: TOTALS epoch:%.3fs frame:%.3fs handle:%.3fs step:%.3fs output:%.3fs",
+        hdLog ("frame#%lu: TOTALS epoch:%.3fs frame:%.3fs handle:%.3fs "
+               "step:%.3fs output:%.3fs",
                frameCounter,
-               totalEpoch.ToSeconds(),
+               totalEpoch.ToSeconds (),
                totalFrame.ToSeconds (),
                totalHandle.ToSeconds (),
                totalStep.ToSeconds (),
@@ -168,7 +169,8 @@ namespace hd {
                "output: %.1f%%",
                frameCounter,
                ((float)frameCounter / totalEpoch.ToSeconds ()),
-               100.0f-(((float)totalFrame.pc/(float)totalEpoch.pc )*100.0f),
+               100.0f
+                   - (((float)totalFrame.pc / (float)totalEpoch.pc) * 100.0f),
                ((float)totalHandle.pc / (float)totalFrame.pc) * 100.0f,
                ((float)totalStep.pc / (float)totalFrame.pc) * 100.0f,
                ((float)totalOutput.pc / (float)totalFrame.pc) * 100.0f);
@@ -197,7 +199,7 @@ namespace hd {
     int evtCnt = 0;
     SDL_Event e;
     while (SDL_PollEvent (&e) != 0) {
-      input.Trigger (e);
+      sdl::events.Trigger (e);
     }
     return evtCnt;
   }
@@ -242,7 +244,7 @@ namespace hd {
     }
     int mixInitFlags
         = MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG;
-    if (Mix_Init (mixInitFlags) != 0) {
+    if (Mix_Init (mixInitFlags) == 0) {
       hdError ("Failed to initialize SDL_mixer because: %s", Mix_GetError ());
       TTF_Quit ();
       IMG_Quit ();
@@ -262,7 +264,7 @@ namespace hd {
     s_ptr mounted = s_ptr (new Engine ());
     instance = mounted;
     // Apparently in order to initializes GLEW we *MUST* have a window created
-    sdl::Window splashWindow = sdl::Window::Create (320, 200, "Splash!");
+    sdl::Window splashWindow = sdl::Window::Create (SDL_WINDOW_OPENGL);
     if (!splashWindow) {
       hdError ("Failed to create splash window.");
       mounted = NULL;
@@ -330,7 +332,7 @@ namespace hd {
   Engine::Engine () /* @todo :  remove camera (glm::vec3 (0.0f, 0.0f, 1.0f)) */
   {
     hdDebugCall (NULL);
-    input.Quit.Void.On (Quit);
+    sdl::events.Quit.Void.On (Quit);
   }
   int Engine::m_Argc = 0;
 

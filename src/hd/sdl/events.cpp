@@ -24,5 +24,5 @@
  */
 #include "hd/sdl/events.hpp"
 namespace hd::sdl{
-  EngineDispatch events;
+    EngineDispatch events;
 }

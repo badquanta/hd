@@ -1,4 +1,5 @@
 #include "hd/sdl/Window.hpp"
+#include "hd/sdl/events.hpp"
 namespace hd::sdl {
 
   Surface
@@ -21,8 +22,8 @@ namespace hd::sdl {
    * @brief Controls default __additional__ flags for the next window created.
    * @note SDL_WINDOW_OPENGL is always enabled.
    */
-  SDL_WindowFlags Window::NextFlags
-      = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+  int Window::NextFlags
+      = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
   /** SDL_Window* -> Smart Pointer cache. **/
   //std::map<SDL_Window *, std::weak_ptr<SDL_Window> > Window::m_PtrCache;
   /** Uint32 (SDL_WindowID) -> Smart pointer cache. **/
@@ -67,7 +68,7 @@ namespace hd::sdl {
                                             aRect->y,
                                             aRect->w,
                                             aRect->h,
-                                            SDL_WINDOW_OPENGL | aFlags);
+                                            aFlags);
     if (created == NULL) {
       hdError ("Unable to create SDL Window because:\n %s", SDL_GetError ());
     }
@@ -79,14 +80,23 @@ namespace hd::sdl {
     }
     return s_ptr (created, SDL_DestroyWindow);
   }
+/**
+ *
+ **/
   sdl::Window
   Window::Create (int w, int h, const char *aTitle, Uint32 aFlags)
   {
     SDL_Rect aRect = { NextRect.x, NextRect.h, w, h };
     return Create (aTitle, &aRect, aFlags);
   }
+  /** **/
+  sdl::Window Window::Create(Uint32 aFlags){
+    return Create (NextTitle, &NextRect, aFlags);
+  }
+
+  /** **/
   sdl::WindowDispatch&Window::Event(){
-    return engine->input.Windows[Id ()];
+    return sdl::events.Windows[Id ()];
   }
   Uint32
   Window::Id ()
