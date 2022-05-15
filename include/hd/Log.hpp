@@ -29,6 +29,11 @@
 
 #include <stdio.h>
 
+/**
+ * @brief output an message
+ *
+ */
+
 #define hdLog(MESSAGE, ...)                                                   \
   fprintf (stdout, "%s -> ", __PRETTY_FUNCTION__);                            \
   fprintf (stdout, MESSAGE, ##__VA_ARGS__);                                   \

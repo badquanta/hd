@@ -24,10 +24,21 @@
  */
 #pragma once
 #include <cassert>
+
+/**
+ * @brief output an error message
+ *
+ */
+
 #define hdError(MESSAGE, ...)                                                 \
   fprintf (stderr, "%s:%d\t+++\tERROR\t+++\n\t", __FILE__, __LINE__);         \
   fprintf (stderr, MESSAGE, ##__VA_ARGS__);                                   \
   fprintf (stderr, "\n---\tERROR\r---\n")
+
+/**
+ * @brief output an error message and HALT!
+ *
+ */
 
 #define hdErrorIf(CONDITION, ERROR_MESSAGE, ...)                              \
   if (CONDITION) {                                                            \

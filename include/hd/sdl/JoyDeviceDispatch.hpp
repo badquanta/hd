@@ -18,6 +18,10 @@
  */
 #include "hd/sdl/JoyDispatch.hpp"
 namespace hd::sdl {
+  /**
+   * @brief Dispatch joystick events by their ID to the specific ID handler.
+   *
+   */
   class JoyDeviceDispatch : public std::map<SDL_JoystickID, JoyDispatch>,
                             public EventDispatch {
   public:

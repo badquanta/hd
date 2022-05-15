@@ -10,8 +10,13 @@
 #pragma once
 #include "hd/Engine.hpp"
 namespace hd {
+  /**
+   * @brief Represent dependency upon an initialized engine.
+   *
+   */
   class EngineComponent {
-      public:
-        Engine::s_ptr engine = Engine::Get();
+  public:
+    /** instance shared_ptr? **/
+    Engine::s_ptr engine = Engine::Get ();
   };
 }

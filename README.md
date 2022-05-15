@@ -1,4 +1,4 @@
-# hd
+# README.md
 
 You have reached the `hd` [repository](#repository).
 Here you will find the sources of the project and more [about](#about) it.
@@ -128,13 +128,11 @@ A lot of open source software was utilized just to get a skeleton running:
     - https://www.doxygen.nl/manual/commands.html
 - c libraries
     - [SDL2][SDL_HOME]
-        - [SDL2_image][SDL_IMAGE_HOME]
-        - [SDL2_GFX](#TODO)
-        - [SDL2_TTF][SDL_TTF]
+        - [SDL2_image][SDL_IMAGE_HOME][docs][SDL_IMAGE_DOCS]
+        - [SDL2_TTF][SDL_TTF_HOME] [docs][SDL_TTF_DOCS]
         - [SDL2_Mixer][SDL_MIXER_HOME]
         - [SDL2_Net][SDL_NET_HOME]
         - https://www.libsdl.org/projects/SDL_rtf/
-    - [eventpp](https://github.com/wqking/eventpp)
 - tutorials
     - [Victor Gordan's OpenGL tutorials repository][TUT_VICTOR_REPO] & [youtube playlist][TUT_VICTOR_YOUTUBE].
 
@@ -161,9 +159,14 @@ However if I took the time to document it in the `README.md` it means it's eithe
 [DOXYGEN_HOME]: https://www.doxygen.nl/
 [SDL_HOME]: #TODO
 [SDL_IMAGE_HOME]: https://www.libsdl.org/projects/SDL_image/
+[SDL_IMAGE_DOCS]: https://www.libsdl.org/projects/docs/SDL_image/SDL_image.html
 [SDL_TTF_HOME]: https://github.com/libsdl-org/SDL_ttf
+[SDL_TTF_DOCS]: https://www.libsdl.org/projects/docs/SDL_ttf/
 [SDL_MIXER_HOME]: https://www.libsdl.org/projects/SDL_mixer/
+[SDL_MIXER_DOCS]: https://www.libsdl.org/projects/docs/SDL_mixer/
 [SDL_NET_HOME]: https://www.libsdl.org/projects/SDL_net/
 [TUT_VICTOR_REPO]: https://github.com/VictorGordan/opengl-tutorials
 [TUT_VICTOR_YOUTUBE]: https://www.youtube.com/playlist?list=PLPaoO-vpZnumdcb4tZc4x5Q-v7CkrQ6M-
-[NEW_ISSUE]:https://github.com/badquanta/hd/issues/new
+[NEW_ISSUE]: https://github.com/badquanta/hd/issues/new
+[std::shared_ptr]: https://en.cppreference.com/w/cpp/memory/shared_ptr
+[SDL_PROJECTS_DOC]: https://www.libsdl.org/projects/docs/

@@ -18,7 +18,10 @@
  */
 #include "hd/sdl/EventDispatch.hpp"
 namespace hd::sdl {
-  /** **/
+  /**
+   * @brief Distribute between Up & Down event handlers.
+   *
+   */
   class MouseButtonDispatch : public EventDispatch {
   public:
     EventDispatch Up, Down;

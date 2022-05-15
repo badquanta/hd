@@ -13,7 +13,7 @@
 
 namespace hd::sdl {
     /**
-     * @brief
+     * @brief Represent an `SDL_mixer` channel.
      *
      */
     class MixerChannel {

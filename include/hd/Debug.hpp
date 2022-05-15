@@ -27,10 +27,20 @@
 #include <stdio.h>
 #ifdef HD_DEBUG_BUILD
 
+/**
+ * @brief output a message if debugging is enabled.
+ *
+ */
+
 #define hdDebug(MESSAGE, ...)                                                 \
   fprintf (stderr, "%s:%d\t", __FILE__, __LINE__);                            \
   fprintf (stderr, MESSAGE, ##__VA_ARGS__);                                   \
   fprintf (stderr, "\n")
+
+/**
+ * @brief output a message if debugging is enabled.
+ *
+ */
 
 #define hdDebugCall(MESSAGE, ...)                                             \
   fprintf (stderr, "%s:%d ", __FILE__, __LINE__);                             \
@@ -39,6 +49,11 @@
     fprintf (stderr, MESSAGE, ##__VA_ARGS__);                                 \
   }                                                                           \
   fprintf (stderr, ")\n")
+
+/**
+ * @brief output a message if debugging is enabled.
+ *
+ */
 
 #define hdDebugReturn(MESSAGE, ...)                                           \
   fprintf (stderr, "%s:%d ", __FILE__, __LINE__);                             \
@@ -50,9 +65,24 @@
 
 #else
 
+/**
+ * @brief output a message if debugging is enabled.
+ *
+ */
+
 #define hdDebugReturn(message, ...) true
 
+/**
+ * @brief output a message if debugging is enabled.
+ *
+ */
+
 #define hdDebugCall(message, ...) true
+
+/**
+ * @brief output a message if debugging is enabled.
+ *
+ */
 
 #define hdDebug(message, ...) true
 

@@ -51,7 +51,6 @@ namespace hd::sdl {
      * @param aTitle [const char*] used for the initial window title.
      * @param aFlags [Uint32] describing the window flags to use
      * @note Windows are always created with SDL_WINDOW_OPENGL flag set.
-     * @example multiWindow.cpp
      * @return Window::s_ptr
      */
     static Window Create (const char *aTitle = Window::NextTitle,

@@ -82,7 +82,7 @@ openFirstWindow ()
 
       SDL_Rect f{ 0 };
       winSurf.FillRect ({ 0, 0, 800, 600 }, winSurf.MapRGBA (0, 0, 0));
-      message.Blit (winSurf, NULL, NULL);
+      message.BlitTo (winSurf, NULL, NULL);
       win.UpdateSurface ();
     }
   });

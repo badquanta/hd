@@ -26,17 +26,36 @@
 #include <GL/glew.h>
 namespace hd {
   namespace gl {
+    /**
+     * @brief Element (index) Buffer Object
+     *
+     */
     class EBO {
       private:
         GLuint ID;
       public:
+        /**
+         * @brief Construct a new EBO object
+         *
+         */
         EBO();
+        /**
+         * @brief Construct a new EBO object
+         *
+         * @param data
+         * @param size
+         */
         EBO (GLuint *data, GLsizeiptr size);
-
+        /**
+         * @brief Create an Element Buffer Object
+         *
+         */
         void Create (GLuint *, GLsizeiptr);
-
+        /** @brief set this context as the active open gl context **/
         void Bind ();
+        /** @brief clear the active open gl context **/
         void Unbind();
+        /** @brief Destroy this Element Buffer Object **/
         void Delete();
     };
   }

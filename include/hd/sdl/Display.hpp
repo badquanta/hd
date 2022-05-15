@@ -26,8 +26,17 @@
 #include "hd/Wrap.hpp"
 #include "SDL2/SDL_video.h"
 namespace hd::sdl {
+    /**
+     * @brief Wrap an SDL_DisplayMode pointer?
+     * @todo Not sure if this is what I mean to do.
+     *
+     */
     class DisplayMode : public WRAP_PTR<SDL_DisplayMode> {
     };
+    /**
+     * @brief Displays are identified by an integer.
+     *
+     */
     class Display : public WRAP_IDENTITY<int> {
     public:
       using WRAP_IDENTITY::WRAP_IDENTITY;

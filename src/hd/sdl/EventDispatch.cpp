@@ -18,10 +18,6 @@
  */
 /** **/
 namespace hd::sdl {
-  void
-  EventDispatch::Trigger (const SDL_Event &e)
-  {
-    Void.Trigger ();
-    AbstractDispatch<const SDL_Event &>::Trigger (e);
-  }
+
+
 }

@@ -53,6 +53,7 @@ namespace hd {
      */
     static s_ptr Get ();
     /** Print an SDL_version structure to aFile
+     * @param v `SDL_Version*`
      * @param aFile `*FILE` defaults to `stdout`
      * @param of `const char*` defaults to `"SDL"`.
      **/
@@ -76,6 +77,11 @@ namespace hd {
      *`aSearchPaths`.
      **/
     static std::filesystem::path
+    /**
+     * @brief Construct a new Find Path object
+     *
+     * @param aSearchPaths
+     */
     FindPath (std::filesystem::path,
               std::list<std::filesystem::path> &aSearchPaths = searchPaths);
 
@@ -84,6 +90,7 @@ namespace hd {
     /** Signal to the engine we wish to exit the main loop **/
     // void Quit ();
     const std::function<void ()> Quit = [this] () { m_Quit = true; };
+    /** Run the engine. **/
     void Start ();
     /** Print out what went wrong with SDL2.
      * \deprecated someone else should just do this. **/

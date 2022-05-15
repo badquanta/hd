@@ -1,5 +1,5 @@
 /**
- * @file Controller.cpp
+ * @file GameController.cpp
  * @author your name (you@domain.com)
  * @brief
  * @version 0.1

@@ -366,7 +366,10 @@ namespace hd::sdl {
   {
     return SDL_GetWindowFlags (*this);
   }
-
+/**
+ * @brief Simply calls `Window::GetFlags()` and checks if `aFlag` is set.
+ *
+ */
 #define CheckFor(aFlag) (GetFlags () & aFlag) != 0
 
   bool

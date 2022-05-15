@@ -18,6 +18,10 @@
  */
 #include "hd/sdl/EventDispatch.hpp"
 namespace hd::sdl {
+  /**
+   * @brief the different events a joystick can have.
+   *
+   */
   class JoyDispatch : public EventDispatch {
   public:
     std::map<Uint8, EventDispatch> Axis, Ball, Hat, Button;

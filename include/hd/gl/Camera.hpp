@@ -34,6 +34,10 @@
 #include <glm/vec3.hpp>
 namespace hd {
   namespace gl {
+    /**
+     * @brief simple test implementation of sdl camera.
+     *
+     */
     class Camera {
     private:
       glm::vec3 Position;
@@ -46,6 +50,11 @@ namespace hd {
       float sensitivity = 0.10f;
 
     public:
+      /**
+       * @brief Construct a new Camera object
+       *
+       * @param p
+       */
       Camera (glm::vec3 p = { 0.0f, 0.0f, 1.0f });
       /**
        * @brief Redefine the camera.
@@ -53,19 +62,28 @@ namespace hd {
        */
       void
       Matrix (int, int, float, float, float, ShaderProgram &, const char *);
+      /**
+       * @brief user controls
+       * @todo will be removing this soon to the "ui" family of objects.
+       *
+       */
       sdl::WindowDispatch input;
 
-      // Event Handlers
+      /** @brief Start tracking mouse motion.**/
       VoidDispatch::Handler StartTrackingMouse = [this] () {
         hdDebug ("Start Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_TRUE);
         TrackingListenerHandle = input.Mouse.Motion.On (TrackingListener);
       };
+      /** @brief Stop tracking mouse motion by disconnecting the Mouse.Motion
+       * handler. */
       VoidDispatch::Handler StopTrackingMouse = [this] () {
         hdDebug ("Stop Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_FALSE);
         input.Mouse.Motion.Delete (TrackingListenerHandle);
       };
+      /** @brief connected to the Mouse.Motion dispatcher when tracking mouse.
+       * **/
       sdl::EventDispatch::Handler TrackingListener = [this] (
                                                          const SDL_Event &e) {
         // hdDebug ("Tracking Listener");
@@ -84,35 +102,45 @@ namespace hd {
                              Up);
         }
       };
+      /** Handle kept so that we can later remove the Mouse Motion tracking
+       * listener **/
       sdl::EventDispatch::Handle TrackingListenerHandle;
+      /** @brief Move the camera forward **/
       VoidDispatch::Handler MoveForward = [this] () {
         hdDebug ("Move Forward");
         Position += speed * Orientation;
       };
+      /** @brief Move the camera backward **/
       VoidDispatch::Handler MoveBackward = [this] () {
         hdDebug ("Move Backward");
         Position += speed * -Orientation;
       };
+      /** @brief Strafe the camera left. **/
       VoidDispatch::Handler StrafeLeft = [this] () {
         hdDebug ("Strafe Left");
         Position += speed * -glm::normalize (glm::cross (Orientation, Up));
       };
+      /** @brief Strafe the camera right **/
       VoidDispatch::Handler StrafeRight = [this] () {
         hdDebug ("Strafe Right");
         Position += speed * glm::normalize (glm::cross (Orientation, Up));
       };
+      /** @brief Strafe the camera up **/
       VoidDispatch::Handler MoveUp = [this] () {
         hdDebug ("Move Up");
         Position += speed * Up;
       };
+      /** @brief Strafe the camera right **/
       VoidDispatch::Handler MoveDown = [this] () {
         hdDebug ("Move Down");
         Position += speed * -Up;
       };
+      /** @brief Set the movement speed to "walkSpeed" **/
       VoidDispatch::Handler WalkSpeed = [this] () {
         hdDebug ("Walk Speed");
         speed = 0.1f;
       };
+      /** @brief Set the movement speed to "run" speed **/
       VoidDispatch::Handler RunSpeed = [this] () {
         hdDebug ("Run Speed");
         speed = 0.4f;

@@ -16,71 +16,125 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "hd/Engine.hpp"
+#include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 #include "hd/sdl/GLContext.hpp"
 #include "hd/sdl/Window.hpp"
 #include "hd/sdl/events.hpp"
-#include "hd/Debug.hpp"
-#include "hd/Error.hpp"
 // Scene::Scene (SDL_Renderer *r) : renderer (r) {}
 namespace hd {
-  struct PcTime {
-    Uint64 pc, pcFps;
-    PcTime (Uint64 p = SDL_GetPerformanceCounter (),
-            Uint64 f = SDL_GetPerformanceFrequency ())
+  /**
+   * @brief Keep track of time precisely.
+   *
+   */
+  struct PrecisionTimer {
+    Uint64 /** precision count **/ pc,
+        /** precision counts per second **/ pcFps;
+    /**
+     * @brief Construct a new Precision Timer object
+     *
+     * @param p
+     * @param f
+     */
+    PrecisionTimer (Uint64 p = SDL_GetPerformanceCounter (),
+                    Uint64 f = SDL_GetPerformanceFrequency ())
         : pc (p), pcFps (f)
     {
     }
-
+    /**
+     * @brief convert into seconds.
+     *
+     * @return float
+     */
     float
     ToSeconds ()
     {
       return (double)pc / (double)pcFps;
     }
+    /**
+     * @brief convert into milliseconds
+     *
+     * @return int
+     */
     int
     ToMs ()
     {
       return ToSeconds () * 1000;
     }
-    PcTime
-    operator+ (PcTime &o)
+    /**
+     * @brief simply add these two together.
+     *
+     * @param o
+     * @return PrecisionTimer
+     */
+    PrecisionTimer
+    operator+ (PrecisionTimer &o)
     {
       return { pc + o.pc, (pcFps + o.pcFps) / 2 };
     }
-    PcTime
-    operator- (PcTime &o)
+    /**
+     * @brief one time minus another
+     *
+     * @param o
+     * @return PrecisionTimer
+     */
+    PrecisionTimer
+    operator- (PrecisionTimer &o)
     {
       return { pc - o.pc, (pcFps + o.pcFps) / 2 };
     }
+    /** which time came first? **/
     bool
-    operator< (PcTime &o)
+    operator<(PrecisionTimer &o)
     {
       return pc < o.pc;
     }
+    /** which time came last? **/
     bool
-    operator> (PcTime &o)
+    operator> (PrecisionTimer &o)
     {
       return pc > o.pc;
     }
+    /**
+     * @brief test if two times are the same.
+     *
+     * @param o
+     * @return true
+     * @return false
+     */
     bool
-    operator== (PcTime &o)
+    operator== (PrecisionTimer &o)
     {
       return pc == o.pc;
     }
-    PcTime
-    operator+= (PcTime &o)
+    /**
+     * @brief advance this time
+     *
+     * @param o
+     * @return PrecisionTimer
+     */
+    PrecisionTimer
+    operator+= (PrecisionTimer &o)
     {
       pc += o.pc;
       pcFps = (pcFps + o.pcFps) / 2;
       return *this;
     }
   };
+  /**
+   * @brief Return a duration between two points in time.
+   *
+   * @param b
+   * @param e
+   * @return PrecisionTimer
+   */
 
-  PcTime
-  PcDuration (PcTime &b, PcTime &e)
+  PrecisionTimer
+  PcDuration (PrecisionTimer &b, PrecisionTimer &e)
   {
 
-    // PcTime &begin = (b.pc < e.pc) ? b : e, &end = (b.pc < e.pc) ? e : b;
-    // return { begin.pc - end.pc, (begin.pcFps + end.pcFps) / 2 };
+    // PrecisionTimer &begin = (b.pc < e.pc) ? b : e, &end = (b.pc < e.pc) ? e
+    // : b; return { begin.pc - end.pc, (begin.pcFps + end.pcFps) / 2 };
     return (b < e) ? e - b : b - e;
   }
 
@@ -99,24 +153,24 @@ namespace hd {
   {
     hdDebugCall (NULL);
     Uint64 frameCounter = 0;
-    PcTime pcEpoch{}, totalFrame (0), totalHandle (0), totalStep (0),
+    PrecisionTimer pcEpoch{}, totalFrame (0), totalHandle (0), totalStep (0),
         totalOutput (0), totalSleep (0);
     while (!m_Quit) {
-      PcTime pcFrameStart{};
+      PrecisionTimer pcFrameStart{};
       int frameTicks = SDL_GetTicks ();
       HandleEvents ();
-      PcTime pcHandle{};
-      PcTime durHandle = PcDuration (pcFrameStart, pcHandle);
+      PrecisionTimer pcHandle{};
+      PrecisionTimer durHandle = PcDuration (pcFrameStart, pcHandle);
       totalHandle += durHandle;
 
       step.Trigger (frameTicks);
-      PcTime pcStep{};
-      PcTime durStep = PcDuration (pcHandle, pcStep);
+      PrecisionTimer pcStep{};
+      PrecisionTimer durStep = PcDuration (pcHandle, pcStep);
       totalStep += durStep;
       // Uint64 frameStepTicks = SDL_GetPerformanceCounter ();
       output.Trigger (frameTicks);
-      PcTime pcOutput{};
-      PcTime durOutput = PcDuration (pcStep, pcOutput);
+      PrecisionTimer pcOutput{};
+      PrecisionTimer durOutput = PcDuration (pcStep, pcOutput);
       totalOutput += durOutput;
 
       std::vector<int> eraseList = {};
@@ -137,11 +191,11 @@ namespace hd {
       // Uint64 thisOutputTicks = frameOutputTicks - frameStepTicks;
       // totalOutputTicks += thisOutputTicks;
 
-      PcTime pcFrameEnd{};
-      PcTime durFrame = PcDuration (pcFrameStart, pcFrameEnd);
+      PrecisionTimer pcFrameEnd{};
+      PrecisionTimer durFrame = PcDuration (pcFrameStart, pcFrameEnd);
       totalFrame += durFrame;
       frameCounter++;
-      PcTime totalEpoch = PcDuration (pcEpoch, pcFrameEnd);
+      PrecisionTimer totalEpoch = PcDuration (pcEpoch, pcFrameEnd);
       if ((frameCounter % 60) == 0) {
         // hdLog ("frame#%lu ABSOLUTE start: %lx handle: %lx step: %lx output:
         // %lx",

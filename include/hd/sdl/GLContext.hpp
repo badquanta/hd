@@ -13,6 +13,10 @@
 #include "hd/Wrap.hpp"
 #include "SDL2/SDL_video.h"
 namespace hd::sdl {
+    /**
+     * @brief Encapsulate the concept of an `SDL_GLContext`
+     *
+     */
     class GLContext: public WRAP_PTR<void> {
         public:
           using WRAP_PTR::WRAP_PTR;

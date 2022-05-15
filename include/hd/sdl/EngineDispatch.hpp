@@ -1,7 +1,12 @@
-#pragma once
-/*
- * holodeck - maybe it will be a game or a game engine
- * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
+/**
+ * @file EngineDispatch.hpp
+ * @author Jón Davíð Sawyer (badquanta@gmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2022-05-15
+ *
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer
+ * (badquanta@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +20,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
  */
-#include "hd/sdl/WindowIdDispatch.hpp"
+#pragma once
+
 #include "hd/sdl/ControllerDeviceDispatch.hpp"
 #include "hd/sdl/JoyDeviceDispatch.hpp"
+#include "hd/sdl/WindowIdDispatch.hpp"
 namespace hd::sdl {
-  /** **/
+  /**
+   * @brief Simply intended to be the root of an event tree.
+   * @todo consider renaming this class.
+   *
+   */
   class EngineDispatch : public EventDispatch {
   public:
-    EventDispatch Quit, App, SysWM, Finger, Dollar, Clipboard, Audio,
-        Render, User, KeymapChange;
+    EventDispatch Quit, App, SysWM, Finger, Dollar, Clipboard, Audio, Render,
+        User, KeymapChange;
     WindowIdDispatch Windows;
     JoyDeviceDispatch Joysticks;
     ControllerDeviceDispatch Controllers;

@@ -20,7 +20,7 @@ main (int argc, char **argv)
     SDL_Rect background{0};
     win.GetSize (&background.w,&background.h);
     winSurf.FillRect (&background, winSurf.MapRGBA(128, 64, 32));
-    pic.BlitScaled (winSurf, &dst, &src);
+    pic.BlitScaledTo (winSurf, &dst, &src);
     win.UpdateSurface ();
   });
   win.Event().Mouse.Wheel.On ([&] (const SDL_Event &e) {

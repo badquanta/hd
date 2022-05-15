@@ -18,7 +18,10 @@
  */
 #include "hd/sdl/EventDispatch.hpp"
 namespace hd::sdl {
-
+  /**
+   * @brief Distribute between Text `Editing` and `Input` events.
+   *
+   */
   class TextDispatch : public EventDispatch {
   public:
     EventDispatch Editing;

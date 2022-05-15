@@ -18,6 +18,10 @@
  */
 #include "hd/sdl/WindowDispatch.hpp"
 namespace hd::sdl {
+  /**
+   * @brief Destribute events by their Window ID
+   *
+   */
   class WindowIdDispatch : public std::map<Uint32, WindowDispatch>,
                            public EventDispatch {
   public:

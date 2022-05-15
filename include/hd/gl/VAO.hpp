@@ -3,12 +3,19 @@
 #include "hd/gl/ShaderProgram.hpp"
 namespace hd {
   namespace gl {
+    /**
+     * @brief Vertex Attribute Object
+     *
+     */
     class VAO {
       private:
       GLuint ID;
       public:
+      /** Create a NULL vertex attribute object **/
       VAO();
+      /** Create a new vertex attribute object **/
       void Create ();
+      /** Link the attributes from this object to a program location **/
       void LinkAttrib (VBO &VBO, GLuint layout, GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset);
       /**
        * @brief
@@ -20,8 +27,11 @@ namespace hd {
        * @return false
        */
       bool LinkAttrib (VBO &aVBO, ShaderProgram &aProgram, GLchar* aName,GLuint aNumComponents, GLenum aType, GLsizeiptr aStride, void* aOffset);
+      /** Bind these vertex attributes to the current opengl context. **/
       void Bind ();
+      /** Unbind these vertex attributes from this opengl context. **/
       void Unbind();
+      /** Release this vertex attribute object. **/
       void Delete();
     };
   }

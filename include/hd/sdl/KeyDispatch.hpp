@@ -18,7 +18,10 @@
  */
 #include "hd/sdl/EventDispatch.hpp"
 namespace hd::sdl {
-  /** **/
+  /**
+   * @brief Dispatch Key Up & Down events to specialized handlers.
+   *
+   */
   class KeyDispatch : public EventDispatch {
   public:
     EventDispatch Up, Down;

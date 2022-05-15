@@ -28,20 +28,36 @@
 #include <filesystem>
 namespace hd {
   namespace gl {
+    /**
+     * @brief Individual shader function.
+     *
+     */
     class Shader {
     private:
       GLuint ID = 0;
-
     public:
+      /** @brief NULL shader instance **/
       Shader ();
+      /** @brief new reference to existing shader **/
       Shader (GLenum);
+      /** @brief stop referencing this shader. **/
       ~Shader ();
+      /** @brief set shader source code from string **/
       void setSource (const GLchar *);
+      /** @brief read shader source code from file **/
       bool loadSource (std::filesystem::path);
+      /** @brief attempt to compile shader source code.
+       * @return true on success
+       * @return false on error, see `printLog`.
+       **/
       bool compile ();
+      /** @brief print the message log from compiling this shader. **/
       void printLog (FILE *);
+      /** @brief get the Id of this shader. **/
       GLuint GetId ();
+      /** @brief create a new shader function **/
       void create (GLenum type);
+      /** @brief destroy this shader function **/
       void Free ();
     };
   }

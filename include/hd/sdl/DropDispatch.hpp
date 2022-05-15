@@ -18,7 +18,10 @@
  */
 #include "hd/sdl/EventDispatch.hpp"
 namespace hd::sdl {
-
+  /**
+   * @brief Dispatch drop events to specialized handlers.
+   *
+   */
   class DropDispatch : public EventDispatch {
   public:
     EventDispatch File, Text, Begin, Complete;

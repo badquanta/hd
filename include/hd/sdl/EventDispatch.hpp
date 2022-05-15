@@ -19,9 +19,12 @@
 #include "hd/Dispatch.hpp"
 #include <SDL2/SDL_events.h>
 namespace hd::sdl {
-  class EventDispatch : public AbstractDispatch<const SDL_Event &> {
+  /**
+   * @brief Implementation of AbsractDispatch that distributes `const
+   * SDL_Event&^ references.
+   *
+   */
+  class EventDispatch : public AbstractToVoidDispatch<const SDL_Event &> {
   public:
-    VoidDispatch Void;
-    virtual void Trigger (const SDL_Event &e) override;
   };
 }

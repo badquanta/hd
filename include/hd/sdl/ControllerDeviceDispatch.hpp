@@ -1,7 +1,12 @@
-#pragma once
-/*
- * holodeck - maybe it will be a game or a game engine
- * Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
+/**
+ * @file ControllerDeviceDispatch.hpp
+ * @author Jón Davíð Sawyer (badquanta@gmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2022-05-15
+ *
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer
+ * (badquanta@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +20,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
  */
+#pragma once
 #include "hd/sdl/ControllerDispatch.hpp"
 namespace hd::sdl {
+  /**
+   * @brief Forward events to controller specific dispatchers.
+   *
+   */
   class ControllerDeviceDispatch
       : public std::map<SDL_JoystickID, ControllerDispatch>,
         public EventDispatch {
   public:
-    EventDispatch Added, Removed;
+    EventDispatch /** detection of new device **/ Added,
+        /** detection of device departure **/ Removed;
+    /** Disbatch GameController events between Added, Removed general handlers,
+     * and the specific handlers for each individual controller. **/
     virtual void Trigger (const SDL_Event &) override;
   };
 

@@ -6,7 +6,7 @@
  * @date 2022-05-07
  *
  * @copyright GNU-GPL 3.0
- *
+ * @example playAudio.cpp
  */
 #pragma once
 #include "hd/EngineComponent.hpp"
@@ -16,7 +16,6 @@
 namespace hd::sdl {
   /**
    * @brief Represents a chunk of audio to play.
-   * @example playAudio.cpp
    */
   class MixerChunk : public EngineComponent,
   public WRAP_PTR<Mix_Chunk> {

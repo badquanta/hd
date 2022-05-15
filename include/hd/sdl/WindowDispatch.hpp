@@ -16,20 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "hd/sdl/DropDispatch.hpp"
 #include "hd/sdl/KeyboardDispatch.hpp"
 #include "hd/sdl/MouseDispatch.hpp"
 #include "hd/sdl/TextDispatch.hpp"
-#include "hd/sdl/DropDispatch.hpp"
 namespace hd::sdl {
-    class WindowDispatch : public EventDispatch {
+  /**
+   * @brief Distribute between the many types of an event that an individual
+   * window can receive.
+   *
+   */
+  class WindowDispatch : public EventDispatch {
   public:
     KeyboardDispatch Key;
     MouseDispatch Mouse;
     TextDispatch Text;
     DropDispatch Drop;
-    EventDispatch Shown, Hidden, Exposed, Moved, Resized, SizeChanged, Minimized,
-        Maximized, Restored, Enter, Leave, FocusGained, FocusLost, Close,
-        TakeFocus, HitTest;
+    EventDispatch Shown, Hidden, Exposed, Moved, Resized, SizeChanged,
+        Minimized, Maximized, Restored, Enter, Leave, FocusGained, FocusLost,
+        Close, TakeFocus, HitTest;
     virtual void Trigger (const SDL_Event &) override;
   };
 

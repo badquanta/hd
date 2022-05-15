@@ -101,9 +101,9 @@ namespace hd::sdl {
   }
 
   bool
-  Surface::Blit (SDL_Surface *aOther,
-                 SDL_Rect *aDstRect,
-                 const SDL_Rect *aSrcRect) const
+  Surface::BlitTo (SDL_Surface *aOther,
+                   SDL_Rect *aDstRect,
+                   const SDL_Rect *aSrcRect) const
   {
     if (SDL_BlitSurface (*this, aSrcRect, aOther, aDstRect) == 0) {
       return true;
@@ -112,12 +112,47 @@ namespace hd::sdl {
       return false;
     }
   }
+
   bool
-  Surface::BlitScaled (SDL_Surface *aOther,
-                       SDL_Rect *aDstRect,
-                       const SDL_Rect *aSrcRect) const
+  Surface::BlitFrom (SDL_Surface *aOther,
+                     SDL_Rect *aDstRect,
+                     const SDL_Rect *aSrcRect) const
   {
-    return SDL_BlitSurface (*this, aSrcRect, aOther, aDstRect) == 0;
+    if (SDL_BlitSurface (aOther, aSrcRect, *this, aDstRect) == 0) {
+      return true;
+    } else {
+      hdError ("Unable to BlitSurface because: %s", SDL_GetError ());
+      return false;
+    }
+  }
+
+  bool
+  Surface::BlitFrom (SDL_Surface *aOther,
+                           SDL_Rect& aDstRect,
+                           const SDL_Rect& aSrcRect) const
+  {
+    return BlitFrom (aOther, &aDstRect, &aSrcRect);
+  }
+  bool
+  Surface::BlitScaledTo (SDL_Surface *aOther,
+                         SDL_Rect *aDstRect,
+                         const SDL_Rect *aSrcRect) const
+  {
+    return SDL_BlitScaled (*this, aSrcRect, aOther, aDstRect) == 0;
+  }
+  bool
+  Surface::BlitScaledFrom (SDL_Surface *aOther,
+                           SDL_Rect *aDstRect,
+                           const SDL_Rect *aSrcRect) const
+  {
+    return SDL_BlitScaled (aOther, aSrcRect, *this, aDstRect) == 0;
+  }
+  bool
+  Surface::BlitScaledFrom (SDL_Surface *aOther,
+                           SDL_Rect& aDstRect,
+                           const SDL_Rect& aSrcRect) const
+  {
+    return BlitScaledFrom (aOther, &aDstRect, &aSrcRect);
   }
   bool
   Surface::FillRect (const SDL_Rect *aRect, Uint32 aColor) const

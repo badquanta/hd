@@ -24,5 +24,8 @@
  */
 #include "hd/sdl/events.hpp"
 namespace hd::sdl{
+/**
+ * @brief There are a fixed set of events that SDL can produce at any one time and this is represented by this structure:
+ */
     EngineDispatch events;
 }

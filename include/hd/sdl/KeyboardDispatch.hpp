@@ -18,7 +18,10 @@
  */
 #include "hd/sdl/KeyDispatch.hpp"
 namespace hd::sdl {
-  /** **/
+  /**
+   * @brief Dispatch events to specialized `SDL_Keycode` or `SDL_Scancode` handers.
+   *
+   */
   class KeyboardDispatch : public EventDispatch {
   public:
     std::map<SDL_Scancode, KeyDispatch> Scancode;

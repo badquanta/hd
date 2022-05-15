@@ -18,7 +18,10 @@
  */
 #include "hd/sdl/MouseButtonDispatch.hpp"
 namespace hd::sdl {
-    /** **/
+    /**
+     * @brief Distribute events between Motion, Wheel, & Button.
+     *
+     */
   class MouseDispatch  : public EventDispatch {
   public:
     EventDispatch Motion, Wheel;
