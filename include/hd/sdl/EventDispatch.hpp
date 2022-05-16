@@ -20,7 +20,7 @@
 #include <SDL2/SDL_events.h>
 namespace hd::sdl {
   /**
-   * @brief Implementation of AbsractDispatch that distributes `const
+   * @brief Implementation of AbstractDispatch that distributes `const
    * SDL_Event&^ references.
    *
    */

@@ -6,7 +6,6 @@
  * @date 2022-05-07
  *
  * @copyright GNU-GPL 3.0
- * @example playAudio.cpp
  */
 #pragma once
 #include "hd/EngineComponent.hpp"
@@ -21,7 +20,8 @@ namespace hd::sdl {
   public WRAP_PTR<Mix_Chunk> {
   public: // class static methods
     using WRAP_PTR::WRAP_PTR;
-    /** **/
+    /** @brief load an chunk of audio from disk
+     ***/
     static MixerChunk Load (char *);
 
   public: // instance methods
@@ -34,4 +34,8 @@ namespace hd::sdl {
   protected:
 
   };
+  /**
+   * @example playAudio.cpp
+   * How to use this to Play Audio...
+   */
 }
