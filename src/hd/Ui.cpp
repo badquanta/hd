@@ -119,9 +119,15 @@ namespace hd {
   SDL_Rect
   UiViewText::RenderSurface (sdl::Surface dst, SDL_Rect reqRect) const
   {
-    SDL_Rect dstRect{ 0 }, minRect = GetMinimumSize ();
+    SDL_Rect dstRect=reqRect, minRect = GetMinimumSize ();
     if (font) {
-      sdl::Surface tmp = font.RenderBlendedText (text, color);
+      if(!(flags & (UI_GROW_V))){
+        //dstRect.w = minRect.w;
+      }
+      if(!(flags&(UI_GROW_H))){
+        dstRect.h = minRect.h;
+      }
+      sdl::Surface tmp = font.RenderBlendedTextWrapped (text, color, dstRect.w);
       tmp.BlitTo (dst, &reqRect);
       if (flags & (UI_GROW_H | UI_GROW_V)) {
         SDL_Rect dstRect = reqRect;
