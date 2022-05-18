@@ -28,6 +28,7 @@
  * **/
 #include <functional>
 #include <map>
+#include <list>
 namespace hd {
   /**
    * @brief Collection of `On` and `Once` handlers.
@@ -51,21 +52,28 @@ namespace hd {
      * @note `Once` callbacks will be called _first_ and then the list will be
      * cleared.
      * @note `On` callbacks will be called each time trigger is called.
+     * @note Callbacks are gathered from the Once and On handlers and THEN executed.
      * @param Args defined by the `Signature`
      */
     virtual void
     Trigger (Signature... Args)
     {
+      std::list<Handler> combined;
       for (std::pair<Handle, Handler> pair : m_OnceHandlers) {
         if (pair.second != NULL) {
-          pair.second (Args...);
+          //pair.second (Args...);
+          combined.push_back (pair.second);
         }
       }
       m_OnceHandlers.clear ();
       for (std::pair<Handle, Handler> pair : m_Handlers) {
         if (pair.second != NULL) {
-          pair.second (Args...);
+          //pair.second (Args...);
+          combined.push_back (pair.second);
         }
+      }
+      for(Handler handler : combined){
+        handler (Args...);
       }
     };
     /**

@@ -58,6 +58,7 @@ namespace hd::sdl {
     bool FillRect (const SDL_Rect *, Uint32) const;
     bool FillRect (SDL_Rect, Uint32) const;
     Uint32 MapRGBA (Uint8, Uint8, Uint8, Uint8 = 255) const;
+    Uint32 MapRGBA (SDL_Color) const;
     Surface Convert (SDL_PixelFormatEnum aFormat
                      = SDL_PIXELFORMAT_RGBA32) const;
   };

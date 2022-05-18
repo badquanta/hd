@@ -4,6 +4,8 @@ list(APPEND LIBHD_COMPONENTS
   Engine.cpp
   EngineComponent.cpp
   Dispatch.cpp
+  Rect.cpp
+  Ui.cpp
 
   sdl/Joystick.cpp
   sdl/GameController.cpp

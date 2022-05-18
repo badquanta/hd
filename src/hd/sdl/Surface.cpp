@@ -18,7 +18,7 @@ namespace hd::sdl {
   {
     s_ptr pointer (p, [b] (SDL_Surface *p) {
       if (b) {
-        hdDebug ("FREEING %p", p);
+        //hdDebug ("FREEING %p", p);
         SDL_FreeSurface (p);
       } else {
         // hdDebugCall ("Not freeing %p", p);
@@ -170,5 +170,8 @@ namespace hd::sdl {
   {
     SDL_PixelFormat *format = ptr->format;
     return SDL_MapRGBA (format, r, g, b, a);
+  }
+  Uint32 Surface::MapRGBA(SDL_Color c) const {
+    return MapRGBA (c.r, c.g, c.b, c.a);
   }
 }

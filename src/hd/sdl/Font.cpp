@@ -45,7 +45,7 @@ namespace hd::sdl {
                       int *aMinY,
                       int *aMaxX,
                       int *aMaxY,
-                      int *aAdvance)
+                      int *aAdvance)const
   {
     assert (*this);
     return TTF_GlyphMetrics (
@@ -58,7 +58,7 @@ namespace hd::sdl {
    * @param aStyle
    */
   void
-  Font::SetStyle (int aStyle)
+  Font::SetStyle (int aStyle)const
   {
     assert (*this);
     TTF_SetFontStyle (*this, aStyle);
@@ -69,7 +69,7 @@ namespace hd::sdl {
    * @return int
    */
   int
-  Font::GetStyle ()
+  Font::GetStyle ()const
   {
     assert (*this);
     return TTF_GetFontStyle (*this);
@@ -81,7 +81,7 @@ namespace hd::sdl {
    * @return false
    */
   bool
-  Font::IsStyleBold ()
+  Font::IsStyleBold ()const
   {
     return (GetStyle () & TTF_STYLE_BOLD);
   }
@@ -92,7 +92,7 @@ namespace hd::sdl {
    * @return false
    */
   bool
-  Font::IsStyleItalic ()
+  Font::IsStyleItalic ()const
   {
     return (GetStyle () & TTF_STYLE_ITALIC);
   }
@@ -103,7 +103,7 @@ namespace hd::sdl {
    * @return false
    */
   bool
-  Font::IsStyleUnderline ()
+  Font::IsStyleUnderline ()const
   {
     return (GetStyle () & TTF_STYLE_UNDERLINE);
   }
@@ -114,7 +114,7 @@ namespace hd::sdl {
    * @return false
    */
   bool
-  Font::IsStyleNormal ()
+  Font::IsStyleNormal ()const
   {
     return (GetStyle () == TTF_STYLE_NORMAL);
   }
@@ -124,7 +124,7 @@ namespace hd::sdl {
    * @return int
    */
   int
-  Font::GetHeight ()
+  Font::GetHeight ()const
   {
     assert (*this);
     return TTF_FontHeight (*this);
@@ -135,7 +135,7 @@ namespace hd::sdl {
    * @return int
    */
   int
-  Font::GetAscent ()
+  Font::GetAscent ()const
   {
     assert (*this);
     return TTF_FontAscent (*this);
@@ -146,7 +146,7 @@ namespace hd::sdl {
    * @return int
    */
   int
-  Font::GetDescent ()
+  Font::GetDescent ()const
   {
     assert (*this);
     return TTF_FontDescent (*this);
@@ -157,7 +157,7 @@ namespace hd::sdl {
    * @return int
    */
   int
-  Font::GetLineSkip ()
+  Font::GetLineSkip ()const
   {
     assert (*this);
     return TTF_FontLineSkip (*this);
@@ -168,7 +168,7 @@ namespace hd::sdl {
    * @return long
    */
   long
-  Font::GetFaces ()
+  Font::GetFaces ()const
   {
     assert (*this);
     return TTF_FontFaces (*this);
@@ -179,58 +179,58 @@ namespace hd::sdl {
    * @return int
    */
   int
-  Font::IsFixedWidth ()
+  Font::IsFixedWidth ()const
   {
     assert (*this);
     return TTF_FontFaceIsFixedWidth (*this);
   }
 
   std::string
-  Font::GetFamilyName ()
+  Font::GetFamilyName ()const
   {
     assert (*this);
     return TTF_FontFaceFamilyName (*this);
   }
   std::string
-  Font::GetStyleName ()
+  Font::GetStyleName ()const
   {
     assert (*this);
     return TTF_FontFaceStyleName (*this);
   }
 
   bool
-  Font::SizeText (std::string aString, int *aWidth, int *aHeight)
+  Font::SizeText (std::string aString, int *aWidth, int *aHeight)const
   {
     return TTF_SizeText (*this, aString.c_str (), aWidth, aHeight) == 0;
   }
   bool
-  Font::SizeUTF8 (std::string aString, int *aWidth, int *aHeight)
+  Font::SizeUTF8 (std::string aString, int *aWidth, int *aHeight)const
   {
     return TTF_SizeUTF8 (*this, aString.c_str (), aWidth, aHeight) == 0;
   }
   bool
-  Font::SizeUTF16 (std::u16string aString, int *aWidth, int *aHeight)
+  Font::SizeUTF16 (std::u16string aString, int *aWidth, int *aHeight)const
   {
     return TTF_SizeUNICODE (*this, (Uint16 *)aString.c_str (), aWidth, aHeight)
            == 0;
   }
 
   Surface
-  Font::RenderSolidText (std::string aString, SDL_Color aColor)
+  Font::RenderSolidText (std::string aString, SDL_Color aColor)const
   {
     return Surface::Create (
         TTF_RenderText_Solid (*this, aString.c_str (), aColor), true);
   }
 
   Surface
-  Font::RenderSolidUTF8 (std::string aString, SDL_Color aColor)
+  Font::RenderSolidUTF8 (std::string aString, SDL_Color aColor)const
   {
     return Surface::Create (
         TTF_RenderUTF8_Solid (*this, aString.c_str (), aColor), true);
   }
 
   Surface
-  Font::RenderSolidUTF16 (std::u16string aString, SDL_Color aColor)
+  Font::RenderSolidUTF16 (std::u16string aString, SDL_Color aColor)const
   {
     return Surface::Create (
         TTF_RenderUNICODE_Solid (*this, (Uint16 *)aString.c_str (), aColor),
@@ -238,28 +238,28 @@ namespace hd::sdl {
   }
 
   Surface
-  Font::RenderSolidGlyph (Uint16 aChar, SDL_Color aColor)
+  Font::RenderSolidGlyph (Uint16 aChar, SDL_Color aColor)const
   {
     return Surface::Create (TTF_RenderGlyph_Solid (*this, aChar, aColor),
                             true);
   }
 
   Surface
-  Font::RenderShadedText (std::string aText, SDL_Color aFg, SDL_Color aBg)
+  Font::RenderShadedText (std::string aText, SDL_Color aFg, SDL_Color aBg)const
   {
     return Surface::Create (
         TTF_RenderText_Shaded (*this, aText.c_str (), aFg, aBg), true);
   }
 
   Surface
-  Font::RenderShadedUTF8 (std::string aText, SDL_Color aFg, SDL_Color aBg)
+  Font::RenderShadedUTF8 (std::string aText, SDL_Color aFg, SDL_Color aBg)const
   {
     return Surface::Create (
         TTF_RenderUTF8_Shaded (*this, aText.c_str (), aFg, aBg), true);
   }
 
   Surface
-  Font::RenderShadedUTF16 (std::u16string aText, SDL_Color aFg, SDL_Color aBg)
+  Font::RenderShadedUTF16 (std::u16string aText, SDL_Color aFg, SDL_Color aBg)const
   {
     return Surface::Create (
         TTF_RenderUNICODE_Shaded (*this, (Uint16 *)aText.c_str (), aFg, aBg),
@@ -267,28 +267,28 @@ namespace hd::sdl {
   }
 
   Surface
-  Font::RenderShadedGlyph (Uint16 aText, SDL_Color aFg, SDL_Color aBg)
+  Font::RenderShadedGlyph (Uint16 aText, SDL_Color aFg, SDL_Color aBg)const
   {
     return Surface::Create (TTF_RenderGlyph_Shaded (*this, aText, aFg, aBg),
                             true);
   }
 
   Surface
-  Font::RenderBlendedText (std::string aText, SDL_Color aFg)
+  Font::RenderBlendedText (std::string aText, SDL_Color aFg)const
   {
     return Surface::Create (
         TTF_RenderText_Blended (*this, aText.c_str (), aFg), true);
   }
 
   Surface
-  Font::RenderBlendedUTF8 (std::string aText, SDL_Color aFg)
+  Font::RenderBlendedUTF8 (std::string aText, SDL_Color aFg)const
   {
     return Surface::Create (
         TTF_RenderUTF8_Blended (*this, aText.c_str (), aFg), true);
   }
 
   Surface
-  Font::RenderBlendedUTF16 (std::u16string aText, SDL_Color aFg)
+  Font::RenderBlendedUTF16 (std::u16string aText, SDL_Color aFg)const
   {
     return Surface::Create (
         TTF_RenderUNICODE_Blended (*this, (Uint16 *)aText.c_str (), aFg),
@@ -296,7 +296,7 @@ namespace hd::sdl {
   }
 
   Surface
-  Font::RenderBlendedGlyph (Uint16 aText, SDL_Color aFg)
+  Font::RenderBlendedGlyph (Uint16 aText, SDL_Color aFg)const
   {
     return Surface::Create (TTF_RenderGlyph_Blended (*this, aText, aFg), true);
   }
@@ -304,7 +304,7 @@ namespace hd::sdl {
   Surface
   Font::RenderBlendedTextWrapped (std::string aText,
                                   SDL_Color aFg,
-                                  Uint32 aWrapAt)
+                                  Uint32 aWrapAt)const
   {
     return Surface::Create (
         TTF_RenderText_Blended_Wrapped (*this, aText.c_str (), aFg, aWrapAt),
@@ -313,7 +313,7 @@ namespace hd::sdl {
   Surface
   Font::RenderBlendedUTF8Wrapped (std::string aText,
                                   SDL_Color aFg,
-                                  Uint32 aWrapAt)
+                                  Uint32 aWrapAt)const
   {
     return Surface::Create (
         TTF_RenderUTF8_Blended_Wrapped (*this, aText.c_str (), aFg, aWrapAt),
@@ -323,7 +323,7 @@ namespace hd::sdl {
   Surface
   Font::RenderBlendedUTF16Wrapped (std::u16string aText,
                                    SDL_Color aFg,
-                                   Uint32 aWrapAt)
+                                   Uint32 aWrapAt)const
   {
     return Surface::Create (TTF_RenderUNICODE_Blended_Wrapped (
                                 *this, (Uint16 *)aText.c_str (), aFg, aWrapAt),
