@@ -4,7 +4,7 @@ if(DOXYGEN_FOUND)
   # Constant DOXYGEN SETTINGS
   # ############################################################################
   # a b
-  set(DOXYGEN_BUILTIN_STL_SUPPORT YES)
+  set(DOXYGEN_BUILTIN_STL_SUPPORT NO)
   # c
   set(DOXYGEN_CASE_SENSE_NAMES YES)
   # d
@@ -100,7 +100,7 @@ if(DOXYGEN_FOUND)
     set(DOXYGEN_SHOW_HEADERFILE YES )
     set(DOXYGEN_SHOW_INCLUDE_FILES YES )
     set(DOXYGEN_SOURCE_BROWSER YES )
-    set(DOXYGEN_STRIP_CODE_COMMENTS NO )
+    set(DOXYGEN_STRIP_CODE_COMMENTS YES )
     # t
     set(DOXYGEN_TEMPLATE_RELATIONS YES )
     # u v
@@ -154,7 +154,7 @@ if(DOXYGEN_FOUND)
 
   doxygen_add_docs(
     doxygen ${PROJECT_SOURCE_DIR}/README.md ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/include COMMENT "Generate documentation.")
+    ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/examples  COMMENT "Generate documentation.")
   # ############################################################################
   configure_file(index.html index.html)
 endif()

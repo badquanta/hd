@@ -19,4 +19,7 @@ By version:
   - prototype engine framework: Singleton + framework main loop.
   - sdl window, surface & font are well abstracted by smart pointer memory handlers.
   - initial prototyping of user interface components
+    - `fontViewer.cpp` bare bones font viewing
+    - `imageViewer.cpp` bare bones image viewing
+
 

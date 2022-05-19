@@ -146,26 +146,15 @@ namespace hd {
      */
     Handle nextId = 1;
   };
-  /**
-   * @brief A dispatch that has a zero length signature.
-   */
-  class VoidDispatch : public AbstractDispatch<> {};
-  /**
-   * @brief Relays triggers to `Void::Handler`(s)
-   *
-   *
-   */
+  /** @brief A dispatch that has a zero length signature. */
+  class VoidSignatureDispatch : public AbstractDispatch<> {};
+  /** @brief Relays triggers to `Void::Handler`(s) */
   template <class... Signature>
   class AbstractToVoidDispatch : public AbstractDispatch<Signature...> {
   public:
-    /**
-     * @brief Allows subscribers that do not need the event information
-     *
-     */
-    VoidDispatch Void;
-    /**
-     * @brief Also causes `Void.Trigger()` to be called.
-     *
+    /** @brief Allows subscribers that do not need the event information */
+    VoidSignatureDispatch Void;
+    /** @brief Also causes `Void.Trigger()` to be called.
      * @param Args
      */
     virtual void

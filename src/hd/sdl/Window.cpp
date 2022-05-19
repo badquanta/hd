@@ -50,29 +50,28 @@ namespace hd::sdl {
    * @note SDL_WINDOW_OPENGL is always enabled.
    */
   int Window::NextFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-  /** SDL_Window* -> Smart Pointer cache. **/
-  // std::map<SDL_Window *, std::weak_ptr<SDL_Window> > Window::m_PtrCache;
-  /** Uint32 (SDL_WindowID) -> Smart pointer cache. **/
-  // std::map<Uint32, std::weak_ptr<SDL_Window> > Window::m_IdCache;
-  /** SDL_GLContext pointer -> Window Smart pointer cache. **/
-  // std::map<SDL_GLContext, std::weak_ptr<SDL_Window> >
-  // Window::m_ContextCache;
+  /**
+   * @brief Create an `sdl::Window` from an existing `SDL_Window*` pointer
+   * @param aWindow the existing `SDL_Window` pointer
+   * @param aFree if true then `SDL_DestroyWindow` will be called when the
+   * shared pointer is finally dereferenced.
+   * @todo define operation around `NULL` pointer assignment. It is allowed for
+   * now but could cause segfaults.
+   * @return Window
+   */
   Window
-  Window::Create (SDL_Window *aWindow, SDL_GLContext aContext, bool aFree)
+  Window::Create (SDL_Window *aWindow, bool aFree)
   {
     s_ptr created (
         aWindow, aFree ? SDL_DestroyWindow : [] (SDL_Window *p) {});
     Window window = created;
-    //@todo remove m_PtrCache[aWindow] = created;
-    // m_IdCache[window.Id ()] = created;
-    // m_ContextCache[aContext] = created;
     return created;
   }
   /**
-   * @brief Construct a new Window:: Create object
-   *
-   * @param aRect position and size
+   * Calls `SDL_CreateWindow(char*,int,int,int,int,Uint32)` and makes it into
+   * `std::shared_ptr` that will call `SDL_DestroyWindow`
    * @param aTitle to be set on new window
+   * @param aRect position and size
    * @param aFlags ADDITIONAL flags.
    * @note aFlags is always set with `SDL_WINDOW_OPENGL`
    * @return smart pointer to and instance of this class managing a window.

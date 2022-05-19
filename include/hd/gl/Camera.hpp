@@ -70,14 +70,14 @@ namespace hd {
       sdl::WindowDispatch input;
 
       /** @brief Start tracking mouse motion.**/
-      VoidDispatch::Handler StartTrackingMouse = [this] () {
+      VoidSignatureDispatch::Handler StartTrackingMouse = [this] () {
         hdDebug ("Start Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_TRUE);
         TrackingListenerHandle = input.Mouse.Motion.On (TrackingListener);
       };
       /** @brief Stop tracking mouse motion by disconnecting the Mouse.Motion
        * handler. */
-      VoidDispatch::Handler StopTrackingMouse = [this] () {
+      VoidSignatureDispatch::Handler StopTrackingMouse = [this] () {
         hdDebug ("Stop Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_FALSE);
         input.Mouse.Motion.Delete (TrackingListenerHandle);
@@ -106,42 +106,42 @@ namespace hd {
        * listener **/
       sdl::EventDispatch::Handle TrackingListenerHandle;
       /** @brief Move the camera forward **/
-      VoidDispatch::Handler MoveForward = [this] () {
+      VoidSignatureDispatch::Handler MoveForward = [this] () {
         hdDebug ("Move Forward");
         Position += speed * Orientation;
       };
       /** @brief Move the camera backward **/
-      VoidDispatch::Handler MoveBackward = [this] () {
+      VoidSignatureDispatch::Handler MoveBackward = [this] () {
         hdDebug ("Move Backward");
         Position += speed * -Orientation;
       };
       /** @brief Strafe the camera left. **/
-      VoidDispatch::Handler StrafeLeft = [this] () {
+      VoidSignatureDispatch::Handler StrafeLeft = [this] () {
         hdDebug ("Strafe Left");
         Position += speed * -glm::normalize (glm::cross (Orientation, Up));
       };
       /** @brief Strafe the camera right **/
-      VoidDispatch::Handler StrafeRight = [this] () {
+      VoidSignatureDispatch::Handler StrafeRight = [this] () {
         hdDebug ("Strafe Right");
         Position += speed * glm::normalize (glm::cross (Orientation, Up));
       };
       /** @brief Strafe the camera up **/
-      VoidDispatch::Handler MoveUp = [this] () {
+      VoidSignatureDispatch::Handler MoveUp = [this] () {
         hdDebug ("Move Up");
         Position += speed * Up;
       };
       /** @brief Strafe the camera right **/
-      VoidDispatch::Handler MoveDown = [this] () {
+      VoidSignatureDispatch::Handler MoveDown = [this] () {
         hdDebug ("Move Down");
         Position += speed * -Up;
       };
       /** @brief Set the movement speed to "walkSpeed" **/
-      VoidDispatch::Handler WalkSpeed = [this] () {
+      VoidSignatureDispatch::Handler WalkSpeed = [this] () {
         hdDebug ("Walk Speed");
         speed = 0.1f;
       };
       /** @brief Set the movement speed to "run" speed **/
-      VoidDispatch::Handler RunSpeed = [this] () {
+      VoidSignatureDispatch::Handler RunSpeed = [this] () {
         hdDebug ("Run Speed");
         speed = 0.4f;
       };

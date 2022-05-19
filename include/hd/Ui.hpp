@@ -41,38 +41,47 @@ namespace hd {
   extern const int UI_FOCUSED_TARGET, UI_FOCUSED, UI_CAN_FOCUS, UI_IS_TAB_STOP,
       UI_GROW_H, UI_GROW_V, UI_MOUSE_IN, UI_MOUSE_OVER, UI_MOUSE_OUT;
 
-  class iUiSurface {
+  class UiSdlSurfaceView {
   public:
-    typedef std::shared_ptr<iUiSurface> s_ptr;
+    typedef std::shared_ptr<UiSdlSurfaceView> s_ptr;
     unsigned int flags = 0;
     virtual SDL_Rect GetMinimumSize () const = 0;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const = 0;
   };
-  class UiComposition : public iUiSurface {
+  class UiComposition : public UiSdlSurfaceView {
   public:
     int NextID = 0;
 
-    std::map<int, iUiSurface::s_ptr> elements;
+    std::map<int, UiSdlSurfaceView::s_ptr> elements;
     virtual SDL_Rect GetMinimumSize () const override;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
     int Append (s_ptr);
   };
-  class UiWindowSurface : public iUiSurface {
+  class UiCtrlSdlWindowSurface : public UiSdlSurfaceView {
   public:
+    typedef std::shared_ptr<UiCtrlSdlWindowSurface> s_ptr;
     sdl::Window window;
     sdl::WindowDispatch event;
-    sdl::WindowDispatch::Handle pipeHandle;
+    sdl::WindowDispatch::Handle eventPipeHandle;
+    IntDispatch output;
+    IntDispatch::Handle outputPipeHandle;
     UiComposition root;
-    UiWindowSurface (sdl::Window);
-    ~UiWindowSurface ();
+    UiCtrlSdlWindowSurface (sdl::Window);
+    ~UiCtrlSdlWindowSurface ();
     std::function<void ()> DoClose = [this] () {
       Engine::Get ()->step.Void.Once ([this] () { window.ptr = nullptr; });
+    };
+    std::function<void ()> DoRender = [this] () {
+      if (window) {
+        this->RenderSurface ();
+        window.UpdateSurface ();
+      }
     };
     virtual SDL_Rect GetMinimumSize () const override;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
     virtual SDL_Rect RenderSurface () const;
   };
-  class UiViewText : public iUiSurface {
+  class UiViewText : public UiSdlSurfaceView {
   public:
     sdl::Font font;
     SDL_Color color; /** @todo wrap SDL_Color **/
@@ -83,17 +92,18 @@ namespace hd {
     virtual SDL_Rect GetMinimumSize () const override;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
   };
-  class UiViewSurface : public iUiSurface {
+  class UiCtrlSdlSurface : public UiSdlSurfaceView {
   public:
+    typedef std::shared_ptr<UiCtrlSdlSurface> s_ptr;
     sdl::Surface surface;
-    UiViewSurface (sdl::Surface);
+    UiCtrlSdlSurface (sdl::Surface);
     virtual SDL_Rect GetMinimumSize () const override;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
   };
-  class UiSurfaceColor : public iUiSurface {
+  class UiCtrlSdlSurfaceColor : public UiSdlSurfaceView {
   public:
     SDL_Color color;
-    UiSurfaceColor (SDL_Color);
+    UiCtrlSdlSurfaceColor (SDL_Color);
     virtual SDL_Rect GetMinimumSize () const override;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
   };

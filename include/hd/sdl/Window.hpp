@@ -38,11 +38,12 @@ namespace hd::sdl {
   public: // Static constructor methods
     using WRAP_PTR::WRAP_PTR;
     using WRAP_PTR::operator=;
-    /** Given an existing SDL_Windowand SDL_GLContext pointer construct
+    /** @brief
+     * Given an existing SDL_Windowand SDL_GLContext pointer construct
      * a Window::s_ptr
      * @todo make this check the caches?
      ***/
-    static Window Create (SDL_Window *, SDL_GLContext, bool);
+    static Window Create (SDL_Window *, bool);
     /**
      * @brief
      *
@@ -64,7 +65,8 @@ namespace hd::sdl {
     static Window Create (Uint32 aFlags);
 
   public: // instance methods:
-    /** @note @see `hd::sdl::events.Windows` **/
+    /** @deprecated gonna remove this
+     * @note @see `hd::sdl::events.Windows` **/
     WindowDispatch &Event () const;
     /** Return the SDL Surface associated with this window. **/
     Surface GetSurface () const;

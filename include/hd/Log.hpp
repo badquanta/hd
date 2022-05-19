@@ -35,6 +35,6 @@
  */
 
 #define hdLog(MESSAGE, ...)                                                   \
-  fprintf (stdout, "%s -> ", __PRETTY_FUNCTION__);                            \
+  fprintf (stdout, "%s -> ", __FUNCTION__);                            \
   fprintf (stdout, MESSAGE, ##__VA_ARGS__);                                   \
   fprintf (stdout, "\n")

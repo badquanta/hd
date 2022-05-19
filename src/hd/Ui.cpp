@@ -25,6 +25,11 @@
  */
 #include "hd/Ui.hpp"
 
+/**
+ * ### UI Flags
+ *
+ * @todo more detailed documention about the ui flags.
+ */
 namespace hd {
   const int UI_FOCUSED_TARGET = 0x01, //
       UI_FOCUSED = 0x02,              //
@@ -32,11 +37,14 @@ namespace hd {
       UI_IS_TAB_STOP = 0x08,          //
       UI_GROW_V = 0x0F,               //
       UI_GROW_H = 0x10;
+}
+/** ### UiComposition **/
+namespace hd {
   SDL_Rect
   UiComposition::GetMinimumSize () const
   {
     Rect r{ 0 };
-    for (std::pair<int, iUiSurface::s_ptr> p : elements) {
+    for (std::pair<int, UiSdlSurfaceView::s_ptr> p : elements) {
       if (p.second) {
         Rect r2;
         r2 = p.second->GetMinimumSize ();
@@ -50,7 +58,7 @@ namespace hd {
   UiComposition::RenderSurface (sdl::Surface s, SDL_Rect r) const
   {
     Rect c{ 0 };
-    for (std::pair<int, iUiSurface::s_ptr> p : elements) {
+    for (std::pair<int, UiSdlSurfaceView::s_ptr> p : elements) {
 
       c = c.Union (p.second->RenderSurface (s, r));
     }
@@ -58,26 +66,31 @@ namespace hd {
   }
 
   int
-  UiComposition::Append (iUiSurface::s_ptr child)
+  UiComposition::Append (UiSdlSurfaceView::s_ptr child)
   {
     int ID = ++NextID;
     elements[ID] = child;
     return ID;
   }
-
-  UiWindowSurface::UiWindowSurface (sdl::Window w) : window (w)
+}
+/** ### UiCtrlSdlWindowSurface **/
+namespace hd {
+  UiCtrlSdlWindowSurface::UiCtrlSdlWindowSurface (sdl::Window w) : window (w)
   {
-    printf ("Connecting UiWindowSurface events.\n");
-    pipeHandle = window.Event ().On (event.pipe);
+    printf ("Connecting UiCtrlSdlWindowSurface events.\n");
+    eventPipeHandle = window.Event ().On (event.pipe);
+    outputPipeHandle = Engine::Get ()->output.On (output.pipe);
     event.Close.Void.Once (DoClose);
+    output.Void.On (DoRender);
   }
-  UiWindowSurface::~UiWindowSurface ()
+  UiCtrlSdlWindowSurface::~UiCtrlSdlWindowSurface ()
   {
-    printf ("Disconnecting UiWindowSurface events.\n");
-    window.Event ().Delete (pipeHandle);
+    printf ("Disconnecting UiCtrlSdlWindowSurface events.\n");
+    window.Event ().Delete (eventPipeHandle);
+    Engine::Get ()->output.Delete (outputPipeHandle);
   }
   SDL_Rect
-  UiWindowSurface::GetMinimumSize () const
+  UiCtrlSdlWindowSurface::GetMinimumSize () const
   {
     SDL_Rect r;
     if (window) {
@@ -87,12 +100,12 @@ namespace hd {
     return r;
   }
   SDL_Rect
-  UiWindowSurface::RenderSurface (sdl::Surface s, SDL_Rect r) const
+  UiCtrlSdlWindowSurface::RenderSurface (sdl::Surface s, SDL_Rect r) const
   {
     return root.RenderSurface (s, r);
   }
   SDL_Rect
-  UiWindowSurface::RenderSurface () const
+  UiCtrlSdlWindowSurface::RenderSurface () const
   {
     SDL_Rect r = GetMinimumSize ();
     r.x = r.y = 0;
@@ -101,7 +114,9 @@ namespace hd {
     }
     return r;
   }
-  /**********************/
+}
+/** ### UiViewText **/
+namespace hd {
   UiViewText::UiViewText (sdl::Font f, std::string s, SDL_Color c)
       : font (f), text (s), color (c)
   {
@@ -119,15 +134,16 @@ namespace hd {
   SDL_Rect
   UiViewText::RenderSurface (sdl::Surface dst, SDL_Rect reqRect) const
   {
-    SDL_Rect dstRect=reqRect, minRect = GetMinimumSize ();
+    SDL_Rect dstRect = reqRect, minRect = GetMinimumSize ();
     if (font) {
-      if(!(flags & (UI_GROW_V))){
-        //dstRect.w = minRect.w;
+      if (!(flags & (UI_GROW_V))) {
+        // dstRect.w = minRect.w;
       }
-      if(!(flags&(UI_GROW_H))){
+      if (!(flags & (UI_GROW_H))) {
         dstRect.h = minRect.h;
       }
-      sdl::Surface tmp = font.RenderBlendedTextWrapped (text, color, dstRect.w);
+      sdl::Surface tmp
+          = font.RenderBlendedTextWrapped (text, color, dstRect.w);
       tmp.BlitTo (dst, &reqRect);
       if (flags & (UI_GROW_H | UI_GROW_V)) {
         SDL_Rect dstRect = reqRect;
@@ -145,10 +161,13 @@ namespace hd {
     }
     return dstRect;
   }
+}
+/** ### UiCtrlSdlSurface **/
+namespace hd {
   /*************************/
-  UiViewSurface::UiViewSurface (sdl::Surface s) : surface (s) {}
+  UiCtrlSdlSurface::UiCtrlSdlSurface (sdl::Surface s) : surface (s) {}
   SDL_Rect
-  UiViewSurface::GetMinimumSize () const
+  UiCtrlSdlSurface::GetMinimumSize () const
   {
     SDL_Rect r{ 0 };
     if (surface) {
@@ -159,7 +178,7 @@ namespace hd {
   }
 
   SDL_Rect
-  UiViewSurface::RenderSurface (sdl::Surface dst, SDL_Rect reqRect) const
+  UiCtrlSdlSurface::RenderSurface (sdl::Surface dst, SDL_Rect reqRect) const
   {
     SDL_Rect minRect = GetMinimumSize ();
     SDL_Rect dstRect = reqRect;
@@ -178,17 +197,20 @@ namespace hd {
     }
     return dstRect;
   }
-  /**************************************/
-  UiSurfaceColor::UiSurfaceColor (SDL_Color c) : color (c) {}
+}
+/** ### UiCtrlSdlSurfaceColor **/
+namespace hd {
+  UiCtrlSdlSurfaceColor::UiCtrlSdlSurfaceColor (SDL_Color c) : color (c) {}
 
   SDL_Rect
-  UiSurfaceColor::GetMinimumSize () const
+  UiCtrlSdlSurfaceColor::GetMinimumSize () const
   {
     return SDL_Rect{ 0 };
   }
 
   SDL_Rect
-  UiSurfaceColor::RenderSurface (sdl::Surface dst, SDL_Rect dstRect) const
+  UiCtrlSdlSurfaceColor::RenderSurface (sdl::Surface dst,
+                                        SDL_Rect dstRect) const
   {
     if (dst) {
       dst.FillRect (dstRect, dst.MapRGBA (color));

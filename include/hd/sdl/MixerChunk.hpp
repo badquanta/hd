@@ -22,7 +22,7 @@ namespace hd::sdl {
     using WRAP_PTR::WRAP_PTR;
     /** @brief load an chunk of audio from disk
      ***/
-    static MixerChunk Load (char *);
+    static MixerChunk Load (std::string);
 
   public: // instance methods
     int SetVolume (int);
