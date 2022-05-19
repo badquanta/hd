@@ -25,6 +25,8 @@
  */
 #pragma once
 #include "glm/vec2.hpp"
+#include "glm/matrix.hpp"
+#include "glm/gtx/transform.hpp"
 #include "hd/Dispatch.hpp"
 #include "hd/Rect.hpp"
 #include "hd/sdl/Font.hpp"
@@ -48,14 +50,23 @@ namespace hd {
     virtual SDL_Rect GetMinimumSize () const = 0;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const = 0;
   };
-  class UiComposition : public UiSdlSurfaceView {
+  class UiSdlSurfaceComposition : public UiSdlSurfaceView {
   public:
     int NextID = 0;
-
     std::map<int, UiSdlSurfaceView::s_ptr> elements;
     virtual SDL_Rect GetMinimumSize () const override;
     virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
     int Append (s_ptr);
+    virtual bool Delete (int);
+  };
+  class UiSdlPositionedSurfaceComposition : public UiSdlSurfaceComposition {
+    public:
+    typedef std::shared_ptr<UiSdlPositionedSurfaceComposition> s_ptr;
+    std::map<int, glm::i32vec2[2]> positions;
+    int Append (s_ptr, SDL_Rect);
+    virtual bool Delete (int);
+    virtual SDL_Rect GetMinimumSize () const override;
+    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
   };
   class UiCtrlSdlWindowSurface : public UiSdlSurfaceView {
   public:
@@ -65,7 +76,7 @@ namespace hd {
     sdl::WindowDispatch::Handle eventPipeHandle;
     IntDispatch output;
     IntDispatch::Handle outputPipeHandle;
-    UiComposition root;
+    UiSdlSurfaceComposition root;
     UiCtrlSdlWindowSurface (sdl::Window);
     ~UiCtrlSdlWindowSurface ();
     std::function<void ()> DoClose = [this] () {

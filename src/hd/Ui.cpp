@@ -41,7 +41,7 @@ namespace hd {
 /** ### UiComposition **/
 namespace hd {
   SDL_Rect
-  UiComposition::GetMinimumSize () const
+  UiSdlSurfaceComposition::GetMinimumSize () const
   {
     Rect r{ 0 };
     for (std::pair<int, UiSdlSurfaceView::s_ptr> p : elements) {
@@ -55,7 +55,7 @@ namespace hd {
   }
 
   SDL_Rect
-  UiComposition::RenderSurface (sdl::Surface s, SDL_Rect r) const
+  UiSdlSurfaceComposition::RenderSurface (sdl::Surface s, SDL_Rect r) const
   {
     Rect c{ 0 };
     for (std::pair<int, UiSdlSurfaceView::s_ptr> p : elements) {
@@ -66,11 +66,71 @@ namespace hd {
   }
 
   int
-  UiComposition::Append (UiSdlSurfaceView::s_ptr child)
+  UiSdlSurfaceComposition::Append (UiSdlSurfaceView::s_ptr child)
   {
     int ID = ++NextID;
     elements[ID] = child;
     return ID;
+  }
+
+  bool
+  UiSdlSurfaceComposition::Delete (int aID)
+  {
+    return (elements.erase (aID) > 0);
+  }
+}
+/** ### UiSdlPositionedSurfaceComposition **/
+namespace hd {
+  int
+  UiSdlPositionedSurfaceComposition::Append (s_ptr aPtr, SDL_Rect aRct)
+  {
+    int ID = UiSdlSurfaceComposition::Append (aPtr);
+
+    positions.emplace (ID, { { R.x, R.y }, { R.x + R.w, R.y + R.h } });
+    return ID;
+  }
+  bool
+  UiSdlPositionedSurfaceComposition::Delete (int aID)
+  {
+    return (positions.erase (aID) | Delete (aID));
+  }
+  SDL_Rect
+  UiSdlPositionedSurfaceComposition::GetMinimumSize () const
+  {
+    Rect u{ 0 };
+    for (std::pair pair : elements) {
+      int ID = pair.first;
+      SDL_Rect u2 = pair.second->GetMinimumSize ();
+      glm::i32vec2 pos{ 0 };
+      if (positions.find (ID) != positions.end ()) {
+        pos = positions.at (ID);
+      }
+      pos = pos + glm::i32vec2{ u2.x, u2.y };
+      u2.x = pos[0];
+      u2.y = pos[1];
+      u = Rect::Union (u, &u2);
+    }
+    return u;
+  }
+  SDL_Rect
+  UiSdlPositionedSurfaceComposition::RenderSurface (sdl::Surface dst,
+                                                    SDL_Rect reqRect) const
+  {
+    Rect c{ 0 };
+    for (std::pair pair : elements) {
+      auto ID = pair.first;
+      auto ctrlSurf = pair.second;
+      glm::i32vec2 position{ 0 };
+      if (positions.find (ID) != positions.end ()) {
+        position = positions.at (ID);
+      }
+      SDL_Rect dstRect = reqRect;
+      position += glm::i32vec2{ dstRect.x, dstRect.y };
+      dstRect.x = position[0];
+      dstRect.y = position[1];
+      c = c.Union (ctrlSurf->RenderSurface (dstRect));
+    }
+    return c;
   }
 }
 /** ### UiCtrlSdlWindowSurface **/

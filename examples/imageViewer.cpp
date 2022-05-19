@@ -14,6 +14,7 @@ main (int argc, char **argv)
   hdErrorIf (!winCtl->window,
              "Unable to open SDL Window because %s",
              SDL_GetError ());
+  // Open an image.
   UiCtrlSdlSurface::s_ptr picCtl = std::make_shared<UiCtrlSdlSurface> (
       sdl::Surface::Load ("textures/pattern_16/preview.jpg"));
   hdErrorIf (!picCtl->surface,
