@@ -34,6 +34,18 @@
 #include "hd/sdl/Window.hpp"
 namespace hd {
   using point = glm::ivec2;
+  typedef glm::ivec2 UiPoint;
+  //typedef std::pair<UiPoint, UiPoint> UiPointPair;
+  class UiPointPair: public std::pair<UiPoint, UiPoint> {
+    public:
+      using std::pair<UiPoint,UiPoint>::pair;
+      UiPointPair ();
+      UiPointPair (const SDL_Rect &);
+      operator SDL_Rect ();
+      UiPointPair& operator= (SDL_Rect);
+      UiPointPair Union (const UiPointPair &);
+      UiPointPair operator+ (UiPoint);
+  };
   template <class Return, class... Signature>
   Return
   ReturnNull (Signature... Args)
@@ -43,32 +55,35 @@ namespace hd {
   extern const int UI_FOCUSED_TARGET, UI_FOCUSED, UI_CAN_FOCUS, UI_IS_TAB_STOP,
       UI_GROW_H, UI_GROW_V, UI_MOUSE_IN, UI_MOUSE_OVER, UI_MOUSE_OUT;
 
-  class UiSdlSurfaceView {
+  class UiViewSurfaceBase {
   public:
-    typedef std::shared_ptr<UiSdlSurfaceView> s_ptr;
+    typedef std::shared_ptr<UiViewSurfaceBase> s_ptr;
     unsigned int flags = 0;
-    virtual SDL_Rect GetMinimumSize () const = 0;
-    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const = 0;
+    virtual UiPointPair GetMinimumSize () const = 0;
+    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const = 0;
   };
-  class UiSdlSurfaceComposition : public UiSdlSurfaceView {
+  class UiViewSurfaces : public UiViewSurfaceBase {
   public:
     int NextID = 0;
-    std::map<int, UiSdlSurfaceView::s_ptr> elements;
-    virtual SDL_Rect GetMinimumSize () const override;
-    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
-    int Append (s_ptr);
+    std::map<int, UiViewSurfaceBase::s_ptr> elements;
+    virtual UiPointPair GetMinimumSize () const override;
+    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
+    virtual int Append (s_ptr);
     virtual bool Delete (int);
   };
-  class UiSdlPositionedSurfaceComposition : public UiSdlSurfaceComposition {
+  class UiSdlPositionedSurfaceComposition : public UiViewSurfaces {
     public:
-    typedef std::shared_ptr<UiSdlPositionedSurfaceComposition> s_ptr;
-    std::map<int, glm::i32vec2[2]> positions;
-    int Append (s_ptr, SDL_Rect);
-    virtual bool Delete (int);
-    virtual SDL_Rect GetMinimumSize () const override;
-    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
+      typedef std::shared_ptr<UiSdlPositionedSurfaceComposition> s_ptr;
+      std::map<int, UiPointPair> positions;
+      virtual int Append (UiViewSurfaceBase::s_ptr, UiPointPair);
+      virtual int Append (UiViewSurfaceBase::s_ptr) override;
+      virtual int Append (UiViewSurfaceBase::s_ptr, UiPoint);
+      virtual bool Delete (int) override;
+      virtual UiPointPair GetMinimumSize () const override;
+      virtual UiPointPair RenderSurface (sdl::Surface,
+                                         UiPointPair) const override;
   };
-  class UiCtrlSdlWindowSurface : public UiSdlSurfaceView {
+  class UiCtrlSdlWindowSurface : public UiViewSurfaceBase {
   public:
     typedef std::shared_ptr<UiCtrlSdlWindowSurface> s_ptr;
     sdl::Window window;
@@ -76,7 +91,7 @@ namespace hd {
     sdl::WindowDispatch::Handle eventPipeHandle;
     IntDispatch output;
     IntDispatch::Handle outputPipeHandle;
-    UiSdlSurfaceComposition root;
+    UiViewSurfaces root;
     UiCtrlSdlWindowSurface (sdl::Window);
     ~UiCtrlSdlWindowSurface ();
     std::function<void ()> DoClose = [this] () {
@@ -88,11 +103,11 @@ namespace hd {
         window.UpdateSurface ();
       }
     };
-    virtual SDL_Rect GetMinimumSize () const override;
-    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
-    virtual SDL_Rect RenderSurface () const;
+    virtual UiPointPair GetMinimumSize () const override;
+    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
+    virtual UiPointPair RenderSurface () const;
   };
-  class UiViewText : public UiSdlSurfaceView {
+  class UiViewText : public UiViewSurfaceBase {
   public:
     sdl::Font font;
     SDL_Color color; /** @todo wrap SDL_Color **/
@@ -100,22 +115,22 @@ namespace hd {
     UiViewText (sdl::Font f,
                 std::string s = "",
                 SDL_Color c = { 255, 255, 255, 255 });
-    virtual SDL_Rect GetMinimumSize () const override;
-    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
+    virtual UiPointPair GetMinimumSize () const override;
+    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
   };
-  class UiCtrlSdlSurface : public UiSdlSurfaceView {
+  class UiCtrlSdlSurface : public UiViewSurfaceBase {
   public:
     typedef std::shared_ptr<UiCtrlSdlSurface> s_ptr;
     sdl::Surface surface;
     UiCtrlSdlSurface (sdl::Surface);
-    virtual SDL_Rect GetMinimumSize () const override;
-    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
+    virtual UiPointPair GetMinimumSize () const override;
+    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
   };
-  class UiCtrlSdlSurfaceColor : public UiSdlSurfaceView {
+  class UiCtrlSdlSurfaceColor : public UiViewSurfaceBase {
   public:
     SDL_Color color;
     UiCtrlSdlSurfaceColor (SDL_Color);
-    virtual SDL_Rect GetMinimumSize () const override;
-    virtual SDL_Rect RenderSurface (sdl::Surface, SDL_Rect) const override;
+    virtual UiPointPair GetMinimumSize () const override;
+    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
   };
 }

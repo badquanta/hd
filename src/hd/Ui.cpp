@@ -24,6 +24,7 @@
  *
  */
 #include "hd/Ui.hpp"
+#include "hd/Debug.hpp"
 
 /**
  * ### UI Flags
@@ -38,35 +39,77 @@ namespace hd {
       UI_GROW_V = 0x0F,               //
       UI_GROW_H = 0x10;
 }
+/** ### UiPointPair **/
+namespace hd {
+  UiPointPair::UiPointPair ()
+      : std::pair<UiPoint, UiPoint>{ { 0, 0 }, { 0, 0 } }
+  {
+  }
+  UiPointPair::UiPointPair (const SDL_Rect &r)
+      : std::pair<UiPoint, UiPoint>{ UiPoint{ r.x, r.y },
+                                     UiPoint{ r.x + r.w, r.y + r.h } }
+  {
+  }
+  UiPointPair::operator SDL_Rect ()
+  {
+    return SDL_Rect{
+      first.x, first.y, second.x - first.x, second.y - first.y
+    };
+  }
+  UiPointPair &
+  UiPointPair::operator= (SDL_Rect r)
+  {
+    first.x = r.x;
+    first.y = r.y;
+    second.x = r.x + r.w;
+    second.y = r.y + r.h;
+    return (*this);
+  }
+  UiPointPair
+  UiPointPair::operator+ (UiPoint a)
+  {
+    return { a + first, a + second };
+  }
+  UiPointPair
+  UiPointPair::Union (const UiPointPair &aPair)
+  {
+    return { {
+                 (aPair.first.x < first.x) ? aPair.first.x : first.x,
+                 (aPair.first.y < first.y) ? aPair.first.y : first.y,
+             },
+             {
+                 (aPair.second.x > second.x) ? aPair.second.x : second.x,
+                 (aPair.second.x > second.x) ? aPair.second.x : second.x,
+             } };
+  }
+}
 /** ### UiComposition **/
 namespace hd {
-  SDL_Rect
-  UiSdlSurfaceComposition::GetMinimumSize () const
+
+  UiPointPair
+  UiViewSurfaces::GetMinimumSize () const
   {
-    Rect r{ 0 };
-    for (std::pair<int, UiSdlSurfaceView::s_ptr> p : elements) {
-      if (p.second) {
-        Rect r2;
-        r2 = p.second->GetMinimumSize ();
-        r = r.Union (r2);
+    UiPointPair r;
+    for (std::pair<int, UiViewSurfaceBase::s_ptr> pair : elements) {
+      if (pair.second) {
+        r = r.Union (pair.second->GetMinimumSize ());
       }
     }
     return r;
   }
 
-  SDL_Rect
-  UiSdlSurfaceComposition::RenderSurface (sdl::Surface s, SDL_Rect r) const
+  UiPointPair
+  UiViewSurfaces::RenderSurface (sdl::Surface s, UiPointPair r) const
   {
-    Rect c{ 0 };
-    for (std::pair<int, UiSdlSurfaceView::s_ptr> p : elements) {
-
+    UiPointPair c;
+    for (std::pair<int, UiViewSurfaceBase::s_ptr> p : elements) {
       c = c.Union (p.second->RenderSurface (s, r));
     }
     return c;
   }
 
   int
-  UiSdlSurfaceComposition::Append (UiSdlSurfaceView::s_ptr child)
+  UiViewSurfaces::Append (UiViewSurfaceBase::s_ptr child)
   {
     int ID = ++NextID;
     elements[ID] = child;
@@ -74,7 +117,7 @@ namespace hd {
   }
 
   bool
-  UiSdlSurfaceComposition::Delete (int aID)
+  UiViewSurfaces::Delete (int aID)
   {
     return (elements.erase (aID) > 0);
   }
@@ -82,11 +125,22 @@ namespace hd {
 /** ### UiSdlPositionedSurfaceComposition **/
 namespace hd {
   int
-  UiSdlPositionedSurfaceComposition::Append (s_ptr aPtr, SDL_Rect aRct)
+  UiSdlPositionedSurfaceComposition::Append (UiViewSurfaceBase::s_ptr aptr)
   {
-    int ID = UiSdlSurfaceComposition::Append (aPtr);
-
-    positions.emplace (ID, { { R.x, R.y }, { R.x + R.w, R.y + R.h } });
+    return Append (aptr, aptr->GetMinimumSize ());
+  }
+  int
+  UiSdlPositionedSurfaceComposition::Append (UiViewSurfaceBase::s_ptr aPtr,
+                                             UiPoint aPoint)
+  {
+    return Append (aPtr, aPtr->GetMinimumSize () + aPoint);
+  }
+  int
+  UiSdlPositionedSurfaceComposition::Append (UiViewSurfaceBase::s_ptr aPtr,
+                                             UiPointPair aRct)
+  {
+    int ID = UiViewSurfaces::Append (aPtr);
+    positions[ID] = aRct;
     return ID;
   }
   bool
@@ -94,41 +148,39 @@ namespace hd {
   {
     return (positions.erase (aID) | Delete (aID));
   }
-  SDL_Rect
+  UiPointPair
   UiSdlPositionedSurfaceComposition::GetMinimumSize () const
   {
-    Rect u{ 0 };
+    UiPointPair u;
     for (std::pair pair : elements) {
       int ID = pair.first;
-      SDL_Rect u2 = pair.second->GetMinimumSize ();
-      glm::i32vec2 pos{ 0 };
+      // UiPointPair u2 = pair.second->GetMinimumSize ();
+      UiPointPair pos;
       if (positions.find (ID) != positions.end ()) {
         pos = positions.at (ID);
+      } else {
+        pos = pair.second->GetMinimumSize ();
       }
-      pos = pos + glm::i32vec2{ u2.x, u2.y };
-      u2.x = pos[0];
-      u2.y = pos[1];
-      u = Rect::Union (u, &u2);
+      u = u.Union (pos);
     }
     return u;
   }
-  SDL_Rect
+  UiPointPair
   UiSdlPositionedSurfaceComposition::RenderSurface (sdl::Surface dst,
-                                                    SDL_Rect reqRect) const
+                                                    UiPointPair reqRect) const
   {
-    Rect c{ 0 };
+    UiPointPair c;
     for (std::pair pair : elements) {
       auto ID = pair.first;
       auto ctrlSurf = pair.second;
-      glm::i32vec2 position{ 0 };
+      UiPointPair position;
       if (positions.find (ID) != positions.end ()) {
         position = positions.at (ID);
+      } else {
+        position = ctrlSurf->GetMinimumSize ();
       }
-      SDL_Rect dstRect = reqRect;
-      position += glm::i32vec2{ dstRect.x, dstRect.y };
-      dstRect.x = position[0];
-      dstRect.y = position[1];
-      c = c.Union (ctrlSurf->RenderSurface (dstRect));
+
+      c = c.Union (ctrlSurf->RenderSurface (dst, position));
     }
     return c;
   }
@@ -149,7 +201,7 @@ namespace hd {
     window.Event ().Delete (eventPipeHandle);
     Engine::Get ()->output.Delete (outputPipeHandle);
   }
-  SDL_Rect
+  UiPointPair
   UiCtrlSdlWindowSurface::GetMinimumSize () const
   {
     SDL_Rect r;
@@ -159,12 +211,12 @@ namespace hd {
     }
     return r;
   }
-  SDL_Rect
-  UiCtrlSdlWindowSurface::RenderSurface (sdl::Surface s, SDL_Rect r) const
+  UiPointPair
+  UiCtrlSdlWindowSurface::RenderSurface (sdl::Surface s, UiPointPair r) const
   {
     return root.RenderSurface (s, r);
   }
-  SDL_Rect
+  UiPointPair
   UiCtrlSdlWindowSurface::RenderSurface () const
   {
     SDL_Rect r = GetMinimumSize ();
@@ -182,7 +234,7 @@ namespace hd {
   {
   }
 
-  SDL_Rect
+  UiPointPair
   UiViewText::GetMinimumSize () const
   {
     SDL_Rect r{ 0 };
@@ -191,31 +243,24 @@ namespace hd {
     }
     return r;
   }
-  SDL_Rect
-  UiViewText::RenderSurface (sdl::Surface dst, SDL_Rect reqRect) const
+  UiPointPair
+  UiViewText::RenderSurface (sdl::Surface dst, UiPointPair reqRect) const
   {
     SDL_Rect dstRect = reqRect, minRect = GetMinimumSize ();
     if (font) {
-      if (!(flags & (UI_GROW_V))) {
-        // dstRect.w = minRect.w;
+      sdl::Surface tmp
+          = font.RenderBlendedUTF8Wrapped (text, color, dstRect.w);
+      minRect = { 0, 0, tmp.ptr->w, tmp.ptr->h };
+      if ((flags & (UI_GROW_H))) {
+        dstRect.w = minRect.w;
       }
-      if (!(flags & (UI_GROW_H))) {
+      if (!(flags & (UI_GROW_V))) {
         dstRect.h = minRect.h;
       }
-      sdl::Surface tmp
-          = font.RenderBlendedTextWrapped (text, color, dstRect.w);
-      tmp.BlitTo (dst, &reqRect);
+
       if (flags & (UI_GROW_H | UI_GROW_V)) {
-        SDL_Rect dstRect = reqRect;
-        if (!(flags & UI_GROW_H)) {
-          dstRect.w = minRect.w;
-        }
-        if (!(flags & UI_GROW_V)) {
-          dstRect.h = minRect.h;
-        }
         tmp.BlitScaledTo (dst, &dstRect, &minRect);
       } else {
-        dstRect = { reqRect.x, reqRect.y, minRect.w, minRect.h };
         tmp.BlitTo (dst, &dstRect, &minRect);
       }
     }
@@ -226,7 +271,7 @@ namespace hd {
 namespace hd {
   /*************************/
   UiCtrlSdlSurface::UiCtrlSdlSurface (sdl::Surface s) : surface (s) {}
-  SDL_Rect
+  UiPointPair
   UiCtrlSdlSurface::GetMinimumSize () const
   {
     SDL_Rect r{ 0 };
@@ -237,8 +282,8 @@ namespace hd {
     return r;
   }
 
-  SDL_Rect
-  UiCtrlSdlSurface::RenderSurface (sdl::Surface dst, SDL_Rect reqRect) const
+  UiPointPair
+  UiCtrlSdlSurface::RenderSurface (sdl::Surface dst, UiPointPair reqRect) const
   {
     SDL_Rect minRect = GetMinimumSize ();
     SDL_Rect dstRect = reqRect;
@@ -262,15 +307,15 @@ namespace hd {
 namespace hd {
   UiCtrlSdlSurfaceColor::UiCtrlSdlSurfaceColor (SDL_Color c) : color (c) {}
 
-  SDL_Rect
+  UiPointPair
   UiCtrlSdlSurfaceColor::GetMinimumSize () const
   {
     return SDL_Rect{ 0 };
   }
 
-  SDL_Rect
+  UiPointPair
   UiCtrlSdlSurfaceColor::RenderSurface (sdl::Surface dst,
-                                        SDL_Rect dstRect) const
+                                        UiPointPair dstRect) const
   {
     if (dst) {
       dst.FillRect (dstRect, dst.MapRGBA (color));

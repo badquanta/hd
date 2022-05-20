@@ -88,13 +88,28 @@ main (int argc, char **argv)
   // We also connect to the SDL_DROPTEXT event
   winCtl->event.Drop.Text.On ([&] (const SDL_Event &e) {
     txtCtl->text += e.drop.file; // So that the user can provide sample text.
+    txtCtl->text += "\n";
     printf ("DROP TEXT: %s\n", e.drop.file);
     SDL_free (e.drop.file);
   });
+  winCtl->event.Drop.Complete.Void.On ([&] () {
+    clrCtl->color = { 128, 128, 128, 255 };
+  });
   // Append the color & text to the `root` (UiComposition) of the Window
   // Controller
+  auto posCtrl = std::make_shared<UiSdlPositionedSurfaceComposition> ();
+  auto txt2Ctrl = std::make_shared<UiViewText> (
+      font, "Say something new", SDL_Color{ 255, 0, 0, 255 });
+  auto clr2Ctrl
+      = std::make_shared<UiCtrlSdlSurfaceColor> (SDL_Color{ 0, 255, 0, 255 });
+  posCtrl->Append (txt2Ctrl, { 100, 200 });
+  posCtrl->Append (clr2Ctrl, { { 25, 25 }, { 50, 50 } });
+  posCtrl->Append (clr2Ctrl, { { 300, 200 }, { 500, 500 } });
+
   winCtl->root.Append (clrCtl);
   winCtl->root.Append (txtCtl);
+  winCtl->root.Append (posCtrl);
+
   // @todo (winCtl should have its own output event handler)
   // start the engine
   Engine::Get ()->Start ();
