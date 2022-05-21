@@ -55,12 +55,44 @@ namespace hd {
   extern const int UI_FOCUSED_TARGET, UI_FOCUSED, UI_CAN_FOCUS, UI_IS_TAB_STOP,
       UI_GROW_H, UI_GROW_V, UI_MOUSE_IN, UI_MOUSE_OVER, UI_MOUSE_OUT;
 
+  class UiBaseView {
+    public:
+      virtual UiPointPair RenderSurface(sdl::Surface, UiPointPair) const = 0;
+  };
+  template<class MODEL_TYPE>
+  class UiAbstractView: public UiBaseView {
+    public:
+      MODEL_TYPE model;
+  };
+  class UiBaseControl {
+  public:
+    virtual void Render () const = 0;
+  };
+  template<class MODEL_TYPE>
+  class UiAbstractControl {
+    public:
+    UiAbstractView<MODEL_TYPE> view;
+  };
+
+  typedef struct {
+    sdl::Font font;
+    int fontSize;
+    SDL_Color textColor;
+    std::string text;
+  } UiViewTextModel;
+
   class UiViewSurfaceBase {
   public:
     typedef std::shared_ptr<UiViewSurfaceBase> s_ptr;
-    unsigned int flags = 0;
+    typedef unsigned int flag_t;
+    flag_t flags = 0;
     virtual UiPointPair GetMinimumSize () const = 0;
     virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const = 0;
+    flag_t ToggleFlag(flag_t );
+    flag_t SetFlag(flag_t);
+    flag_t ClearFlags(flag_t);
+    bool CheckAllFlags (flag_t);
+    bool CheckAnyFlags (flag_t);
   };
   class UiViewSurfaces : public UiViewSurfaceBase {
   public:
@@ -71,9 +103,9 @@ namespace hd {
     virtual int Append (s_ptr);
     virtual bool Delete (int);
   };
-  class UiSdlPositionedSurfaceComposition : public UiViewSurfaces {
+  class UiViewPositionedSurfaces : public UiViewSurfaces {
     public:
-      typedef std::shared_ptr<UiSdlPositionedSurfaceComposition> s_ptr;
+      typedef std::shared_ptr<UiViewPositionedSurfaces> s_ptr;
       std::map<int, UiPointPair> positions;
       virtual int Append (UiViewSurfaceBase::s_ptr, UiPointPair);
       virtual int Append (UiViewSurfaceBase::s_ptr) override;

@@ -25,6 +25,7 @@
  */
 #include "hd/Ui.hpp"
 #include "hd/Debug.hpp"
+#include "hd/Error.hpp"
 
 /**
  * ### UI Flags
@@ -38,6 +39,24 @@ namespace hd {
       UI_IS_TAB_STOP = 0x08,          //
       UI_GROW_V = 0x0F,               //
       UI_GROW_H = 0x10;
+}
+/** ### UiViewSurfaceBase **/
+namespace hd {
+  UiViewSurfaceBase::flag_t UiViewSurfaceBase::ToggleFlag(flag_t toggleFlags){
+    return flags ^= toggleFlags;
+  }
+  UiViewSurfaceBase::flag_t UiViewSurfaceBase::SetFlag(flag_t setFlags){
+    return flags |= setFlags;
+  }
+  UiViewSurfaceBase::flag_t UiViewSurfaceBase::ClearFlags(flag_t clearFlags){
+    return flags &= ~clearFlags;
+  }
+  bool UiViewSurfaceBase::CheckAllFlags(flag_t checkFlags) {
+    return (flags & checkFlags) == checkFlags;
+  }
+  bool UiViewSurfaceBase::CheckAnyFlags(flag_t anyFlags){
+    return (flags & checkFlags) != 0;
+  }
 }
 /** ### UiPointPair **/
 namespace hd {
@@ -122,34 +141,34 @@ namespace hd {
     return (elements.erase (aID) > 0);
   }
 }
-/** ### UiSdlPositionedSurfaceComposition **/
+/** ### UiViewPositionedSurfaces **/
 namespace hd {
   int
-  UiSdlPositionedSurfaceComposition::Append (UiViewSurfaceBase::s_ptr aptr)
+  UiViewPositionedSurfaces::Append (UiViewSurfaceBase::s_ptr aptr)
   {
     return Append (aptr, aptr->GetMinimumSize ());
   }
   int
-  UiSdlPositionedSurfaceComposition::Append (UiViewSurfaceBase::s_ptr aPtr,
-                                             UiPoint aPoint)
+  UiViewPositionedSurfaces::Append (UiViewSurfaceBase::s_ptr aPtr,
+                                    UiPoint aPoint)
   {
     return Append (aPtr, aPtr->GetMinimumSize () + aPoint);
   }
   int
-  UiSdlPositionedSurfaceComposition::Append (UiViewSurfaceBase::s_ptr aPtr,
-                                             UiPointPair aRct)
+  UiViewPositionedSurfaces::Append (UiViewSurfaceBase::s_ptr aPtr,
+                                    UiPointPair aRct)
   {
     int ID = UiViewSurfaces::Append (aPtr);
     positions[ID] = aRct;
     return ID;
   }
   bool
-  UiSdlPositionedSurfaceComposition::Delete (int aID)
+  UiViewPositionedSurfaces::Delete (int aID)
   {
     return (positions.erase (aID) | Delete (aID));
   }
   UiPointPair
-  UiSdlPositionedSurfaceComposition::GetMinimumSize () const
+  UiViewPositionedSurfaces::GetMinimumSize () const
   {
     UiPointPair u;
     for (std::pair pair : elements) {
@@ -166,8 +185,8 @@ namespace hd {
     return u;
   }
   UiPointPair
-  UiSdlPositionedSurfaceComposition::RenderSurface (sdl::Surface dst,
-                                                    UiPointPair reqRect) const
+  UiViewPositionedSurfaces::RenderSurface (sdl::Surface dst,
+                                           UiPointPair reqRect) const
   {
     UiPointPair c;
     for (std::pair pair : elements) {
@@ -246,11 +265,16 @@ namespace hd {
   UiPointPair
   UiViewText::RenderSurface (sdl::Surface dst, UiPointPair reqRect) const
   {
+    if (!dst) {
+      hdError ("destination surface missing");
+    }
     SDL_Rect dstRect = reqRect, minRect = GetMinimumSize ();
     if (font) {
       sdl::Surface tmp
-          = font.RenderBlendedUTF8Wrapped (text, color, dstRect.w);
+          = font.RenderBlendedTextWrapped (text, color, dstRect.w);
+      assert (tmp);
       minRect = { 0, 0, tmp.ptr->w, tmp.ptr->h };
+
       if ((flags & (UI_GROW_H))) {
         dstRect.w = minRect.w;
       }

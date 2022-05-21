@@ -97,7 +97,7 @@ main (int argc, char **argv)
   });
   // Append the color & text to the `root` (UiComposition) of the Window
   // Controller
-  auto posCtrl = std::make_shared<UiSdlPositionedSurfaceComposition> ();
+  auto posCtrl = std::make_shared<UiViewPositionedSurfaces> ();
   auto txt2Ctrl = std::make_shared<UiViewText> (
       font, "Say something new", SDL_Color{ 255, 0, 0, 255 });
   auto clr2Ctrl

@@ -105,6 +105,8 @@ namespace hd::sdl {
                    SDL_Rect *aDstRect,
                    const SDL_Rect *aSrcRect) const
   {
+    assert (*this);
+    assert (aOther);
     if (SDL_BlitSurface (*this, aSrcRect, aOther, aDstRect) == 0) {
       return true;
     } else {
@@ -138,6 +140,8 @@ namespace hd::sdl {
                          SDL_Rect *aDstRect,
                          const SDL_Rect *aSrcRect) const
   {
+    assert (*this);
+    assert (aOther);
     return SDL_BlitScaled (*this, aSrcRect, aOther, aDstRect) == 0;
   }
   bool
