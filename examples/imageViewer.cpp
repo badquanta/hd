@@ -25,10 +25,12 @@ main (int argc, char **argv)
     const SDL_MouseWheelEvent &w = e.wheel;
     printf ("Mouse wheel x=%d y=%d direction:%d\n", w.x, w.y, w.direction);
   });
-  winCtl->event.Key.Keycode[SDLK_F1].Void.On (
-      [] () { picCtl->ToggleFlags (HD_GROW_V); });
-  winCtl->event.Key.Keycode[SDLK_F1].Void.On (
-      [] () { picCtl->ToggleFlags (HD_GROW_H); });
+  winCtl->event.Key.Keycode[SDLK_F1].Up.Void.On (
+      [&] () { picCtl->ToggleFlags (UI_GROW_V); });
+  winCtl->event.Key.Keycode[SDLK_F2].Up.Void.On ([&] () {
+    printf ("Toggle Grow Horizontal");
+    picCtl->ToggleFlags (UI_GROW_H);
+  });
   winCtl->event.Key.Keycode[SDLK_f].Void.On (
       [] () { printf ("SFS's keycode.\n"); });
 

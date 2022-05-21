@@ -157,4 +157,8 @@ if(DOXYGEN_FOUND)
     ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/examples  COMMENT "Generate documentation.")
   # ############################################################################
   configure_file(index.html index.html)
+  add_custom_target(open-html-docs
+  COMMAND xdg-open "${DOXYGEN_OUTPUT_DIRECTORY}/html/index.html"
+  DEPENDS doxygen
+  )
 endif()

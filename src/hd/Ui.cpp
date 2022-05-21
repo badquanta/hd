@@ -30,7 +30,7 @@
 /**
  * ### UI Flags
  *
- * @todo more detailed documention about the ui flags.
+ * @todo more detailed documentation about the ui flags.
  */
 namespace hd {
   const int UI_FOCUSED_TARGET = 0x01, //
@@ -42,10 +42,10 @@ namespace hd {
 }
 /** ### UiViewSurfaceBase **/
 namespace hd {
-  UiViewSurfaceBase::flag_t UiViewSurfaceBase::ToggleFlag(flag_t toggleFlags){
+  UiViewSurfaceBase::flag_t UiViewSurfaceBase::ToggleFlags(flag_t toggleFlags){
     return flags ^= toggleFlags;
   }
-  UiViewSurfaceBase::flag_t UiViewSurfaceBase::SetFlag(flag_t setFlags){
+  UiViewSurfaceBase::flag_t UiViewSurfaceBase::SetFlags(flag_t setFlags){
     return flags |= setFlags;
   }
   UiViewSurfaceBase::flag_t UiViewSurfaceBase::ClearFlags(flag_t clearFlags){
@@ -55,7 +55,7 @@ namespace hd {
     return (flags & checkFlags) == checkFlags;
   }
   bool UiViewSurfaceBase::CheckAnyFlags(flag_t anyFlags){
-    return (flags & checkFlags) != 0;
+    return (flags & anyFlags) != 0;
   }
 }
 /** ### UiPointPair **/
@@ -144,9 +144,9 @@ namespace hd {
 /** ### UiViewPositionedSurfaces **/
 namespace hd {
   int
-  UiViewPositionedSurfaces::Append (UiViewSurfaceBase::s_ptr aptr)
+  UiViewPositionedSurfaces::Append (UiViewSurfaceBase::s_ptr aPtr)
   {
-    return Append (aptr, aptr->GetMinimumSize ());
+    return Append (aPtr, aPtr->GetMinimumSize ());
   }
   int
   UiViewPositionedSurfaces::Append (UiViewSurfaceBase::s_ptr aPtr,
@@ -319,9 +319,11 @@ namespace hd {
         dstRect.h = minRect.h;
       }
       if (flags & (UI_GROW_H | UI_GROW_V)) {
-        surface.BlitTo (dst, &dstRect, &minRect);
-      } else {
+        hdDebug ("Dynamic Blit %b",flags);
         surface.BlitScaledTo (dst, &dstRect, &minRect);
+      } else {
+        surface.BlitTo (dst, &dstRect, &minRect);
+
       }
     }
     return dstRect;

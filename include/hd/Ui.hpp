@@ -24,53 +24,56 @@
  *
  */
 #pragma once
-#include "glm/vec2.hpp"
-#include "glm/matrix.hpp"
 #include "glm/gtx/transform.hpp"
+#include "glm/matrix.hpp"
+#include "glm/vec2.hpp"
 #include "hd/Dispatch.hpp"
 #include "hd/Rect.hpp"
 #include "hd/sdl/Font.hpp"
 #include "hd/sdl/Surface.hpp"
 #include "hd/sdl/Window.hpp"
 namespace hd {
-  using point = glm::ivec2;
+  /** defines a 2D UI Point from glm's ivec2 **/
   typedef glm::ivec2 UiPoint;
-  //typedef std::pair<UiPoint, UiPoint> UiPointPair;
-  class UiPointPair: public std::pair<UiPoint, UiPoint> {
-    public:
-      using std::pair<UiPoint,UiPoint>::pair;
-      UiPointPair ();
-      UiPointPair (const SDL_Rect &);
-      operator SDL_Rect ();
-      UiPointPair& operator= (SDL_Rect);
-      UiPointPair Union (const UiPointPair &);
-      UiPointPair operator+ (UiPoint);
+  /** defines a pair of 2D UI Points analogous to an `SDL_Rect` but differs in
+  that both points share the same origin and their height and with are inferred
+  by the difference between the two points. **/
+  class UiPointPair : public std::pair<UiPoint, UiPoint> {
+  public:
+    using std::pair<UiPoint, UiPoint>::pair;
+    UiPointPair ();
+    UiPointPair (const SDL_Rect &);
+    operator SDL_Rect ();
+    UiPointPair &operator= (SDL_Rect);
+    UiPointPair Union (const UiPointPair &);
+    UiPointPair operator+ (UiPoint);
   };
+  /** @todo possibly remove **/
   template <class Return, class... Signature>
   Return
   ReturnNull (Signature... Args)
   {
     return Return (NULL);
   }
+  /** User interface constants: **/
   extern const int UI_FOCUSED_TARGET, UI_FOCUSED, UI_CAN_FOCUS, UI_IS_TAB_STOP,
       UI_GROW_H, UI_GROW_V, UI_MOUSE_IN, UI_MOUSE_OVER, UI_MOUSE_OUT;
-
+  /** Pure virtual class that provides the common interface **/
   class UiBaseView {
-    public:
-      virtual UiPointPair RenderSurface(sdl::Surface, UiPointPair) const = 0;
+  public:
+    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const = 0;
   };
-  template<class MODEL_TYPE>
-  class UiAbstractView: public UiBaseView {
-    public:
-      MODEL_TYPE model;
+  /** The model based view template that allows specialization of DataViews **/
+  template <class MODEL_TYPE> class UiAbstractView : public UiBaseView {
+  public:
+    MODEL_TYPE model;
   };
   class UiBaseControl {
   public:
     virtual void Render () const = 0;
   };
-  template<class MODEL_TYPE>
-  class UiAbstractControl {
-    public:
+  template <class MODEL_TYPE> class UiAbstractControl {
+  public:
     UiAbstractView<MODEL_TYPE> view;
   };
 
@@ -88,9 +91,9 @@ namespace hd {
     flag_t flags = 0;
     virtual UiPointPair GetMinimumSize () const = 0;
     virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const = 0;
-    flag_t ToggleFlag(flag_t );
-    flag_t SetFlag(flag_t);
-    flag_t ClearFlags(flag_t);
+    flag_t ToggleFlags (flag_t);
+    flag_t SetFlags (flag_t);
+    flag_t ClearFlags (flag_t);
     bool CheckAllFlags (flag_t);
     bool CheckAnyFlags (flag_t);
   };
@@ -99,21 +102,22 @@ namespace hd {
     int NextID = 0;
     std::map<int, UiViewSurfaceBase::s_ptr> elements;
     virtual UiPointPair GetMinimumSize () const override;
-    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
+    virtual UiPointPair RenderSurface (sdl::Surface,
+                                       UiPointPair) const override;
     virtual int Append (s_ptr);
     virtual bool Delete (int);
   };
   class UiViewPositionedSurfaces : public UiViewSurfaces {
-    public:
-      typedef std::shared_ptr<UiViewPositionedSurfaces> s_ptr;
-      std::map<int, UiPointPair> positions;
-      virtual int Append (UiViewSurfaceBase::s_ptr, UiPointPair);
-      virtual int Append (UiViewSurfaceBase::s_ptr) override;
-      virtual int Append (UiViewSurfaceBase::s_ptr, UiPoint);
-      virtual bool Delete (int) override;
-      virtual UiPointPair GetMinimumSize () const override;
-      virtual UiPointPair RenderSurface (sdl::Surface,
-                                         UiPointPair) const override;
+  public:
+    typedef std::shared_ptr<UiViewPositionedSurfaces> s_ptr;
+    std::map<int, UiPointPair> positions;
+    virtual int Append (UiViewSurfaceBase::s_ptr, UiPointPair);
+    virtual int Append (UiViewSurfaceBase::s_ptr) override;
+    virtual int Append (UiViewSurfaceBase::s_ptr, UiPoint);
+    virtual bool Delete (int) override;
+    virtual UiPointPair GetMinimumSize () const override;
+    virtual UiPointPair RenderSurface (sdl::Surface,
+                                       UiPointPair) const override;
   };
   class UiCtrlSdlWindowSurface : public UiViewSurfaceBase {
   public:
@@ -136,7 +140,8 @@ namespace hd {
       }
     };
     virtual UiPointPair GetMinimumSize () const override;
-    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
+    virtual UiPointPair RenderSurface (sdl::Surface,
+                                       UiPointPair) const override;
     virtual UiPointPair RenderSurface () const;
   };
   class UiViewText : public UiViewSurfaceBase {
@@ -148,7 +153,8 @@ namespace hd {
                 std::string s = "",
                 SDL_Color c = { 255, 255, 255, 255 });
     virtual UiPointPair GetMinimumSize () const override;
-    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
+    virtual UiPointPair RenderSurface (sdl::Surface,
+                                       UiPointPair) const override;
   };
   class UiCtrlSdlSurface : public UiViewSurfaceBase {
   public:
@@ -156,13 +162,15 @@ namespace hd {
     sdl::Surface surface;
     UiCtrlSdlSurface (sdl::Surface);
     virtual UiPointPair GetMinimumSize () const override;
-    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
+    virtual UiPointPair RenderSurface (sdl::Surface,
+                                       UiPointPair) const override;
   };
   class UiCtrlSdlSurfaceColor : public UiViewSurfaceBase {
   public:
     SDL_Color color;
     UiCtrlSdlSurfaceColor (SDL_Color);
     virtual UiPointPair GetMinimumSize () const override;
-    virtual UiPointPair RenderSurface (sdl::Surface, UiPointPair) const override;
+    virtual UiPointPair RenderSurface (sdl::Surface,
+                                       UiPointPair) const override;
   };
 }
