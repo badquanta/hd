@@ -296,22 +296,25 @@ namespace hd::sdl {
   public:
     GameControllerWhichAxisDispatch ();
   };
-  class GameControllerWhichButtonDispatch : public AbstractFieldDispatch<Uint8> {
-    public:
-      GameControllerWhichButtonDispatch ();
+  class GameControllerWhichButtonDispatch
+      : public AbstractFieldDispatch<Uint8> {
+  public:
+    GameControllerWhichButtonDispatch ();
   };
-  class GameControllerWhichTouchpadDispatch : public AbstractFieldDispatch<Sint32> {
-    public:
-      GameControllerWhichTouchpadDispatch ();
+  class GameControllerWhichTouchpadDispatch
+      : public AbstractFieldDispatch<Sint32> {
+  public:
+    GameControllerWhichTouchpadDispatch ();
   };
-  class GameControllerWhichSensorDispatch : public AbstractFieldDispatch<Sint32> {
-    public:
-      GameControllerWhichSensorDispatch ();
+  class GameControllerWhichSensorDispatch
+      : public AbstractFieldDispatch<Sint32> {
+  public:
+    GameControllerWhichSensorDispatch ();
   };
   /** @brief Dispatch various events for a controller to specialized handlers.
    *
    */
-  class GameControllerDispatch : public EventDispatch {
+  class GameControllerDispatch : public EventTypeDispatch {
   public:
     GameControllerWhichAxisDispatch axis;
     GameControllerWhichButtonDispatch button;
@@ -324,15 +327,15 @@ namespace hd::sdl {
    *
    */
   class WhichGameControllerDispatch
-      : AbstractFieldDispatch<GameController,  { =swial0Fro
+      : public AbstractFieldDispatch<SDL_JoystickID, GameControllerDispatch> {
   public:
     WhichGameControllerDispatch ();
   };
   class AllGameControllerDispatch : public GameControllerDispatch {
-    public:
-      WhichGameControllerDispatch controller;
-      AllGameControllerDispatch ();
-  }
+  public:
+    WhichGameControllerDispatch controller;
+    AllGameControllerDispatch ();
+  };
 }
 /** ## Engine Dispatch
  * @todo rename to RootDispatch and document? */

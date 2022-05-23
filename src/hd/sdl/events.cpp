@@ -344,16 +344,40 @@ namespace hd::sdl {
   }
 
   /** **/
-  AllJoyDispatch::AllJoyDispatch ()
-  {
-    On (JoyIdEvents, stick.pipe);
-  }
+  AllJoyDispatch::AllJoyDispatch () { On (JoyIdEvents, stick.pipe); }
 }
 /** #### Controller Dispatch Implementation */
 namespace hd::sdl {
-  WhichGameControllerDispatch::WhichGameControllerDispatch
-  AllGameControllerDispatch::AllGameControllerDispatch(){
-    On (GameControllerEvents, controller.bind);
+  GameControllerWhichButtonDispatch::GameControllerWhichButtonDispatch():AbstractFieldDispatch([](const SDL_Event&e){return e.cbutton.button;}){}
+  GameControllerWhichAxisDispatch::GameControllerWhichAxisDispatch():AbstractFieldDispatch([](const SDL_Event &e){return e.caxis.axis;}){}
+  GameControllerWhichTouchpadDispatch::GameControllerWhichTouchpadDispatch():AbstractFieldDispatch([](const SDL_Event&e){return e.ctouchpad.touchpad;}){}
+  GameControllerWhichSensorDispatch::GameControllerWhichSensorDispatch():AbstractFieldDispatch([](const SDL_Event&e){return e.csensor.sensor;}){}
+  WhichGameControllerDispatch::WhichGameControllerDispatch ()
+      : AbstractFieldDispatch (IndirectExtractor<SDL_JoystickID,SDL_EventType> (
+          { { { SDL_CONTROLLERAXISMOTION },
+              [] (const SDL_Event &e) { return e.caxis.which; } },
+            { GameControllerDeviceEvents,
+              [] (const SDL_Event &e) { return e.cdevice.which; } },
+            { GameControllerButtonEvents,
+              [] (const SDL_Event &e) { return e.cbutton.which; } },
+            { GameControllerTouchpadEvents,
+              [] (const SDL_Event &e) { return e.ctouchpad.which; } },
+            { { SDL_CONTROLLERSENSORUPDATE },
+              [] (const SDL_Event &e) { return e.csensor.which; } } },
+          [] (const SDL_Event &e) { return (SDL_EventType)e.type; }))
+  {
+  }
+  GameControllerDispatch::GameControllerDispatch():
+  added((*this)[SDL_CONTROLLERDEVICEADDED]), removed((*this)[SDL_CONTROLLERDEVICEREMOVED]), remapped((*this)[SDL_CONTROLLERDEVICEREMAPPED])
+  {
+    On(SDL_CONTROLLERAXISMOTION, axis.pipe);
+    On(SDL_CONTROLLERSENSORUPDATE, sensor.pipe);
+    On(GameControllerButtonEvents, button.pipe);
+    On(GameControllerTouchpadEvents, touchpad.pipe);
+  }
+  AllGameControllerDispatch::AllGameControllerDispatch ()
+  {
+    On (GameControllerEvents, controller.pipe);
   }
 }
 /** #### hd::sdl::EngineDispatch
