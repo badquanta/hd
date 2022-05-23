@@ -21,13 +21,13 @@ main (int argc, char **argv)
              "Unable to open SDL Window because %s",
              SDL_GetError ());
   winCtl->root.Append (picCtl);
-  winCtl->event.Mouse.Wheel.On ([&] (const SDL_Event &e) {
+  winCtl->event.Mouse.wheel.On ([&] (const SDL_Event &e) {
     const SDL_MouseWheelEvent &w = e.wheel;
     printf ("Mouse wheel x=%d y=%d direction:%d\n", w.x, w.y, w.direction);
   });
-  winCtl->event.Key.Keycode[SDLK_F1].Up.Void.On (
+  winCtl->event.Key.Keycode[SDLK_F1].up.Void.On (
       [&] () { picCtl->ToggleFlags (UI_GROW_V); });
-  winCtl->event.Key.Keycode[SDLK_F2].Up.Void.On ([&] () {
+  winCtl->event.Key.Keycode[SDLK_F2].up.Void.On ([&] () {
     printf ("Toggle Grow Horizontal");
     picCtl->ToggleFlags (UI_GROW_H);
   });

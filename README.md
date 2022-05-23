@@ -1,4 +1,4 @@
-# README.md
+# repo README.md
 
 You have reached the `hd` [repository](#repository).
 Here you will find the sources of the project and more [about](#about) it.
@@ -97,6 +97,8 @@ Utilized to generate debian and other installers. Simply execute `cpack` within 
 <a name='credits'>
 
 # Credits
+
+@include CREDITS.md
 
 ## Assets
 

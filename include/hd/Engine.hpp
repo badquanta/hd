@@ -25,7 +25,7 @@
  */
 #pragma once
 #include "hd/Log.hpp"
-#include "hd/sdl/EngineDispatch.hpp"
+#include "hd/sdl/events.hpp"
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

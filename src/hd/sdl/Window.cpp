@@ -132,7 +132,7 @@ namespace hd::sdl {
   WindowDispatch &
   Window::Event () const
   {
-    return events.Windows[Id ()];
+    return events.windows[Id ()];
   }
 
   /**

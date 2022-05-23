@@ -30,7 +30,7 @@
 #include "hd/Debug.hpp"
 #include "hd/Error.hpp"
 #include "hd/gl/ShaderProgram.hpp"
-#include "hd/sdl/WindowDispatch.hpp"
+#include "hd/sdl/events.hpp"
 #include <glm/vec3.hpp>
 namespace hd {
   namespace gl {
@@ -73,16 +73,16 @@ namespace hd {
       VoidSignatureDispatch::Handler StartTrackingMouse = [this] () {
         hdDebug ("Start Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_TRUE);
-        TrackingListenerHandle = input.Mouse.Motion.On (TrackingListener);
+        TrackingListenerHandle = input.mouse.motion.On (TrackingListener);
       };
-      /** @brief Stop tracking mouse motion by disconnecting the Mouse.Motion
+      /** @brief Stop tracking mouse motion by disconnecting the Mouse.motion
        * handler. */
       VoidSignatureDispatch::Handler StopTrackingMouse = [this] () {
         hdDebug ("Stop Tracking Mouse");
         SDL_SetRelativeMouseMode (SDL_FALSE);
-        input.Mouse.Motion.Delete (TrackingListenerHandle);
+        input.mouse.motion.Delete (TrackingListenerHandle);
       };
-      /** @brief connected to the Mouse.Motion dispatcher when tracking mouse.
+      /** @brief connected to the Mouse.motion dispatcher when tracking mouse.
        * **/
       sdl::EventDispatch::Handler TrackingListener = [this] (
                                                          const SDL_Event &e) {
@@ -102,7 +102,7 @@ namespace hd {
                              Up);
         }
       };
-      /** Handle kept so that we can later remove the Mouse Motion tracking
+      /** Handle kept so that we can later remove the Mouse motion tracking
        * listener **/
       sdl::EventDispatch::Handle TrackingListenerHandle;
       /** @brief Move the camera forward **/

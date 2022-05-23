@@ -387,7 +387,7 @@ namespace hd {
   Engine::Engine ()
   {
     hdDebugCall (NULL);
-    sdl::events.Quit.Void.On (Quit);
+    sdl::events.quit.Void.On (Quit);
   }
   /**
    * @brief perminate store of the last int value passed to `Configure`

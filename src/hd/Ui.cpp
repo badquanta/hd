@@ -211,7 +211,7 @@ namespace hd {
     printf ("Connecting UiCtrlSdlWindowSurface events.\n");
     eventPipeHandle = window.Event ().On (event.pipe);
     outputPipeHandle = Engine::Get ()->output.On (output.pipe);
-    event.Close.Void.Once (DoClose);
+    event.window.close.Void.Once (DoClose);
     output.Void.On (DoRender);
   }
   UiCtrlSdlWindowSurface::~UiCtrlSdlWindowSurface ()
@@ -271,7 +271,7 @@ namespace hd {
     SDL_Rect dstRect = reqRect, minRect = GetMinimumSize ();
     if (font) {
       sdl::Surface tmp
-          = font.RenderBlendedTextWrapped (text, color, dstRect.w);
+          = font.RenderBlendedUTF8Wrapped (text, color, dstRect.w);
       assert (tmp);
       minRect = { 0, 0, tmp.ptr->w, tmp.ptr->h };
 

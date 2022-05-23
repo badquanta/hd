@@ -24,6 +24,7 @@
 
  */
 #include <hd/Error.hpp>
+#include <hd/Debug.hpp>
 #include <hd/Ui.hpp>
 #include <hd/sdl/Window.hpp>
 using namespace hd;
@@ -77,7 +78,9 @@ main (int argc, char **argv)
     // Check that it was loaded
     if (!newFont) {                               // If not
       winCtl->window.SetTitle ("Unable to open"); // Tell the user
-    } else {                                      // Otherwise
+      hdError ("Drop File Failed:", e.drop.file);
+    } else {
+      hdDebug ("Drop File:", e.drop.file);        // Otherwise
       winCtl->window.SetTitle (e.drop.file);      // Tell the user
       txtCtl->font = newFont;                     // and start using it.
     }
@@ -95,16 +98,23 @@ main (int argc, char **argv)
   winCtl->event.Drop.Complete.Void.On ([&] () {
     clrCtl->color = { 128, 128, 128, 255 };
   });
+  auto font2 = sdl::Font::Load ("ttf/LinLib/LinBiolinum_Rah.ttf", 24);
+  hdSdlErrorIf (!font2, "Unable to load 2nd font.");
   // Append the color & text to the `root` (UiComposition) of the Window
   // Controller
   auto posCtrl = std::make_shared<UiViewPositionedSurfaces> ();
   auto txt2Ctrl = std::make_shared<UiViewText> (
-      font, "Say something new", SDL_Color{ 255, 0, 0, 255 });
+      font2,
+      "The quick brown fox jumped over the lazy dog.\n"
+      "🎮💻═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬\n"
+      "😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏\n"
+      , SDL_Color{ 255, 0, 0, 255 });
   auto clr2Ctrl
       = std::make_shared<UiCtrlSdlSurfaceColor> (SDL_Color{ 0, 255, 0, 255 });
-  posCtrl->Append (txt2Ctrl, { 100, 200 });
   posCtrl->Append (clr2Ctrl, { { 25, 25 }, { 50, 50 } });
-  posCtrl->Append (clr2Ctrl, { { 300, 200 }, { 500, 500 } });
+  posCtrl->Append (clr2Ctrl, { { 350, 200 }, { 450, 300 } });
+  posCtrl->Append (txt2Ctrl, { 100, 200 });
+
 
   winCtl->root.Append (clrCtl);
   winCtl->root.Append (txtCtl);

@@ -51,7 +51,7 @@ openAnotherWindow ()
     winSurf.FillRect ({ 0, 0, 320, 200 }, winSurf.MapRGBA (0, 0, 0));
     win.UpdateSurface ();
   });
-  opened.Event ().Key.Keycode[SDLK_f].Up.Void.On (
+  opened.Event ().Key.Keycode[SDLK_f].up.Void.On (
       [=] { sdl::Window (firstWinPtr).Raise (); });
   opened.Event ().Close.Void.Once ([=] () {
     Engine::Get ()->step.Void.Once ([=] () {
@@ -86,7 +86,7 @@ openFirstWindow ()
       win.UpdateSurface ();
     }
   });
-  win.Event ().Mouse.Button[1].Up.Void.On (openAnotherWindow);
+  win.Event ().Mouse.button[1].up.Void.On (openAnotherWindow);
   win.Event ().Close.Void.Once ([=] () {
     win.engine->step.Void.Once ([=] () { firstWinPtr = NULL; });
     Engine::Get ()->Quit ();

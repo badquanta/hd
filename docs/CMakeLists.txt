@@ -47,6 +47,7 @@ if(DOXYGEN_FOUND)
   set(DOXYGEN_WARN_NO_PARAMDOC NO)
   set(DOXYGEN_WARN_IF_INCOMPLETE_DOC NO)
   set(DOXYGEN_WARN_IF_DOC_ERROR NO)
+  set(DOXYGEN_QUIET NO )
   # x y z
   # ############################################################################
   # Variant DOXYGEN SETTINGS
@@ -91,7 +92,6 @@ if(DOXYGEN_FOUND)
     set(DOXYGEN_INCLUDE_BY_GRAPH YES )
     set(DOXYGEN_INTERACTIVE_SVG YES )
     # j k l m n o p q
-    set(DOXYGEN_QUIET NO )
     # r
     set(DOXYGEN_REFERENCES_LINK_SOURCE YES )
     set(DOXYGEN_REFERENCED_BY_RELATION YES )
@@ -149,12 +149,26 @@ if(DOXYGEN_FOUND)
     set(DOXYGEN_TEMPLATE_RELATIONS NO )
     set(DOXYGEN_VERBATIM_HEADERS NO)
     set(DOXYGEN_WARN_AS_ERROR YES )
-    set(DOXYGEN_QUIET YES )
+
   endif(CMAKE_BUILD_TYPE EQUAL "DEBUG")
 
-  doxygen_add_docs(
-    doxygen ${PROJECT_SOURCE_DIR}/README.md ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/examples  COMMENT "Generate documentation.")
+  option(HD_DOXYGEN_ALL "Enable building doxygen with all target" OFF)
+  list(APPEND HD_DOXYGEN_SOURCE ${PROJECT_SOURCE_DIR}/README.md ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/examples)
+  option(HD_DOXYGEN_SOURCE "List of sources to use with doxygen")
+
+  if(HD_DOXYGEN_ALL)
+    doxygen_add_docs(
+      doxygen ${HD_DOXYGEN_SOURCE}
+      ALL
+      COMMENT "Generate documentation."
+    )
+  else()
+    doxygen_add_docs(
+      doxygen ${HD_DOXYGEN_SOURCE}
+      COMMENT "Generate documentation."
+    )
+  endif()
   # ############################################################################
   configure_file(index.html index.html)
   add_custom_target(open-html-docs

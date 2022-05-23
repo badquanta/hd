@@ -5,7 +5,8 @@
  * @version 0.1
  * @date 2022-05-14
  *
- * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer (badquanta@gmail.com)
+ * @copyright GNU-GPL 3.0 Copyright (C) 2022 Jón Davíð Sawyer
+ * (badquanta@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +24,8 @@
  *
  */
 #pragma once
+#include <SDL2/SDL_error.h>
 #include <cassert>
-
 /**
  * @brief output an error message
  *
@@ -45,3 +46,17 @@
     hdError (ERROR_MESSAGE, ##__VA_ARGS__);                                   \
     assert (!CONDITION);                                                      \
   }
+
+/**
+ * @brief output an SDL error message and HALT!
+ */
+
+#define hdSdlErrorIf(CONDITION, ERROR_MESSAGE, ...)                           \
+  if (CONDITION) {                                                            \
+    fprintf (stderr, "%s:%d\t+++\tSDL ERROR\t+++\n\t", __FILE__, __LINE__);   \
+    fprintf (stderr, ERROR_MESSAGE, ##__VA_ARGS__);                           \
+    hdError ("\t\tSDL Error: %s", SDL_GetError ());                           \
+    throw ERROR_MESSAGE;                                                      \
+  }
+
+/** End of file stub. **/

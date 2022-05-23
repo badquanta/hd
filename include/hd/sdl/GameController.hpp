@@ -5,7 +5,7 @@
  */
 
 #include "hd/EngineComponent.hpp"
-#include "hd/sdl/ControllerDispatch.hpp"
+#include "hd/sdl/events.hpp"
 #include "hd/Wrap.hpp"
 namespace hd::sdl {
   /**
@@ -59,7 +59,7 @@ namespace hd::sdl {
      */
 
   public: // Input Events
-    sdl::ControllerDispatch input;
+    sdl::GameControllerDispatch input;
     sdl::EventDispatch::Handle inputHandle;
 
   private: // static caches

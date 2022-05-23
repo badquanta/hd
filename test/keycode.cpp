@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <hd/sdl/EngineDispatch.hpp>
+#include <hd/sdl/events.hpp>
 // Demonstrate some basic assertions.
 TEST (keycode, getsCalled)
 {

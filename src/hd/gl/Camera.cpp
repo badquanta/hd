@@ -5,18 +5,18 @@ namespace hd::gl {
   Camera::Camera (glm::vec3 p) : Position (p)
   {
     hdDebugCall (NULL);
-    input.Mouse.Button[SDL_BUTTON_LEFT].Down.Void.On (StartTrackingMouse);
-    input.Mouse.Button[SDL_BUTTON_LEFT].Up.Void.On (StopTrackingMouse);
-    //on.Mouse.Motion.Add (TrackingListener);
+    input.mouse.button[SDL_BUTTON_LEFT].down.Void.On (StartTrackingMouse);
+    input.mouse.button[SDL_BUTTON_LEFT].up.Void.On (StopTrackingMouse);
+    //on.mouse.motion.Add (TrackingListener);
 
-    input.Key.Keycode[SDLK_w].Down.Void.On (MoveForward);
-    input.Key.Keycode[SDLK_s].Down.Void.On (MoveBackward);
-    input.Key.Keycode[SDLK_a].Down.Void.On (StrafeLeft);
-    input.Key.Keycode[SDLK_d].Down.Void.On (StrafeRight);
-    input.Key.Keycode[SDLK_LCTRL].Down.Void.On (MoveUp);
-    input.Key.Keycode[SDLK_SPACE].Down.Void.On (MoveDown);
-    input.Key.Keycode[SDLK_LSHIFT].Down.Void.On (RunSpeed);
-    input.Key.Keycode[SDLK_LSHIFT].Up.Void.On (WalkSpeed);
+    input.key.keycode[SDLK_w].down.Void.On (MoveForward);
+    input.key.keycode[SDLK_s].down.Void.On (MoveBackward);
+    input.key.keycode[SDLK_a].down.Void.On (StrafeLeft);
+    input.key.keycode[SDLK_d].down.Void.On (StrafeRight);
+    input.key.keycode[SDLK_LCTRL].down.Void.On (MoveUp);
+    input.key.keycode[SDLK_SPACE].down.Void.On (MoveDown);
+    input.key.keycode[SDLK_LSHIFT].down.Void.On (RunSpeed);
+    input.key.keycode[SDLK_LSHIFT].up.Void.On (WalkSpeed);
   }
 
 

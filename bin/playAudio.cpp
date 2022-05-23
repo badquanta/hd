@@ -67,9 +67,9 @@ main (int argc, char **argv)
   }
   MixerChannel defaultChannel = -1, s_Channel;
 
-  window.Event ().Key.Keycode[SDLK_s].Up.Void.On (
+  window.Event ().Key.Keycode[SDLK_s].up.Void.On (
       [&] () { s_Channel = horrorAmbient.Play (-1); });
-  window.Event ().Key.Keycode[SDLK_m].Up.Void.On (
+  window.Event ().Key.Keycode[SDLK_m].up.Void.On (
       [&] () { defaultChannel.FadeOut (100); });
 
   window.engine->Delay (5000, [&horrorAmbient] (int) {

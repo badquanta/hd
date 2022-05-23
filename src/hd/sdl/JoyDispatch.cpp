@@ -23,7 +23,7 @@
  *
  *
  */
-#include "hd/sdl/JoyDispatch.hpp"
+#include "hd/sdl/events.hpp"
 #include "hd/Debug.hpp"
 #include "hd/Error.hpp"
 namespace hd::sdl {
@@ -54,8 +54,8 @@ namespace hd::sdl {
       break;
     case SDL_JOYBUTTONDOWN:
     case SDL_JOYBUTTONUP:
-      if (Button.find (e.jbutton.button) != Button.end ()) {
-        Button[e.jbutton.button].Trigger (e);
+      if (button.find (e.jbutton.button) != button.end ()) {
+        button[e.jbutton.button].Trigger (e);
       } else {
         hdDebug ("No handlers for Joystick Button #%d", e.jbutton.button);
       }

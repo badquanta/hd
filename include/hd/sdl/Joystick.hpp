@@ -5,7 +5,7 @@
  */
 
 #include "hd/EngineComponent.hpp"
-#include "hd/sdl/JoyDispatch.hpp"
+#include "hd/sdl/events.hpp"
 #include "hd/Wrap.hpp"
 #include <map>
 namespace hd::sdl {

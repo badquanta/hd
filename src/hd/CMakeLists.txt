@@ -7,6 +7,7 @@ list(APPEND LIBHD_COMPONENTS
   Rect.cpp
   Ui.cpp
 
+  sdl/events.cpp
   sdl/Joystick.cpp
   sdl/GameController.cpp
   sdl/MixerChunk.cpp
@@ -18,21 +19,7 @@ list(APPEND LIBHD_COMPONENTS
   sdl/Texture.cpp
   sdl/Display.cpp
 
-  sdl/ControllerDeviceDispatch.cpp
-  sdl/ControllerDispatch.cpp
-  sdl/DropDispatch.cpp
-  sdl/EngineDispatch.cpp
-  sdl/JoyDeviceDispatch.cpp
-  sdl/JoyDispatch.cpp
-  sdl/KeyboardDispatch.cpp
-  sdl/KeyDispatch.cpp
-  sdl/MouseButtonDispatch.cpp
-  sdl/MouseDispatch.cpp
-  sdl/EventDispatch.cpp
-  sdl/TextDispatch.cpp
-  sdl/WindowDispatch.cpp
-  sdl/WindowIdDispatch.cpp
-  sdl/events.cpp
+
 
   gl/Camera.cpp
   gl/Texture.cpp

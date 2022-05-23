@@ -18,7 +18,7 @@ namespace hd::sdl {
   {
     s_ptr pointer (p, [b] (SDL_Surface *p) {
       if (b) {
-        //hdDebug ("FREEING %p", p);
+        // hdDebug ("FREEING %p", p);
         SDL_FreeSurface (p);
       } else {
         // hdDebugCall ("Not freeing %p", p);
@@ -130,8 +130,8 @@ namespace hd::sdl {
 
   bool
   Surface::BlitFrom (SDL_Surface *aOther,
-                           SDL_Rect& aDstRect,
-                           const SDL_Rect& aSrcRect) const
+                     SDL_Rect &aDstRect,
+                     const SDL_Rect &aSrcRect) const
   {
     return BlitFrom (aOther, &aDstRect, &aSrcRect);
   }
@@ -153,8 +153,8 @@ namespace hd::sdl {
   }
   bool
   Surface::BlitScaledFrom (SDL_Surface *aOther,
-                           SDL_Rect& aDstRect,
-                           const SDL_Rect& aSrcRect) const
+                           SDL_Rect &aDstRect,
+                           const SDL_Rect &aSrcRect) const
   {
     return BlitScaledFrom (aOther, &aDstRect, &aSrcRect);
   }
@@ -175,7 +175,66 @@ namespace hd::sdl {
     SDL_PixelFormat *format = ptr->format;
     return SDL_MapRGBA (format, r, g, b, a);
   }
-  Uint32 Surface::MapRGBA(SDL_Color c) const {
+  Uint32
+  Surface::MapRGBA (SDL_Color c) const
+  {
     return MapRGBA (c.r, c.g, c.b, c.a);
+  }
+
+  SDL_Rect
+  Surface::GetClip ()
+  {
+    assert (*this);
+    SDL_Rect r;
+    SDL_GetClipRect (*this, &r);
+    return r;
+  }
+
+  bool
+  Surface::SetClip (SDL_Rect r)
+  {
+    assert (*this);
+    return SDL_SetClipRect (*this, &r) == SDL_TRUE;
+  }
+
+  bool
+  Surface::SetColorKey (int flags, Uint32 color)
+  {
+    hdSdlErrorIf (SDL_SetColorKey (*this, flags, color) != 0,
+                  "Unable to set surface color key...");
+    return true;
+  };
+
+  bool
+  Surface::SetColorKey(SDL_Color clr){
+    return SetColorKey (SDL_ENABLE, MapRGBA (clr));
+  }
+
+  Uint32
+  Surface::GetColorKey ()
+  {
+    Uint32 key;
+    int result = SDL_GetColorKey (*this, &key);
+    hdSdlErrorIf (result < -1, "Unable to get color key...");
+    if (result == -1) {
+      return 0;
+    } else {
+      return key;
+    }
+  }
+  bool Surface::IsColorKeyed(){
+    Uint32 unused_key;
+    int result = SDL_GetColorKey (*this, &unused_key);
+    if(result == 0){
+      return true;
+    } else if (result == -1){
+      return false;
+    } else {
+      hdErrorIf (result < -1, "Error checking if surface is color keyed.");
+    }
+    return false;
+  }
+  bool Surface::DisableColorKey(){
+    return SDL_SetColorKey (*this, SDL_DISABLE, 0)==0;
   }
 }
