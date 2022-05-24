@@ -78,9 +78,9 @@ main (int argc, char **argv)
     // Check that it was loaded
     if (!newFont) {                               // If not
       winCtl->window.SetTitle ("Unable to open"); // Tell the user
-      hdError ("drop file Failed:", e.drop.file);
+      hdError ("drop file Failed: %s", e.drop.file);
     } else {
-      hdDebug ("drop file:", e.drop.file);        // Otherwise
+      hdDebug ("drop file: %s", e.drop.file);        // Otherwise
       winCtl->window.SetTitle (e.drop.file);      // Tell the user
       txtCtl->font = newFont;                     // and start using it.
     }
