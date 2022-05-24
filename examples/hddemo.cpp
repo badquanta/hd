@@ -108,7 +108,7 @@ main (int argc, char **argv)
   window = hd::sdl::Window::Create (hd::Engine::GetProgramName ());
   glCtx = hd::sdl::GLContext::Create (window);
   window.Event ().On (camera.input.pipe);
-  window.Event().Close.Void.Once ([] () {
+  window.Event().window.close.Void.Once ([] () {
     hd::Engine::Get ()->step.Void.Once ([] () { window = NULL; });
   });
   window.engine->step.Void.Once ([] () {

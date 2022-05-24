@@ -7,7 +7,7 @@ TEST (keycode, getsCalled)
 {
   testing::MockFunction<void (const SDL_Event &e)> test;
   hd::sdl::EngineDispatch list;
-  list.Windows[123].Key.Keycode[SDLK_0].On(test.AsStdFunction());
+  list.windows[123].key.keycode[SDLK_0].On(test.AsStdFunction());
 
   SDL_Event e;
   e.type = SDL_KEYDOWN;

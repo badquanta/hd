@@ -96,13 +96,13 @@ main (int argc, char **argv)
     glDrawElements (GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
     window.Swap ();
   });
-  window.Event().Close.Void.On ([&window] () {
+  window.Event().window.close.Void.On ([&window] () {
     window.engine->step.Once ([&window] (int) { window = NULL; });
   });
 
   sdl::Window win2 = sdl::Window::Create (320, 200, "HD2");
   sdl::GLContext win2gl = sdl::GLContext::Create (win2);
-  win2.Event ().Close.Void.On (
+  win2.Event ().window.close.Void.On (
       [&win2] () { win2.engine->step.Once ([&win2] (int) { win2 = NULL; }); });
   win2.engine->output.On ([&] (int aTime) {
     win2.MakeCurrent (win2gl);

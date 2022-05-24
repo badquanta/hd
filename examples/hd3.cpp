@@ -69,7 +69,7 @@ main (int argc, char **argv)
     glDrawElements (GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
     window.Swap ();
   });
-  window.Event().Close.Void.On ([&window] () {
+  window.Event().window.close.Void.On ([&window] () {
     hd::Engine::Get ()->step.Once ([&window] (int) { window = NULL; });
   });
 

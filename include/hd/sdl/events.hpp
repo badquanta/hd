@@ -259,9 +259,7 @@ namespace hd::sdl {
   public:
     JoyWhichHatDispatch ();
   };
-  /** @brief the different events a joystick can have.
-   *
-   */
+  /** @brief the different events a joystick can have. */
   class JoyDispatch : public EventTypeDispatch {
   public:
     JoyWhichAxisDispatch axis;
@@ -272,7 +270,6 @@ namespace hd::sdl {
     JoyDispatch ();
   };
   /** @brief Dispatch joystick events by their ID to the specific ID handler.
-   *
    */
   class WhichJoyDispatch
       : public AbstractFieldDispatch<SDL_JoystickID, JoyDispatch> {
@@ -296,8 +293,13 @@ namespace hd::sdl {
   public:
     GameControllerWhichAxisDispatch ();
   };
+  class GameControllerButtonDispatch : public EventTypeDispatch {
+  public:
+    EventDispatch &up, &down;
+    GameControllerButtonDispatch ();
+  };
   class GameControllerWhichButtonDispatch
-      : public AbstractFieldDispatch<Uint8> {
+      : public AbstractFieldDispatch<Uint8, GameControllerButtonDispatch> {
   public:
     GameControllerWhichButtonDispatch ();
   };
@@ -312,7 +314,6 @@ namespace hd::sdl {
     GameControllerWhichSensorDispatch ();
   };
   /** @brief Dispatch various events for a controller to specialized handlers.
-   *
    */
   class GameControllerDispatch : public EventTypeDispatch {
   public:
@@ -346,8 +347,8 @@ namespace hd::sdl {
    */
   class EngineDispatch : public EventTypeDispatch {
   public:
-    EventDispatch quit, app, sysWm, finger, dollar, clipboard, audio, render,
-        user, keymap, sensor;
+    EventDispatch &quit, app, &localChanged, &sysWm, finger, dollar, &clipboard, audio, render,
+        &user, &keymap, &sensor;
     WhichWindowDispatch windows;
     AllJoyDispatch joysticks;
     WhichGameControllerDispatch controllers;
