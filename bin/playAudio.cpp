@@ -58,7 +58,7 @@ main (int argc, char **argv)
   window = Window::Create (800, 600, "play some audio");
   glContext = GLContext::Create (window);
   window.engine->output.Void.On (&doWindowOutput);
-  window.Event ().Close.Void.On (&doWindowClosed);
+  window.Event ().window.close.Void.On (&doWindowClosed);
 
   MixerChunk horrorAmbient = MixerChunk::Load ("audio/horror ambient.ogg");
   if (!horrorAmbient) {
@@ -67,9 +67,9 @@ main (int argc, char **argv)
   }
   MixerChannel defaultChannel = -1, s_Channel;
 
-  window.Event ().Key.Keycode[SDLK_s].up.Void.On (
+  window.Event ().key.keycode[SDLK_s].up.Void.On (
       [&] () { s_Channel = horrorAmbient.Play (-1); });
-  window.Event ().Key.Keycode[SDLK_m].up.Void.On (
+  window.Event ().key.keycode[SDLK_m].up.Void.On (
       [&] () { defaultChannel.FadeOut (100); });
 
   window.engine->Delay (5000, [&horrorAmbient] (int) {

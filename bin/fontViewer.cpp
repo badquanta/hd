@@ -72,30 +72,30 @@ main (int argc, char **argv)
   auto txtCtl = std::make_shared<UiViewText> (
       font, "Font viewer.", SDL_Color{ 0, 0, 0, 255 });
   // We connect a sdl::Event::Handler to the SDL_DROPFILE event
-  winCtl->event.Drop.File.On ([&] (const SDL_Event &e) {
+  winCtl->event.drop.file.On ([&] (const SDL_Event &e) {
     // Try to load the font
     sdl::Font newFont = sdl::Font::Load (e.drop.file, 16);
     // Check that it was loaded
     if (!newFont) {                               // If not
       winCtl->window.SetTitle ("Unable to open"); // Tell the user
-      hdError ("Drop File Failed:", e.drop.file);
+      hdError ("drop file Failed:", e.drop.file);
     } else {
-      hdDebug ("Drop File:", e.drop.file);        // Otherwise
+      hdDebug ("drop file:", e.drop.file);        // Otherwise
       winCtl->window.SetTitle (e.drop.file);      // Tell the user
       txtCtl->font = newFont;                     // and start using it.
     }
     // Per the SDL docs on the event
     SDL_free (e.drop.file);
   });
-  winCtl->event.Drop.Begin.Void.On ([&] () { txtCtl->text = ""; });
+  winCtl->event.drop.begin.Void.On ([&] () { txtCtl->text = ""; });
   // We also connect to the SDL_DROPTEXT event
-  winCtl->event.Drop.Text.On ([&] (const SDL_Event &e) {
+  winCtl->event.drop.text.On ([&] (const SDL_Event &e) {
     txtCtl->text += e.drop.file; // So that the user can provide sample text.
     txtCtl->text += "\n";
     printf ("DROP TEXT: %s\n", e.drop.file);
     SDL_free (e.drop.file);
   });
-  winCtl->event.Drop.Complete.Void.On ([&] () {
+  winCtl->event.drop.complete.Void.On ([&] () {
     clrCtl->color = { 128, 128, 128, 255 };
   });
   auto font2 = sdl::Font::Load ("ttf/LinLib/LinBiolinum_Rah.ttf", 24);

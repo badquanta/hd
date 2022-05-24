@@ -24,7 +24,7 @@
  *
  */
 #include "hd/sdl/events.hpp"
-/** # Event grouping
+/** ###### Event grouping
  * hd groups events into common dispatchers so that one can listen to all that
  * group at once.**/
 namespace hd::sdl {
@@ -128,28 +128,9 @@ namespace hd::sdl {
       DropEvents = { HD_DROP_EVENTS }
 
   ;
-  std::list<indirect_extractor<Uint32, SDL_EventType> > MouseIdExtractorMap{
-    { MouseButtonEvents, [] (const SDL_Event &e) { return e.button.which; } },
-    { { SDL_MOUSEMOTION },
-      [] (const SDL_Event &e) { return e.motion.which; } },
-    { { SDL_MOUSEWHEEL }, [] (const SDL_Event &e) { return e.wheel.which; } }
-  };
-  std::list<indirect_extractor<Uint32, SDL_EventType> > WindowIdExtractorMap{
-    { { SDL_WINDOWEVENT },
-      [] (const SDL_Event &e) { return e.window.windowID; } },
-    { KeyEvents, [] (const SDL_Event &e) { return e.key.windowID; } },
-    { { SDL_TEXTEDITING },
-      [] (const SDL_Event &e) { return e.edit.windowID; } },
-    { { SDL_TEXTINPUT }, [] (const SDL_Event &e) { return e.text.windowID; } },
-    { { SDL_MOUSEMOTION },
-      [] (const SDL_Event &e) { return e.motion.windowID; } },
-    { { SDL_MOUSEWHEEL },
-      [] (const SDL_Event &e) { return e.wheel.windowID; } },
-    { MouseButtonEvents,
-      [] (const SDL_Event &e) { return e.button.windowID; } }
-  };
+
 }
-/** # Event Type Dispatch
+/** ######## Event Type Dispatch
  * Often what is required is the categorization of events into dispatchers of
  *those types.
  ***/
@@ -160,7 +141,7 @@ namespace hd::sdl {
   {
   }
 }
-/** #### Key / Keyboard events
+/** ########## Key / Keyboard events
  *  - KeyDispatch: up, down
  *  - ScancodeDispatch: each scancode -> up/down
  *  - KeycodeDispatch: each keycode -> up/down
@@ -194,7 +175,7 @@ namespace hd::sdl {
     scancode.Trigger (e);
   }
 }
-/** #### Text, & Drop Implementation
+/** ########## Text, & Drop Implementation
  * - TextDispatch
  * - DropDispatch
  **/
@@ -211,7 +192,7 @@ namespace hd::sdl {
   {
   }
 }
-/** #### Mouse Dispatch Implementation
+/** ########## Mouse Dispatch Implementation
  * - MouseButtonDispatch groups up & down events.
  * - MouseWhichButtonDispatch
  * - MouseDispatch groups up/down, motion, wheel events.
@@ -239,19 +220,24 @@ namespace hd::sdl {
    */
   WhichMouseDispatch::WhichMouseDispatch ()
       : AbstractFieldDispatch (IndirectExtractor<Uint32, SDL_EventType> (
-          MouseIdExtractorMap,
+          { { MouseButtonEvents,
+              [] (const SDL_Event &e) { return e.button.which; } },
+            { { SDL_MOUSEMOTION },
+              [] (const SDL_Event &e) { return e.motion.which; } },
+            { { SDL_MOUSEWHEEL },
+              [] (const SDL_Event &e) { return e.wheel.which; } } },
           [] (const SDL_Event &e) { return (SDL_EventType)e.type; }))
   {
   }
 }
-/** #### Window Dispatch Implementation
+/** ########## Window Dispatch Implementation
  * - WindowEventTypeDispatch
  * - WindowDispatch this dispatches all the events that report a"windowID"...
  * @todo
  *  - WhichWindowDispatch: e.<something>.windowID
  ***/
 namespace hd::sdl {
-  /**  **/
+  /** Set up dispatching to named references of SDL_WINDOWEVENT_* **/
   WindowEventTypeDispatch::WindowEventTypeDispatch ()
       : AbstractFieldDispatch (
           [] (const SDL_Event &e) { return e.window.event; }),
@@ -287,15 +273,26 @@ namespace hd::sdl {
   /** **/
   WhichWindowDispatch::WhichWindowDispatch ()
       : AbstractFieldDispatch (IndirectExtractor<Uint32, SDL_EventType> (
-          WindowIdExtractorMap,
+          { { { SDL_WINDOWEVENT },
+              [] (const SDL_Event &e) { return e.window.windowID; } },
+            { KeyEvents, [] (const SDL_Event &e) { return e.key.windowID; } },
+            { { SDL_TEXTEDITING },
+              [] (const SDL_Event &e) { return e.edit.windowID; } },
+            { { SDL_TEXTINPUT },
+              [] (const SDL_Event &e) { return e.text.windowID; } },
+            { { SDL_MOUSEMOTION },
+              [] (const SDL_Event &e) { return e.motion.windowID; } },
+            { { SDL_MOUSEWHEEL },
+              [] (const SDL_Event &e) { return e.wheel.windowID; } },
+            { MouseButtonEvents,
+              [] (const SDL_Event &e) { return e.button.windowID; } } },
           [] (const SDL_Event &e) { return (SDL_EventType)e.type; }))
 
   {
     /** @todo key dispatch once & filters **/
   }
 }
-
-/** #### Joystick Dispatch Implementation */
+/** ########## Joystick Dispatch Implementation */
 namespace hd::sdl {
   JoyWhichAxisDispatch::JoyWhichAxisDispatch ()
       : AbstractFieldDispatch (
@@ -344,120 +341,117 @@ namespace hd::sdl {
   }
 
   /** **/
-  AllJoyDispatch::AllJoyDispatch ()
-  {
-    On (JoyIdEvents, stick.pipe);
-  }
+  AllJoyDispatch::AllJoyDispatch () { On (JoyIdEvents, stick.pipe); }
 }
-/** #### Controller Dispatch Implementation */
+/** ########## Controller Dispatch Implementation */
 namespace hd::sdl {
-  WhichGameControllerDispatch::WhichGameControllerDispatch
-  AllGameControllerDispatch::AllGameControllerDispatch(){
-    On (GameControllerEvents, controller.bind);
+  /** set up dispatching on `e.cbutton.button`  */
+  GameControllerWhichButtonDispatch::GameControllerWhichButtonDispatch ()
+      : AbstractFieldDispatch (
+          [] (const SDL_Event &e) { return e.cbutton.button; })
+  {
+  }
+  /** set up dispatching on `e.caxis.axis`  */
+  GameControllerWhichAxisDispatch::GameControllerWhichAxisDispatch ()
+      : AbstractFieldDispatch (
+          [] (const SDL_Event &e) { return e.caxis.axis; })
+  {
+  }
+  /** set up dispatching on `e.ctouchpad.touchpad` */
+  GameControllerWhichTouchpadDispatch::GameControllerWhichTouchpadDispatch ()
+      : AbstractFieldDispatch (
+          [] (const SDL_Event &e) { return e.ctouchpad.touchpad; })
+  {
+  }
+  /** set up dispatching on `e.csensor.sensor` */
+  GameControllerWhichSensorDispatch::GameControllerWhichSensorDispatch ()
+      : AbstractFieldDispatch (
+          [] (const SDL_Event &e) { return e.csensor.sensor; })
+  {
+  }
+  /** set up dispatching on the right `which` value for these events:
+   * #. SDL_CONTROLLERAXISMOTION
+   * #. GameControllerDeviceEvents (added,removed,remapped)
+   * #. GameControllerButtonEvents (up, down)
+   * #. GameControllerTouchpadEvents ()
+   * #.
+   */
+  WhichGameControllerDispatch::WhichGameControllerDispatch ()
+      : AbstractFieldDispatch (
+          IndirectExtractor<SDL_JoystickID, SDL_EventType> (
+              { { { SDL_CONTROLLERAXISMOTION },
+                  [] (const SDL_Event &e) { return e.caxis.which; } },
+                { GameControllerDeviceEvents,
+                  [] (const SDL_Event &e) { return e.cdevice.which; } },
+                { GameControllerButtonEvents,
+                  [] (const SDL_Event &e) { return e.cbutton.which; } },
+                { GameControllerTouchpadEvents,
+                  [] (const SDL_Event &e) { return e.ctouchpad.which; } },
+                { { SDL_CONTROLLERSENSORUPDATE },
+                  [] (const SDL_Event &e) { return e.csensor.which; } } },
+              [] (const SDL_Event &e) { return (SDL_EventType)e.type; }))
+  {
+  }
+  GameControllerDispatch::GameControllerDispatch ()
+      : added ((*this)[SDL_CONTROLLERDEVICEADDED]),
+        removed ((*this)[SDL_CONTROLLERDEVICEREMOVED]),
+        remapped ((*this)[SDL_CONTROLLERDEVICEREMAPPED])
+  {
+    On (SDL_CONTROLLERAXISMOTION, axis.pipe);
+    On (SDL_CONTROLLERSENSORUPDATE, sensor.pipe);
+    On (GameControllerButtonEvents, button.pipe);
+    On (GameControllerTouchpadEvents, touchpad.pipe);
+  }
+  AllGameControllerDispatch::AllGameControllerDispatch ()
+  {
+    On (GameControllerEvents, controller.pipe);
   }
 }
-/** #### hd::sdl::EngineDispatch
+/** ########## hd::sdl::EngineDispatch
  * @todo rename to "root" or something?
  **/
 namespace hd::sdl {
+
+#define HD_APP_EVENTS                                                         \
+  SDL_APP_TERMINATING, SDL_APP_LOWMEMORY, SDL_APP_WILLENTERBACKGROUND,        \
+      SDL_APP_DIDENTERBACKGROUND, SDL_APP_WILLENTERFOREGROUND,                \
+      SDL_APP_DIDENTERFOREGROUND
+
+#define HD_WINDOWID_EVENTS                                                    \
+  SDL_WINDOWEVENT, SDL_KEYDOWN, SDL_KEYUP, SDL_TEXTEDITING, SDL_TEXTINPUT,    \
+      SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP,                \
+      SDL_MOUSEWHEEL, SDL_DROPFILE, SDL_DROPTEXT, SDL_DROPBEGIN,              \
+      SDL_DROPCOMPLETE
+
+#define HD_FINGER_EVENTS SDL_FINGERDOWN, SDL_FINGERUP, SDL_FINGERMOTION
+
+#define HD_DOLLAR_EVENTS SDL_DOLLARGESTURE, SDL_DOLLARRECORD, SDL_MULTIGESTURE
+
+#define HD_RENDER_EVENTS SDL_RENDER_TARGETS_RESET, SDL_RENDER_DEVICE_RESET
+
   EngineDispatch::EngineDispatch ()
+      : quit ((*this)[SDL_QUIT]),
+        localChanged ((*this)[SDL_LOCALECHANGED]),
+        clipboard ((*this)[SDL_CLIPBOARDUPDATE]),
+        user((*this)[SDL_USEREVENT]),
+        keymap((*this)[SDL_KEYMAPCHANGED]),
+        sensor((*this)[SDL_SENSORUPDATE]),
+        sysWm((*this)[SDL_SYSWMEVENT])
   {
-    On (SDL_QUIT, // user-requested quit; see Remarks for details
-        quit.pipe);
-    On (
-        {
-            SDL_APP_TERMINATING,         // OS is terminating the application
-            SDL_APP_LOWMEMORY,           // OS is low on memory; free some
-            SDL_APP_WILLENTERBACKGROUND, // application is entering
-                                         // background
-            SDL_APP_DIDENTERBACKGROUND,  // application entered background
-            SDL_APP_WILLENTERFOREGROUND, // application is entering
-                                         // foreground
-            SDL_APP_DIDENTERFOREGROUND,  // application entered foreground
-        },
-        app.pipe);
+    On ({ HD_APP_EVENTS }, app.pipe);
     On (SDL_SYSWMEVENT, // system specific event
         sysWm.pipe);
     On (SDL_KEYMAPCHANGED, // keymap changed due to a system event such as an
                            // input language or keyboard layout change (>=
                            // SDL 2.0.4)
         keymap.pipe);
-    On (
-        {
-            //                   // All events with a Window ID
-            SDL_WINDOWEVENT,     // window state change
-            SDL_KEYDOWN,         // key pressed
-            SDL_KEYUP,           // key released
-            SDL_TEXTEDITING,     // keyboard text editing (composition)
-            SDL_TEXTINPUT,       // keyboard text input
-            SDL_MOUSEMOTION,     // mouse moved
-            SDL_MOUSEBUTTONDOWN, // mouse button pressed
-            SDL_MOUSEBUTTONUP,   // mouse button released
-            SDL_MOUSEWHEEL,      // mouse wheel motion
-            SDL_DROPFILE,        // the system requests a file open
-            SDL_DROPTEXT,        // text/plain drag-and-drop event
-            SDL_DROPBEGIN,    // a new set of drops is beginning (>= SDL 2.0.5)
-                              // .
-            SDL_DROPCOMPLETE, // current set of drops is
-                              // now complete (>= SDL 2.0.5) or higher
-        },
-        windows.pipe);
-    On (
-        {
-            SDL_JOYAXISMOTION,    // joystick axis motion
-            SDL_JOYBALLMOTION,    // joystick trackball motion
-            SDL_JOYHATMOTION,     // joystick hat position change
-            SDL_JOYBUTTONDOWN,    // joystick button pressed
-            SDL_JOYBUTTONUP,      // joystick button released
-            SDL_JOYDEVICEADDED,   // joystick connected
-            SDL_JOYDEVICEREMOVED, // joystick disconnected
-        },
-        joysticks.pipe);
-    On (
-        {
-            SDL_CONTROLLERAXISMOTION,     // controller axis motion
-            SDL_CONTROLLERBUTTONDOWN,     // controller button pressed
-            SDL_CONTROLLERBUTTONUP,       // controller button released
-            SDL_CONTROLLERDEVICEADDED,    // controller connected
-            SDL_CONTROLLERDEVICEREMOVED,  // controller disconnected
-            SDL_CONTROLLERDEVICEREMAPPED, // controller mapping updated
-        },
-        controllers.pipe);
-    On (
-        {
-            SDL_FINGERDOWN,   // user has touched input device
-            SDL_FINGERUP,     // user stopped touching input device
-            SDL_FINGERMOTION, // user is dragging finger on input device
-        },
-        finger.pipe);
-    On (
-        {
-            SDL_DOLLARGESTURE, //
-            SDL_DOLLARRECORD,  //
-            SDL_MULTIGESTURE,  //
-        },
-        dollar.pipe);
-    On (SDL_CLIPBOARDUPDATE, // the clipboard changed
-        clipboard.pipe);
-    On (
-        {
-            SDL_AUDIODEVICEADDED,   // a new audio device is available (>=
-                                    // SDL 2.0.4)
-            SDL_AUDIODEVICEREMOVED, // an audio device has been removed (>=
-                                    // SDL 2.0.4)
-        },
-        audio.pipe);
-    On (
-        {
-            SDL_RENDER_TARGETS_RESET, // the render targets have been reset
-                                      // and
-            // their contents need to be updated (>=
-            // SDL 2.0.2)
-            SDL_RENDER_DEVICE_RESET, // the device has been reset and all
-                                     // textures
-                                     // need to be recreated (>= SDL 2.0.4)
-        },
-        render.pipe);
+    On ({ HD_WINDOWID_EVENTS }, windows.pipe);
+    On (JoyEvents, joysticks.pipe);
+    On (GameControllerEvents, controllers.pipe);
+    On ({ HD_FINGER_EVENTS }, finger.pipe);
+    On ({ HD_DOLLAR_EVENTS }, dollar.pipe);
+    On (AudioDeviceEvents, audio.pipe);
+    On ({ HD_RENDER_EVENTS }, render.pipe);
     On (SDL_USEREVENT, // These are for your use, and should be allocated
                        // with SDL_RegisterEvents()
         user.pipe);
@@ -465,7 +459,7 @@ namespace hd::sdl {
     // hdError ("Unknown Event type %d\n", e.type);
   }
 }
-/** ## hd::sdl::events
+/** ######## hd::sdl::events
  *
  * @code hd::sdl::events.Close.On([](const SDL_Event&e){\/* your handler
  * *\/});

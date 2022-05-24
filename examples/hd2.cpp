@@ -47,7 +47,7 @@ main (int argc, char **argv)
     glClear (GL_COLOR_BUFFER_BIT);
     window.Swap ();
   });
-  window.Event().Close.Void.On ([&] () {
+  window.Event().window.close.Void.On ([&] () {
     hd::Engine::Get()->step.Once( [&](int){
       window = NULL;
     });

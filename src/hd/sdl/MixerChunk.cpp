@@ -38,7 +38,7 @@ namespace hd::sdl {
     Mix_Chunk *chunk = Mix_LoadWAV (realPath.generic_string ().c_str ());
     if (chunk == NULL) {
       hdError ("Unable to load MixerChunk from path '%s' because: %s",
-               aFile,
+               aFile.c_str(),
                Mix_GetError ());
     }
     return MixerChunk (s_ptr (chunk, Mix_FreeChunk));

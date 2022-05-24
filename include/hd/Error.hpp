@@ -56,7 +56,7 @@
     fprintf (stderr, "%s:%d\t+++\tSDL ERROR\t+++\n\t", __FILE__, __LINE__);   \
     fprintf (stderr, ERROR_MESSAGE, ##__VA_ARGS__);                           \
     hdError ("\t\tSDL Error: %s", SDL_GetError ());                           \
-    throw ERROR_MESSAGE;                                                      \
+    assert(!(CONDITION));                                                     \
   }
 
 /** End of file stub. **/
